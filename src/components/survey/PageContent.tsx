@@ -20,12 +20,12 @@ export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => 
 
   if (!currentPage) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center">
-        <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-          <FileText className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+      <div className="h-[60vh] flex flex-col items-center justify-center p-4 sm:p-8 text-center">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 dark:text-gray-500" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No Page Selected</h2>
-        <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No Page Selected</h2>
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 max-w-sm">
           Select a page from the sidebar or create a new one to start building your survey.
         </p>
       </div>
@@ -33,19 +33,19 @@ export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => 
   }
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
         <div className="flex items-center gap-3">
           {currentPage.pageType === 'survey' ? (
-            <FileText className="h-6 w-6 text-gray-400 dark:text-gray-500" />
+            <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-500" />
           ) : (
-            <Info className="h-6 w-6 text-gray-400 dark:text-gray-500" />
+            <Info className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-500" />
           )}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
               {currentPage.title}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               {currentPage.pageType === 'survey'
                 ? `${currentPage.questions.length} question${currentPage.questions.length !== 1 ? 's' : ''}`
                 : 'Information page'
@@ -54,38 +54,38 @@ export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => 
           </div>
         </div>
 
-        <div className="flex items-center gap-3 self-stretch sm:self-auto">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <button
             onClick={onEditPage}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
           >
-            <Pencil className="h-4 w-4" />
+            <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Edit Page
           </button>
           <button
             onClick={handleDeletePage}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-red-200 dark:border-red-800/30 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-red-200 dark:border-red-800/30 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors text-sm"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Delete
           </button>
         </div>
       </div>
 
       {currentPage.pageType === 'info' ? (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-6">
           {currentPage.contextElements && currentPage.contextElements.length > 0 ? (
             <ContextElements elements={currentPage.contextElements} />
           ) : (
-            <div className="text-center py-8">
-              <Info className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
-              <p className="text-gray-500 dark:text-gray-400">No content added to this information page yet.</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Click the "Edit Page" button to add content.</p>
+            <div className="text-center py-6 sm:py-8">
+              <Info className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-400 dark:text-gray-500" />
+              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">No content added to this information page yet.</p>
+              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click the "Edit Page" button to add content.</p>
             </div>
           )}
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {currentPage.questions.map((question, index) => (
             <Question
               key={index}
@@ -98,18 +98,18 @@ export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => 
           ))}
 
           {currentPage.questions.length === 0 && (
-            <div className="text-center py-12 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
-              <p className="text-gray-500 dark:text-gray-400">No questions added to this survey page yet.</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Click the button below to add your first question.</p>
+            <div className="text-center py-8 sm:py-12 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+              <FileText className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-400 dark:text-gray-500" />
+              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">No questions added to this survey page yet.</p>
+              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click the button below to add your first question.</p>
             </div>
           )}
 
           <button
             onClick={onAddQuestion}
-            className="mt-8 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium transition-colors"
+            className="mt-6 sm:mt-8 w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:py-3 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium transition-colors text-sm"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Add Question
           </button>
         </div>
