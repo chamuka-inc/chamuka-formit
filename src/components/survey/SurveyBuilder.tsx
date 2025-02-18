@@ -73,20 +73,19 @@ const SurveyBuilderContent = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      {/* Enhanced Header */}
-      <header className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500"></div>
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
-        <div className="relative z-10 px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Layout className="h-8 w-8 sm:h-10 sm:w-10 text-white opacity-90" />
+      {/* Lean Header */}
+      <header className="relative bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+        <div className="relative z-10 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Layout className="h-5 w-5 sm:h-6 sm:w-6 text-white/90" />
+              <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-white">
+                Survey Builder
+              </h1>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
-              Survey Builder
-            </h1>
-            <p className="mx-auto mt-3 max-w-md text-sm sm:text-base text-gray-100 md:mt-5 md:max-w-3xl">
-              Create beautiful, interactive surveys with our modern builder
+            <p className="text-xs sm:text-sm text-white/80">
+              {pages.length} page{pages.length !== 1 ? 's' : ''} created
             </p>
           </div>
         </div>
