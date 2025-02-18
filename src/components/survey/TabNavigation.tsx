@@ -1,5 +1,7 @@
 "use client";
 
+import { PencilRuler, Eye } from 'lucide-react';
+
 interface TabNavigationProps {
   activeTab: 'builder' | 'preview';
   onTabChange: (tab: 'builder' | 'preview') => void;
@@ -7,37 +9,35 @@ interface TabNavigationProps {
 
 export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) => {
   return (
-    <div className="mb-8 border-b border-gray-300 dark:border-gray-700">
-      <ul className="flex space-x-4 sm:space-x-8">
-        <li>
-          <button
-            onClick={() => onTabChange('builder')}
-            className={`
-              py-3 px-4 sm:py-4 sm:px-8 font-semibold rounded-t-xl transition-all
-              ${activeTab === 'builder'
-                ? 'bg-white dark:bg-gray-800 text-blue-500 shadow'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
-              }
-            `}
-          >
-            Builder
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => onTabChange('preview')}
-            className={`
-              py-3 px-4 sm:py-4 sm:px-8 font-semibold rounded-t-xl transition-all
-              ${activeTab === 'preview'
-                ? 'bg-white dark:bg-gray-800 text-blue-500 shadow'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
-              }
-            `}
-          >
-            Preview
-          </button>
-        </li>
-      </ul>
+    <div className="mb-8">
+      <div className="inline-flex p-1 rounded-xl bg-gray-100 dark:bg-gray-700/50 backdrop-blur-sm">
+        <button
+          onClick={() => onTabChange('builder')}
+          className={`
+            flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200
+            ${activeTab === 'builder'
+              ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+              : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
+            }
+          `}
+        >
+          <PencilRuler className="h-4 w-4" />
+          Builder
+        </button>
+        <button
+          onClick={() => onTabChange('preview')}
+          className={`
+            flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200
+            ${activeTab === 'preview'
+              ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+              : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
+            }
+          `}
+        >
+          <Eye className="h-4 w-4" />
+          Preview
+        </button>
+      </div>
     </div>
   );
 }; 
