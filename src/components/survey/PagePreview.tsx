@@ -25,7 +25,7 @@ export const PagePreview = () => {
   const currentPage = pages[previewPageIndex];
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-0">
+    <div className="w-full">
       {/* Progress Bar */}
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2">
