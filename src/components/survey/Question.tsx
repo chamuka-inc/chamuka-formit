@@ -48,44 +48,44 @@ export const Question = ({
       }
       bg-white dark:bg-gray-800 shadow-sm hover:shadow-md
     `}>
-      <div className="p-6">
-        <div className="flex items-start gap-4">
+      <div className="p-4 sm:p-6">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div className={`
-            mt-1 p-2 rounded-lg
+            mt-1 p-1.5 sm:p-2 rounded-lg
             ${isBuilder
               ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
               : 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
             }
           `}>
-            <QuestionTypeIcon className="h-5 w-5" />
+            <QuestionTypeIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
 
           <div className="flex-1 min-w-0">
             {question.contextElements && question.contextElements.length > 0 && (
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <ContextElements elements={question.contextElements} />
               </div>
             )}
             
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
               {question.text}
             </h3>
 
             {question.type === 'text' && !isBuilder && (
               <input
                 type="text"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-shadow"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-shadow text-sm sm:text-base"
                 placeholder="Type your answer here..."
               />
             )}
 
             {(question.type === 'radio' || question.type === 'checkbox') && (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {question.options?.map((option, optionIndex) => (
                   <label
                     key={optionIndex}
                     className={`
-                      flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700
+                      flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg border border-gray-200 dark:border-gray-700
                       ${!isBuilder && 'cursor-pointer hover:border-blue-500 dark:hover:border-blue-400'}
                     `}
                   >
@@ -94,7 +94,7 @@ export const Question = ({
                       name={isBuilder ? undefined : question.text.replace(/\s/g, '')}
                       disabled={isBuilder}
                       className={`
-                        h-4 w-4 border-2 transition-colors
+                        h-3.5 w-3.5 sm:h-4 sm:w-4 border-2 transition-colors
                         ${question.type === 'radio'
                           ? 'rounded-full'
                           : 'rounded'
@@ -105,7 +105,7 @@ export const Question = ({
                         }
                       `}
                     />
-                    <span className="text-gray-700 dark:text-gray-300">{option}</span>
+                    <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300">{option}</span>
                   </label>
                 ))}
               </div>
@@ -115,20 +115,20 @@ export const Question = ({
       </div>
 
       {isBuilder && (
-        <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={handleEdit}
-            className="p-2 rounded-lg text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-1.5 sm:p-2 rounded-lg text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title="Edit question"
           >
-            <Pencil className="h-4 w-4" />
+            <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
           <button
             onClick={handleDelete}
-            className="p-2 rounded-lg text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-1.5 sm:p-2 rounded-lg text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title="Delete question"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
         </div>
       )}
