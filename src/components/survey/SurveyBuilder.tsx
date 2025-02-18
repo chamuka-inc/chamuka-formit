@@ -77,7 +77,7 @@ const SurveyBuilderContent = () => {
       <header className="relative bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         <div className="relative z-10 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl flex items-center justify-between">
+          <div className="mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Layout className="h-5 w-5 sm:h-6 sm:w-6 text-white/90" />
               <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-white">
