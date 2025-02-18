@@ -9,6 +9,7 @@ import { PagePreview } from './PagePreview';
 import { PageModal } from './PageModal';
 import { QuestionModal } from './QuestionModal';
 import { useSurveyContext } from '@/lib/context/SurveyContext';
+import { Layout } from 'lucide-react';
 
 const SurveyBuilderContent = () => {
   const [activeTab, setActiveTab] = useState<'builder' | 'preview'>('builder');
@@ -64,36 +65,51 @@ const SurveyBuilderContent = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <header className="relative overflow-hidden mb-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse-slow opacity-70"></div>
-        <div className="relative z-10 py-8">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-center text-white drop-shadow-sm transition-transform transform hover:scale-105">
-            Survey Builder
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      {/* Enhanced Header */}
+      <header className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500"></div>
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
+        <div className="relative z-10 px-4 py-12 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl text-center">
+            <div className="flex items-center justify-center mb-4">
+              <Layout className="h-10 w-10 text-white opacity-90" />
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
+              Survey Builder
+            </h1>
+            <p className="mx-auto mt-3 max-w-md text-base text-gray-100 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl">
+              Create beautiful, interactive surveys with our modern builder
+            </p>
+          </div>
         </div>
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
       </header>
 
-      {/* Tab Navigation */}
-      <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+      {/* Main Content with Enhanced Container */}
+      <main className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-8">
+        <div className="rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl">
+          <div className="p-6">
+            <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
 
-      {/* Main Content */}
-      <div className="mb-12">
-        {activeTab === 'builder' ? (
-          <div className="flex flex-col md:flex-row">
-            <PageListSidebar onAddPage={handleOpenPageModal} />
-            <div className="md:w-3/4">
-              <PageContent
-                onEditPage={handleOpenPageModal}
-                onAddQuestion={handleOpenQuestionModal}
-              />
+            <div className="mb-12">
+              {activeTab === 'builder' ? (
+                <div className="flex flex-col lg:flex-row gap-6">
+                  <PageListSidebar onAddPage={handleOpenPageModal} />
+                  <div className="lg:flex-1">
+                    <PageContent
+                      onEditPage={handleOpenPageModal}
+                      onAddQuestion={handleOpenQuestionModal}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <PagePreview />
+              )}
             </div>
           </div>
-        ) : (
-          <PagePreview />
-        )}
-      </div>
+        </div>
+      </main>
 
       {/* Modals */}
       <PageModal
