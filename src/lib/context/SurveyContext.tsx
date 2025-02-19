@@ -119,13 +119,19 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
   const setupSampleSurvey = () => {
     const samplePages: SurveyPage[] = [
       {
-        title: "Customer Satisfaction Survey - Page 1",
-        pageType: "survey",
+        title: "Welcome to Our Survey",
+        contextElements: [
+          { type: 'paragraph', content: 'Welcome to our survey! We value your input and feedback.' },
+          { type: 'image', content: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80' },
+          { type: 'paragraph', content: 'Please take a moment to share your thoughts with us.' }
+        ]
+      },
+      {
+        title: "Contact Information",
         questions: [
           {
             contextElements: [
-              { type: 'paragraph', content: 'We value your input! Please provide your contact information below.' },
-              { type: 'image', content: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80' }
+              { type: 'paragraph', content: 'Please provide your contact information below.' }
             ],
             type: "text",
             text: "What is your name?"
@@ -137,12 +143,32 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
         ]
       },
       {
-        title: "Information Page - About Us",
-        pageType: "info",
-        questions: [],
+        title: "Product Feedback",
         contextElements: [
-          { type: 'paragraph', content: 'Discover our journey. We are dedicated to innovation and excellence.' },
-          { type: 'image', content: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80' }
+          { type: 'paragraph', content: 'We would love to hear about your experience with our products.' }
+        ],
+        questions: [
+          {
+            type: "radio",
+            text: "How satisfied are you with our product?",
+            options: [
+              "Very satisfied",
+              "Satisfied",
+              "Neutral",
+              "Dissatisfied",
+              "Very dissatisfied"
+            ]
+          },
+          {
+            type: "checkbox",
+            text: "Which features do you use most? (Select all that apply)",
+            options: [
+              "Feature A",
+              "Feature B",
+              "Feature C",
+              "Feature D"
+            ]
+          }
         ]
       }
     ];

@@ -14,12 +14,9 @@ export interface Question {
   contextElements?: ContextElement[];
 }
 
-export type PageType = 'survey' | 'info';
-
 export interface SurveyPage {
   title: string;
-  pageType: PageType;
-  questions: Question[];
+  questions?: Question[];
   contextElements?: ContextElement[];
 }
 
