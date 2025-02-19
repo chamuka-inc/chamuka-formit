@@ -7,7 +7,7 @@ import { Pencil, Plus, Trash2, FileText, Info } from 'lucide-react';
 
 interface PageContentProps {
   onEditPage: () => void;
-  onAddQuestion: () => void;
+  onAddQuestion: (questionIndex?: number) => void;
 }
 
 export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => {
@@ -92,7 +92,7 @@ export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => 
               question={question}
               index={index}
               mode="builder"
-              onEdit={onAddQuestion}
+              onEdit={(index) => onAddQuestion(index)}
               onDelete={() => deleteQuestion(currentPageIndex, index)}
             />
           ))}
@@ -106,7 +106,7 @@ export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => 
           )}
 
           <button
-            onClick={onAddQuestion}
+            onClick={() => onAddQuestion()}
             className="mt-6 sm:mt-8 w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:py-3 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium transition-colors text-sm"
           >
             <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

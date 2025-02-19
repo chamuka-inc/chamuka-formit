@@ -19,3 +19,5 @@
 - Streamlined header design with improved layout, reduced vertical space, and better information hierarchy including page count display.
 - Implemented comprehensive theme system with light/dark mode support, including semantic color tokens, smooth transitions, and a theme toggle component.
 - Fixed "Add New Page" functionality to properly handle both adding new pages and editing existing pages by resetting currentPageIndex and improving the UI/UX of the page list sidebar.
+- Added question context support with paragraph, image, and video elements in the QuestionModal component, leveraging existing ContextElements component for display.
+- Fixed question editing functionality by improving type safety, properly handling question indices, and ensuring state updates are reflected in the builder view.
