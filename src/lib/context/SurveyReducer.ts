@@ -114,7 +114,7 @@ export function surveyReducer(state: SurveyState = initialState, action: SurveyA
         ...state,
         pages: state.pages.map((page, index) =>
           index === action.payload.pageIndex
-            ? { ...page, questions: [...(page.questions || []), action.payload.question] }
+            ? { ...page, questions: [...page.questions, action.payload.question] }
             : page
         ),
       };
@@ -127,10 +127,8 @@ export function surveyReducer(state: SurveyState = initialState, action: SurveyA
           index === action.payload.pageIndex
             ? {
                 ...page,
-                questions: (page.questions || []).map((q, qIndex) =>
-                  qIndex === action.payload.questionIndex
-                    ? action.payload.question
-                    : q
+                questions: page.questions.map((q, qIndex) =>
+                  qIndex === action.payload.questionIndex ? action.payload.question : q
                 ),
               }
             : page
@@ -145,9 +143,7 @@ export function surveyReducer(state: SurveyState = initialState, action: SurveyA
           index === action.payload.pageIndex
             ? {
                 ...page,
-                questions: (page.questions || []).filter(
-                  (_, qIndex) => qIndex !== action.payload.questionIndex
-                ),
+                questions: page.questions.filter((_, qIndex) => qIndex !== action.payload.questionIndex),
               }
             : page
         ),
