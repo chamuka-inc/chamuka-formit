@@ -27,6 +27,20 @@ export const PagePreview = () => {
   }
 
   const currentPage = pages[previewPageIndex];
+  
+  if (!currentPage) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center p-4 sm:p-8 text-center">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <Info className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 dark:text-gray-500" />
+        </div>
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Page Not Found</h2>
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 max-w-sm">
+          The selected page could not be found. Please try selecting a different page.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">

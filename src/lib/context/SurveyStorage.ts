@@ -43,6 +43,11 @@ export function createStorageManager(key: string, debounceMs = 1000): StorageMan
         previewPageIndex: 0,
         isLoading: false,
         error: null,
+        loadingStates: {
+          savingPage: false,
+          savingQuestion: false,
+          loadingSurvey: false
+        }
       };
     } catch (error) {
       console.error('Failed to load state from localStorage:', error);
