@@ -170,7 +170,7 @@ const SurveyBuilderContent = () => {
         isOpen={isQuestionModalOpen}
         onClose={handleCloseQuestionModal}
         currentQuestion={
-          currentQuestionIndex !== -1 && currentPageIndex !== -1
+          currentQuestionIndex !== -1 && currentPageIndex !== -1 && pages[currentPageIndex]?.questions?.[currentQuestionIndex]
             ? pages[currentPageIndex].questions[currentQuestionIndex]
             : undefined
         }

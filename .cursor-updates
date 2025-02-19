@@ -23,3 +23,4 @@
 - Fixed question editing functionality by improving type safety, properly handling question indices, and ensuring state updates are reflected in the builder view.
 - Improved state management with loading states, memoized selectors, error boundary, and performance optimizations while maintaining existing functionality.
 - Fixed PagePreview component to handle null currentPage case with a user-friendly error message.
+- Refactored survey pages to use a unified page type by removing the distinction between 'survey' and 'info' pages, making both questions and context elements optional

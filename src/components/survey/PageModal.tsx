@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { SurveyPage, ContextElement } from '@/lib/types';
 import { ContextElementEditor } from './ContextElementEditor';
-import { X, FileText, Info } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface PageModalProps {
   isOpen: boolean;
@@ -19,17 +19,14 @@ export const PageModal = ({
   onSave,
 }: PageModalProps) => {
   const [pageTitle, setPageTitle] = useState('');
-  const [pageType, setPageType] = useState<'survey' | 'info'>('survey');
   const [contextElements, setContextElements] = useState<ContextElement[]>([]);
 
   useEffect(() => {
     if (isOpen && currentPage) {
       setPageTitle(currentPage.title);
-      setPageType(currentPage.pageType);
       setContextElements(currentPage.contextElements || []);
     } else {
       setPageTitle('');
-      setPageType('survey');
       setContextElements([]);
     }
   }, [isOpen, currentPage]);
@@ -37,9 +34,8 @@ export const PageModal = ({
   const handleSave = () => {
     const newPage: SurveyPage = {
       title: pageTitle,
-      pageType: pageType,
       questions: currentPage?.questions || [],
-      contextElements: pageType === 'info' ? contextElements : undefined,
+      contextElements: contextElements.length > 0 ? contextElements : undefined,
     };
     onSave(newPage);
     onClose();
@@ -57,16 +53,9 @@ export const PageModal = ({
         <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-2xl">
           {/* Header */}
           <div className="relative px-8 py-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              {pageType === 'survey' ? (
-                <FileText className="h-6 w-6 text-blue-500 dark:text-blue-400" />
-              ) : (
-                <Info className="h-6 w-6 text-purple-500 dark:text-purple-400" />
-              )}
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {currentPage ? 'Edit Page' : 'Add Page'}
-              </h2>
-            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              {currentPage ? 'Edit Page' : 'Add Page'}
+            </h2>
             <button
               onClick={onClose}
               className="absolute right-6 top-6 p-2 rounded-full text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -92,70 +81,12 @@ export const PageModal = ({
                 />
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="page-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Page Type
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setPageType('survey')}
-                    className={`
-                      flex items-center gap-3 p-4 rounded-lg border-2 transition-all
-                      ${pageType === 'survey'
-                        ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-500/10'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'
-                      }
-                    `}
-                  >
-                    <FileText className={`h-5 w-5 ${
-                      pageType === 'survey'
-                        ? 'text-blue-500 dark:text-blue-400'
-                        : 'text-gray-400 dark:text-gray-500'
-                    }`} />
-                    <span className={`font-medium ${
-                      pageType === 'survey'
-                        ? 'text-blue-700 dark:text-blue-400'
-                        : 'text-gray-700 dark:text-gray-300'
-                    }`}>
-                      Survey Page
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPageType('info')}
-                    className={`
-                      flex items-center gap-3 p-4 rounded-lg border-2 transition-all
-                      ${pageType === 'info'
-                        ? 'border-purple-500 dark:border-purple-400 bg-purple-50 dark:bg-purple-500/10'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-400'
-                      }
-                    `}
-                  >
-                    <Info className={`h-5 w-5 ${
-                      pageType === 'info'
-                        ? 'text-purple-500 dark:text-purple-400'
-                        : 'text-gray-400 dark:text-gray-500'
-                    }`} />
-                    <span className={`font-medium ${
-                      pageType === 'info'
-                        ? 'text-purple-700 dark:text-purple-400'
-                        : 'text-gray-700 dark:text-gray-300'
-                    }`}>
-                      Info Page
-                    </span>
-                  </button>
-                </div>
+              <div className="pt-4">
+                <ContextElementEditor
+                  elements={contextElements}
+                  setElements={setContextElements}
+                />
               </div>
-
-              {pageType === 'info' && (
-                <div className="pt-4">
-                  <ContextElementEditor
-                    elements={contextElements}
-                    setElements={setContextElements}
-                  />
-                </div>
-              )}
             </div>
           </div>
 

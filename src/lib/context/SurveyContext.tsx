@@ -127,7 +127,6 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
     const samplePages: SurveyPage[] = [
       {
         title: "Customer Satisfaction Survey - Page 1",
-        pageType: "survey",
         questions: [
           {
             contextElements: [
@@ -145,7 +144,6 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
       },
       {
         title: "Information Page - About Us",
-        pageType: "info",
         questions: [],
         contextElements: [
           { type: 'paragraph', content: 'Discover our journey. We are dedicated to innovation and excellence.' },
