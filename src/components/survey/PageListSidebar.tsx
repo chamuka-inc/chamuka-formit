@@ -14,7 +14,13 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
     selectPage,
     movePageUp,
     movePageDown,
+    setCurrentPageIndex,
   } = useSurveyContext();
+
+  const handleAddPage = () => {
+    setCurrentPageIndex(-1); // Reset currentPageIndex to -1 when adding a new page
+    onAddPage();
+  };
 
   return (
     <div className="lg:w-80 flex-shrink-0">
@@ -26,6 +32,14 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             {pages.length} page{pages.length !== 1 ? 's' : ''} in total
           </p>
+
+          <button
+            onClick={handleAddPage}
+            className="w-full mb-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Add New Page
+          </button>
 
           <div className="space-y-2">
             {pages.map((page, index) => (
@@ -56,13 +70,13 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                       }`} />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className={`font-medium truncate ${
+                      <h3 className={`font-medium truncate ${
                         index === currentPageIndex
-                          ? 'text-blue-600 dark:text-blue-400'
-                          : 'text-gray-700 dark:text-gray-200'
+                          ? 'text-blue-700 dark:text-blue-400'
+                          : 'text-gray-900 dark:text-gray-100'
                       }`}>
-                        {page.title}
-                      </p>
+                        {page.title || 'Untitled Page'}
+                      </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {page.pageType === 'survey'
                           ? `${page.questions.length} question${page.questions.length !== 1 ? 's' : ''}`
@@ -71,51 +85,34 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                       </p>
                     </div>
                   </div>
+                </div>
 
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        movePageUp(index);
-                      }}
-                      disabled={index === 0}
-                      className={`p-1 rounded-md transition-colors ${
-                        index === 0
-                          ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-600'
-                      }`}
-                      title="Move Up"
-                    >
-                      <ArrowUp className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        movePageDown(index);
-                      }}
-                      disabled={index === pages.length - 1}
-                      className={`p-1 rounded-md transition-colors ${
-                        index === pages.length - 1
-                          ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-600'
-                      }`}
-                      title="Move Down"
-                    >
-                      <ArrowDown className="h-4 w-4" />
-                    </button>
-                  </div>
+                {/* Page Actions */}
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      movePageUp(index);
+                    }}
+                    className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    disabled={index === 0}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      movePageDown(index);
+                    }}
+                    className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    disabled={index === pages.length - 1}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
-
-          <button
-            onClick={onAddPage}
-            className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium px-4 py-2.5 rounded-lg transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Add New Page
-          </button>
         </div>
       </div>
     </div>
