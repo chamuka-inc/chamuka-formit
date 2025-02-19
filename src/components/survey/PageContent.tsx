@@ -3,7 +3,7 @@
 import { useSurveyContext } from '@/lib/context/SurveyContext';
 import { Question } from './Question';
 import { ContextElements } from './ContextElements';
-import { Pencil, Plus, Trash2, FileText, Info } from 'lucide-react';
+import { Pencil, Plus, Trash2, FileText } from 'lucide-react';
 
 interface PageContentProps {
   onEditPage: () => void;
@@ -41,19 +41,15 @@ export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => 
     <div className="p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
         <div className="flex items-center gap-3">
-          {currentPage.pageType === 'survey' ? (
-            <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-500" />
-          ) : (
-            <Info className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-500" />
-          )}
+          <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-500" />
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
               {currentPage.title}
             </h2>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              {currentPage.pageType === 'survey'
+              {currentPage.questions?.length
                 ? `${currentPage.questions.length} question${currentPage.questions.length !== 1 ? 's' : ''}`
-                : 'Information page'
+                : 'Content page'
               }
             </p>
           </div>
@@ -77,48 +73,40 @@ export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => 
         </div>
       </div>
 
-      {currentPage.pageType === 'info' ? (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-6">
-          {currentPage.contextElements && currentPage.contextElements.length > 0 ? (
+      <div className="space-y-4 sm:space-y-6">
+        {currentPage.contextElements && currentPage.contextElements.length > 0 && (
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-6">
             <ContextElements elements={currentPage.contextElements} />
-          ) : (
-            <div className="text-center py-6 sm:py-8">
-              <Info className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-400 dark:text-gray-500" />
-              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">No content added to this information page yet.</p>
-              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click the "Edit Page" button to add content.</p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-4 sm:space-y-6">
-          {currentPage.questions.map((question, index) => (
-            <Question
-              key={index}
-              question={question}
-              index={index}
-              mode="builder"
-              onEdit={(index) => onAddQuestion(index)}
-              onDelete={() => deleteQuestion(currentPageIndex, index)}
-            />
-          ))}
+          </div>
+        )}
 
-          {currentPage.questions.length === 0 && (
-            <div className="text-center py-8 sm:py-12 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <FileText className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-400 dark:text-gray-500" />
-              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">No questions added to this survey page yet.</p>
-              <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click the button below to add your first question.</p>
-            </div>
-          )}
+        {currentPage.questions?.map((question, index) => (
+          <Question
+            key={index}
+            question={question}
+            index={index}
+            mode="builder"
+            onEdit={(index) => onAddQuestion(index)}
+            onDelete={() => deleteQuestion(currentPageIndex, index)}
+          />
+        ))}
 
-          <button
-            onClick={() => onAddQuestion()}
-            className="mt-6 sm:mt-8 w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:py-3 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium transition-colors text-sm"
-          >
-            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            Add Question
-          </button>
-        </div>
-      )}
+        {(!currentPage.questions?.length && !currentPage.contextElements?.length) && (
+          <div className="text-center py-8 sm:py-12 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+            <FileText className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-400 dark:text-gray-500" />
+            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">No content added to this page yet.</p>
+            <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click the buttons below to add content.</p>
+          </div>
+        )}
+
+        <button
+          onClick={() => onAddQuestion()}
+          className="mt-6 sm:mt-8 w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:py-3 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium transition-colors text-sm"
+        >
+          <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          Add Question
+        </button>
+      </div>
     </div>
   );
 }; 
