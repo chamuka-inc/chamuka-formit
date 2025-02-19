@@ -69,7 +69,7 @@ function validatePage(page: SurveyPage, index: number): ValidationError[] {
     });
   }
 
-  if (page.questions) {
+  if (page.pageType === 'survey') {
     page.questions.forEach((question, qIndex) => {
       const questionErrors = validateQuestion(question, [...path, 'questions', qIndex.toString()]);
       errors.push(...questionErrors);
@@ -97,15 +97,6 @@ function validatePage(page: SurveyPage, index: number): ValidationError[] {
           });
         }
       }
-    });
-  }
-
-  // Ensure page has either questions or context elements
-  if (!page.questions?.length && !page.contextElements?.length) {
-    errors.push({
-      type: 'REQUIRED',
-      message: 'Page must have either questions or content',
-      path: [...path],
     });
   }
 
@@ -162,7 +153,7 @@ export function validateAction(state: SurveyState, action: any): ValidationError
       const question = action.payload.question;
       const pageIndex = action.payload.pageIndex;
       const questionIndex = action.type === 'ADD_QUESTION' 
-        ? (state.pages[pageIndex].questions?.length || 0)
+        ? state.pages[pageIndex].questions.length 
         : action.payload.questionIndex;
       
       const questionErrors = validateQuestion(
@@ -196,7 +187,7 @@ export function validateAction(state: SurveyState, action: any): ValidationError
           path: ['payload', 'pageIndex'],
         });
       }
-      if (questionIndex < 0 || questionIndex >= (state.pages[pageIndex]?.questions?.length || 0)) {
+      if (questionIndex < 0 || questionIndex >= state.pages[pageIndex]?.questions.length) {
         errors.push({
           type: 'INVALID_INDEX',
           message: 'Question index is out of bounds',
