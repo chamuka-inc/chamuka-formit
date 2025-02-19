@@ -7,6 +7,11 @@ export const initialState: SurveyState = {
   previewPageIndex: 0,
   isLoading: true,
   error: null,
+  loadingStates: {
+    savingPage: false,
+    savingQuestion: false,
+    loadingSurvey: true
+  }
 };
 
 export function surveyReducer(state: SurveyState = initialState, action: SurveyAction): SurveyState {

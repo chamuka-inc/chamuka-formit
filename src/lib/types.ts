@@ -29,6 +29,11 @@ export interface SurveyState {
   previewPageIndex: number;
   isLoading: boolean;
   error: string | null;
+  loadingStates: {
+    savingPage: boolean;
+    savingQuestion: boolean;
+    loadingSurvey: boolean;
+  };
 }
 
 export type SurveyAction =
@@ -64,6 +69,14 @@ export interface SurveyContextType {
   deleteQuestion: (pageIndex: number, questionIndex: number) => void;
   showPreviousPreviewPage: () => void;
   showNextPreviewPage: () => void;
+  // Selectors
+  currentPage: SurveyPage | null;
+  pageStats: {
+    totalPages: number;
+    surveyPages: number;
+    infoPages: number;
+  };
+  questionCount: number;
   // History actions
   canUndo: boolean;
   canRedo: boolean;

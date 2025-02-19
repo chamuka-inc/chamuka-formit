@@ -1,10 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useReducer, useCallback } from 'react';
+import { createContext, useContext, useEffect, useReducer, useCallback, useMemo } from 'react';
 import { SurveyContextType, SurveyPage, Question, SurveyState, SurveyAction } from '../types';
 import { surveyReducer, initialState } from './SurveyReducer';
 import { createHistoryReducer, HistoryState } from './SurveyHistory';
 import { createStorageManager } from './SurveyStorage';
+import { surveySelectors } from './SurveySelectors';
 
 const SurveyContext = createContext<SurveyContextType | null>(null);
 const storageManager = createStorageManager('surveyData');
@@ -17,14 +18,20 @@ export const useSurveyContext = () => {
   return context;
 };
 
-const initialHistoryState: HistoryState<SurveyState> = {
-  past: [],
-  present: initialState,
-  future: [],
-};
-
 export const SurveyContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [history, dispatch] = useReducer(createHistoryReducer(surveyReducer), initialHistoryState);
+  const [history, dispatch] = useReducer(createHistoryReducer(surveyReducer), {
+    past: [],
+    present: {
+      ...initialState,
+      loadingStates: {
+        savingPage: false,
+        savingQuestion: false,
+        loadingSurvey: true
+      }
+    },
+    future: [],
+  });
+
   const state = history.present;
 
   useEffect(() => {
@@ -149,7 +156,7 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
     dispatch({ type: 'LOAD_SURVEY', payload: samplePages });
   };
 
-  const value: SurveyContextType = {
+  const memoizedValue = useMemo(() => ({
     state,
     dispatch,
     loadSurvey,
@@ -164,15 +171,40 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
     deleteQuestion,
     showPreviousPreviewPage,
     showNextPreviewPage,
+    // Memoized selectors
+    currentPage: surveySelectors.getCurrentPage(state),
+    pageStats: surveySelectors.getPageStats(state),
+    questionCount: surveySelectors.getQuestionCount(state),
+    // History actions
     canUndo: history.past.length > 0,
     canRedo: history.future.length > 0,
     undo,
     redo,
     clearHistory,
-  };
+  }), [
+    state,
+    history.past.length,
+    history.future.length,
+    // Include all callback functions in dependencies
+    loadSurvey,
+    addPage,
+    updatePage,
+    deletePage,
+    selectPage,
+    movePageUp,
+    movePageDown,
+    addQuestion,
+    updateQuestion,
+    deleteQuestion,
+    showPreviousPreviewPage,
+    showNextPreviewPage,
+    undo,
+    redo,
+    clearHistory
+  ]);
 
   return (
-    <SurveyContext.Provider value={value}>
+    <SurveyContext.Provider value={memoizedValue}>
       {children}
     </SurveyContext.Provider>
   );
