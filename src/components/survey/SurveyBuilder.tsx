@@ -25,6 +25,7 @@ const SurveyBuilderContent = () => {
     updatePage,
     addQuestion,
     updateQuestion,
+    setCurrentPageIndex,
   } = useSurveyContext();
 
   const handleTabChange = (tab: 'builder' | 'preview') => {
@@ -32,7 +33,10 @@ const SurveyBuilderContent = () => {
     setIsSidebarOpen(false);
   };
 
-  const handleOpenPageModal = (isEditing = false) => {
+  const handleOpenPageModal = () => {
+    if (currentPageIndex === -1) {
+      setCurrentPageIndex(-1);
+    }
     setIsPageModalOpen(true);
     setIsSidebarOpen(false);
   };
