@@ -1,7 +1,7 @@
 "use client";
 
 import { useSurveyContext } from '@/lib/context/SurveyContext';
-import { ArrowDown, ArrowUp, Plus, FileText, Info } from 'lucide-react';
+import { ArrowDown, ArrowUp, Plus, FileText } from 'lucide-react';
 
 interface PageListSidebarProps {
   onAddPage: () => void;
@@ -54,19 +54,11 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
               >
                 <div className="p-3">
                   <div className="flex items-start gap-3">
-                    {page.pageType === 'survey' ? (
-                      <FileText className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                        index === currentPageIndex
-                          ? 'text-blue-500 dark:text-blue-400'
-                          : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300'
-                      }`} />
-                    ) : (
-                      <Info className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                        index === currentPageIndex
-                          ? 'text-blue-500 dark:text-blue-400'
-                          : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300'
-                      }`} />
-                    )}
+                    <FileText className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                      index === currentPageIndex
+                        ? 'text-blue-500 dark:text-blue-400'
+                        : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300'
+                    }`} />
                     <div className="flex-1 min-w-0">
                       <h3 className={`font-medium truncate ${
                         index === currentPageIndex
@@ -76,10 +68,8 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                         {page.title || 'Untitled Page'}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {page.pageType === 'survey'
-                          ? `${page.questions.length} question${page.questions.length !== 1 ? 's' : ''}`
-                          : 'Information page'
-                        }
+                        {page.questions?.length ? `${page.questions.length} question${page.questions.length !== 1 ? 's' : ''}` : 'No questions'}
+                        {page.contextElements?.length ? `, ${page.contextElements.length} content element${page.contextElements.length !== 1 ? 's' : ''}` : ''}
                       </p>
                     </div>
                   </div>

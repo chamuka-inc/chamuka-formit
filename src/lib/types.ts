@@ -14,12 +14,9 @@ export interface Question {
   contextElements?: ContextElement[];
 }
 
-export type PageType = 'survey' | 'info';
-
 export interface SurveyPage {
   title: string;
-  pageType: PageType;
-  questions: Question[];
+  questions?: Question[];
   contextElements?: ContextElement[];
 }
 
@@ -73,8 +70,8 @@ export interface SurveyContextType {
   currentPage: SurveyPage | null;
   pageStats: {
     totalPages: number;
-    surveyPages: number;
-    infoPages: number;
+    pagesWithQuestions: number;
+    pagesWithContent: number;
   };
   questionCount: number;
   // History actions

@@ -69,32 +69,36 @@ function validatePage(page: SurveyPage, index: number): ValidationError[] {
     });
   }
 
-  if (page.pageType === 'survey') {
+  if (page.questions?.length) {
     page.questions.forEach((question, qIndex) => {
-      const questionErrors = validateQuestion(question, [...path, 'questions', qIndex.toString()]);
-      errors.push(...questionErrors);
+      if (question && typeof question === 'object') {
+        const questionErrors = validateQuestion(question, [...path, 'questions', qIndex.toString()]);
+        errors.push(...questionErrors);
+      }
     });
   }
 
-  if (page.contextElements) {
+  if (page.contextElements?.length) {
     page.contextElements.forEach((element, index) => {
-      if (!element.content.trim()) {
-        errors.push({
-          type: 'REQUIRED',
-          message: 'Context element content is required',
-          path: [...path, 'contextElements', index.toString(), 'content'],
-        });
-      }
-
-      if (element.type === 'image' || element.type === 'video') {
-        try {
-          new URL(element.content);
-        } catch {
+      if (element && typeof element === 'object' && 'content' in element) {
+        if (!element.content.trim()) {
           errors.push({
-            type: 'INVALID_URL',
-            message: `Invalid ${element.type} URL`,
+            type: 'REQUIRED',
+            message: 'Context element content is required',
             path: [...path, 'contextElements', index.toString(), 'content'],
           });
+        }
+
+        if (element.type === 'image' || element.type === 'video') {
+          try {
+            new URL(element.content);
+          } catch {
+            errors.push({
+              type: 'INVALID_URL',
+              message: `Invalid ${element.type} URL`,
+              path: [...path, 'contextElements', index.toString(), 'content'],
+            });
+          }
         }
       }
     });
@@ -152,8 +156,19 @@ export function validateAction(state: SurveyState, action: any): ValidationError
     case 'UPDATE_QUESTION': {
       const question = action.payload.question;
       const pageIndex = action.payload.pageIndex;
+      const page = state.pages[pageIndex];
+      
+      if (!page) {
+        errors.push({
+          type: 'INVALID_INDEX',
+          message: 'Page index is out of bounds',
+          path: ['payload', 'pageIndex'],
+        });
+        break;
+      }
+
       const questionIndex = action.type === 'ADD_QUESTION' 
-        ? state.pages[pageIndex].questions.length 
+        ? (page.questions?.length || 0)
         : action.payload.questionIndex;
       
       const questionErrors = validateQuestion(
@@ -180,14 +195,18 @@ export function validateAction(state: SurveyState, action: any): ValidationError
 
     case 'DELETE_QUESTION': {
       const { pageIndex, questionIndex } = action.payload;
-      if (pageIndex < 0 || pageIndex >= state.pages.length) {
+      const page = state.pages[pageIndex];
+      
+      if (!page) {
         errors.push({
           type: 'INVALID_INDEX',
           message: 'Page index is out of bounds',
           path: ['payload', 'pageIndex'],
         });
+        break;
       }
-      if (questionIndex < 0 || questionIndex >= state.pages[pageIndex]?.questions.length) {
+
+      if (questionIndex < 0 || questionIndex >= (page.questions?.length || 0)) {
         errors.push({
           type: 'INVALID_INDEX',
           message: 'Question index is out of bounds',
