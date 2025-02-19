@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Question } from '@/lib/types';
-import { X, MessageSquare, CheckSquare, AlignLeft, Plus, Trash2 } from 'lucide-react';
+import { Question, ContextElement, ContextElementType } from '@/lib/types';
+import { X, MessageSquare, CheckSquare, AlignLeft, Plus, Trash2, Type, Image, Video } from 'lucide-react';
 
 interface QuestionModalProps {
   isOpen: boolean;
@@ -21,18 +21,29 @@ export const QuestionModal = ({
   const [questionType, setQuestionType] = useState<'text' | 'radio' | 'checkbox'>('text');
   const [options, setOptions] = useState<string[]>([]);
   const [newOption, setNewOption] = useState('');
+  const [contextElements, setContextElements] = useState<ContextElement[]>([]);
+  const [newContextElement, setNewContextElement] = useState<{
+    type: ContextElementType;
+    content: string;
+  }>({
+    type: 'paragraph',
+    content: '',
+  });
 
   useEffect(() => {
     if (isOpen && currentQuestion) {
       setQuestionText(currentQuestion.text);
       setQuestionType(currentQuestion.type);
       setOptions(currentQuestion.options || []);
+      setContextElements(currentQuestion.contextElements || []);
     } else {
       setQuestionText('');
       setQuestionType('text');
       setOptions([]);
+      setContextElements([]);
     }
     setNewOption('');
+    setNewContextElement({ type: 'paragraph', content: '' });
   }, [isOpen, currentQuestion]);
 
   const handleAddOption = () => {
@@ -46,11 +57,23 @@ export const QuestionModal = ({
     setOptions(options.filter((_, i) => i !== index));
   };
 
+  const handleAddContextElement = () => {
+    if (newContextElement.content.trim()) {
+      setContextElements([...contextElements, { ...newContextElement }]);
+      setNewContextElement({ ...newContextElement, content: '' });
+    }
+  };
+
+  const handleRemoveContextElement = (index: number) => {
+    setContextElements(contextElements.filter((_, i) => i !== index));
+  };
+
   const handleSave = () => {
     const newQuestion: Question = {
       text: questionText,
       type: questionType,
       options: ['radio', 'checkbox'].includes(questionType) ? options : undefined,
+      contextElements: contextElements.length > 0 ? contextElements : undefined,
     };
     onSave(newQuestion);
     onClose();
@@ -141,6 +164,86 @@ export const QuestionModal = ({
                       </span>
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Context Elements Section */}
+              <div className="space-y-4 pt-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Question Context
+                </label>
+
+                <div className="space-y-3">
+                  {contextElements.map((element, index) => (
+                    <div
+                      key={index}
+                      className="group flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                    >
+                      {element.type === 'paragraph' && <Type className="h-5 w-5 mt-0.5 text-gray-400" />}
+                      {element.type === 'image' && <Image className="h-5 w-5 mt-0.5 text-gray-400" />}
+                      {element.type === 'video' && <Video className="h-5 w-5 mt-0.5 text-gray-400" />}
+                      <div className="flex-1">
+                        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                          {element.type.charAt(0).toUpperCase() + element.type.slice(1)}
+                        </div>
+                        <div className="text-gray-700 dark:text-gray-300">{element.content}</div>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveContextElement(index)}
+                        className="p-1 rounded-md text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <select
+                      value={newContextElement.type}
+                      onChange={(e) => setNewContextElement({
+                        ...newContextElement,
+                        type: e.target.value as ContextElementType
+                      })}
+                      className="px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    >
+                      <option value="paragraph">Paragraph</option>
+                      <option value="image">Image URL</option>
+                      <option value="video">Video URL</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={newContextElement.content}
+                      onChange={(e) => setNewContextElement({
+                        ...newContextElement,
+                        content: e.target.value
+                      })}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddContextElement()}
+                      placeholder={
+                        newContextElement.type === 'paragraph'
+                          ? "Add explanatory text..."
+                          : newContextElement.type === 'image'
+                          ? "Add image URL..."
+                          : "Add video URL..."
+                      }
+                      className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-shadow"
+                    />
+                    <button
+                      onClick={handleAddContextElement}
+                      disabled={!newContextElement.content.trim()}
+                      className={`
+                        inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors
+                        ${newContextElement.content.trim()
+                          ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400'
+                          : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                        }
+                      `}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Context
+                    </button>
+                  </div>
                 </div>
               </div>
 

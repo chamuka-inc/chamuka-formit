@@ -10,6 +10,7 @@ import { PageModal } from './PageModal';
 import { QuestionModal } from './QuestionModal';
 import { useSurveyContext } from '@/lib/context/SurveyContext';
 import { Layout, Menu } from 'lucide-react';
+import { Question, SurveyPage } from '@/lib/types';
 
 const SurveyBuilderContent = () => {
   const [activeTab, setActiveTab] = useState<'builder' | 'preview'>('builder');
@@ -51,11 +52,13 @@ const SurveyBuilderContent = () => {
   };
 
   const handleCloseQuestionModal = () => {
-    setCurrentQuestionIndex(-1);
     setIsQuestionModalOpen(false);
+    setTimeout(() => {
+      setCurrentQuestionIndex(-1);
+    }, 300);
   };
 
-  const handleSavePage = (page: any) => {
+  const handleSavePage = (page: SurveyPage) => {
     if (currentPageIndex === -1) {
       addPage(page);
     } else {
@@ -63,12 +66,17 @@ const SurveyBuilderContent = () => {
     }
   };
 
-  const handleSaveQuestion = (question: any) => {
+  const handleSaveQuestion = (question: Question) => {
+    if (currentPageIndex === -1) {
+      return; // Don't add/update if no page is selected
+    }
+
     if (currentQuestionIndex === -1) {
       addQuestion(currentPageIndex, question);
     } else {
       updateQuestion(currentPageIndex, currentQuestionIndex, question);
     }
+    handleCloseQuestionModal();
   };
 
   const toggleSidebar = () => {
