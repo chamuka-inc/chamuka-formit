@@ -9,16 +9,14 @@ interface PageListSidebarProps {
 
 export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
   const {
-    pages,
-    currentPageIndex,
+    state: { pages, currentPageIndex },
     selectPage,
     movePageUp,
     movePageDown,
-    setCurrentPageIndex,
   } = useSurveyContext();
 
   const handleAddPage = () => {
-    setCurrentPageIndex(-1); // Reset currentPageIndex to -1 when adding a new page
+    selectPage(-1); // Reset currentPageIndex to -1 when adding a new page
     onAddPage();
   };
 

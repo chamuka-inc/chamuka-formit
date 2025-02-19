@@ -1,9 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { SurveyContextType, SurveyPage, Question } from '../types';
+import { createContext, useContext, useEffect, useReducer, useCallback } from 'react';
+import { SurveyContextType, SurveyPage, Question, SurveyState, SurveyAction } from '../types';
+import { surveyReducer, initialState } from './SurveyReducer';
+import { createHistoryReducer, HistoryState } from './SurveyHistory';
+import { createStorageManager } from './SurveyStorage';
 
 const SurveyContext = createContext<SurveyContextType | null>(null);
+const storageManager = createStorageManager('surveyData');
 
 export const useSurveyContext = () => {
   const context = useContext(SurveyContext);
@@ -13,120 +17,104 @@ export const useSurveyContext = () => {
   return context;
 };
 
+const initialHistoryState: HistoryState<SurveyState> = {
+  past: [],
+  present: initialState,
+  future: [],
+};
+
 export const SurveyContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [pages, setPages] = useState<SurveyPage[]>([]);
-  const [currentPageIndex, setCurrentPageIndex] = useState(-1);
-  const [previewPageIndex, setPreviewPageIndex] = useState(0);
+  const [history, dispatch] = useReducer(createHistoryReducer(surveyReducer), initialHistoryState);
+  const state = history.present;
 
   useEffect(() => {
     loadFromLocalStorage();
-    if (pages.length === 0) {
-      setupSampleSurvey();
-    }
   }, []);
 
   useEffect(() => {
-    saveToLocalStorage();
-  }, [pages]);
+    if (!state.isLoading) {
+      storageManager.save(state);
+    }
+  }, [state.pages]);
 
   const loadFromLocalStorage = () => {
-    const storedData = localStorage.getItem('surveyData');
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      setPages(parsedData);
-      if (parsedData.length > 0) {
-        setCurrentPageIndex(0);
+    try {
+      const loadedState = storageManager.load();
+      if (loadedState) {
+        dispatch({ type: 'LOAD_SURVEY', payload: loadedState.pages });
+      } else {
+        setupSampleSurvey();
       }
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: 'Failed to load survey data' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 
-  const saveToLocalStorage = () => {
-    localStorage.setItem('surveyData', JSON.stringify(pages));
-  };
+  const loadSurvey = useCallback((pages: SurveyPage[]) => {
+    dispatch({ type: 'LOAD_SURVEY', payload: pages });
+  }, []);
 
-  const addPage = (newPage: SurveyPage) => {
-    setPages([...pages, newPage]);
-    setCurrentPageIndex(pages.length);
-  };
+  const addPage = useCallback((page: SurveyPage) => {
+    dispatch({ type: 'ADD_PAGE', payload: page });
+  }, []);
 
-  const updatePage = (index: number, updatedPage: SurveyPage) => {
-    const updatedPages = [...pages];
-    updatedPages[index] = updatedPage;
-    setPages(updatedPages);
-  };
+  const updatePage = useCallback((index: number, page: SurveyPage) => {
+    dispatch({ type: 'UPDATE_PAGE', payload: { index, page } });
+  }, []);
 
-  const deletePage = (index: number) => {
-    const updatedPages = pages.filter((_, i) => i !== index);
-    setPages(updatedPages);
-    if (updatedPages.length === 0) {
-      setCurrentPageIndex(-1);
-      setPreviewPageIndex(0);
-    } else {
-      setCurrentPageIndex(Math.max(0, currentPageIndex - 1));
-      setPreviewPageIndex(Math.min(previewPageIndex, updatedPages.length - 1));
+  const deletePage = useCallback((index: number) => {
+    dispatch({ type: 'DELETE_PAGE', payload: index });
+  }, []);
+
+  const selectPage = useCallback((index: number) => {
+    dispatch({ type: 'SELECT_PAGE', payload: index });
+  }, []);
+
+  const movePageUp = useCallback((index: number) => {
+    if (index > 0) {
+      dispatch({ type: 'MOVE_PAGE', payload: { fromIndex: index, toIndex: index - 1 } });
     }
-  };
+  }, [state.pages.length]);
 
-  const selectPage = (index: number) => {
-    setCurrentPageIndex(index);
-  };
-
-  const movePageUp = (index: number) => {
-    if (index <= 0) return;
-    const updatedPages = [...pages];
-    [updatedPages[index - 1], updatedPages[index]] = [updatedPages[index], updatedPages[index - 1]];
-    setPages(updatedPages);
-    if (currentPageIndex === index) {
-      setCurrentPageIndex(index - 1);
-    } else if (currentPageIndex === index - 1) {
-      setCurrentPageIndex(index);
+  const movePageDown = useCallback((index: number) => {
+    if (index < state.pages.length - 1) {
+      dispatch({ type: 'MOVE_PAGE', payload: { fromIndex: index, toIndex: index + 1 } });
     }
-  };
+  }, [state.pages.length]);
 
-  const movePageDown = (index: number) => {
-    if (index >= pages.length - 1) return;
-    const updatedPages = [...pages];
-    [updatedPages[index + 1], updatedPages[index]] = [updatedPages[index], updatedPages[index + 1]];
-    setPages(updatedPages);
-    if (currentPageIndex === index) {
-      setCurrentPageIndex(index + 1);
-    } else if (currentPageIndex === index + 1) {
-      setCurrentPageIndex(index);
-    }
-  };
+  const addQuestion = useCallback((pageIndex: number, question: Question) => {
+    dispatch({ type: 'ADD_QUESTION', payload: { pageIndex, question } });
+  }, []);
 
-  const addQuestion = (pageIndex: number, newQuestion: Question) => {
-    if (pageIndex === -1) return;
-    const updatedPages = [...pages];
-    updatedPages[pageIndex].questions = [...updatedPages[pageIndex].questions, newQuestion];
-    setPages(updatedPages);
-  };
+  const updateQuestion = useCallback((pageIndex: number, questionIndex: number, question: Question) => {
+    dispatch({ type: 'UPDATE_QUESTION', payload: { pageIndex, questionIndex, question } });
+  }, []);
 
-  const updateQuestion = (pageIndex: number, questionIndex: number, updatedQuestion: Question) => {
-    if (pageIndex === -1) return;
-    const updatedPages = [...pages];
-    updatedPages[pageIndex].questions[questionIndex] = updatedQuestion;
-    setPages(updatedPages);
-  };
+  const deleteQuestion = useCallback((pageIndex: number, questionIndex: number) => {
+    dispatch({ type: 'DELETE_QUESTION', payload: { pageIndex, questionIndex } });
+  }, []);
 
-  const deleteQuestion = (pageIndex: number, questionIndex: number) => {
-    if (pageIndex === -1) return;
-    const updatedPages = [...pages];
-    updatedPages[pageIndex].questions = updatedPages[pageIndex].questions.filter((_, i) => i !== questionIndex);
-    setPages(updatedPages);
-  };
+  const showPreviousPreviewPage = useCallback(() => {
+    dispatch({ type: 'SET_PREVIEW_PAGE', payload: state.previewPageIndex - 1 });
+  }, [state.previewPageIndex]);
 
-  const showPreviousPreviewPage = () => {
-    if (previewPageIndex > 0) {
-      setPreviewPageIndex(previewPageIndex - 1);
-    }
-  };
+  const showNextPreviewPage = useCallback(() => {
+    dispatch({ type: 'SET_PREVIEW_PAGE', payload: state.previewPageIndex + 1 });
+  }, [state.previewPageIndex]);
 
-  const showNextPreviewPage = () => {
-    if (previewPageIndex < pages.length - 1) {
-      setPreviewPageIndex(previewPageIndex + 1);
-    }
-  };
+  const undo = useCallback(() => {
+    dispatch({ type: 'UNDO' });
+  }, []);
+
+  const redo = useCallback(() => {
+    dispatch({ type: 'REDO' });
+  }, []);
+
+  const clearHistory = useCallback(() => {
+    dispatch({ type: 'CLEAR_HISTORY' });
+  }, []);
 
   const setupSampleSurvey = () => {
     const samplePages: SurveyPage[] = [
@@ -158,17 +146,13 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
         ]
       }
     ];
-    setPages(samplePages);
-    setCurrentPageIndex(0);
+    dispatch({ type: 'LOAD_SURVEY', payload: samplePages });
   };
 
-  const value = {
-    pages,
-    currentPageIndex,
-    previewPageIndex,
-    setPages,
-    setCurrentPageIndex,
-    setPreviewPageIndex,
+  const value: SurveyContextType = {
+    state,
+    dispatch,
+    loadSurvey,
     addPage,
     updatePage,
     deletePage,
@@ -180,6 +164,11 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
     deleteQuestion,
     showPreviousPreviewPage,
     showNextPreviewPage,
+    canUndo: history.past.length > 0,
+    canRedo: history.future.length > 0,
+    undo,
+    redo,
+    clearHistory,
   };
 
   return (

@@ -23,13 +23,36 @@ export interface SurveyPage {
   contextElements?: ContextElement[];
 }
 
-export interface SurveyContextType {
+export interface SurveyState {
   pages: SurveyPage[];
   currentPageIndex: number;
   previewPageIndex: number;
-  setPages: (pages: SurveyPage[]) => void;
-  setCurrentPageIndex: (index: number) => void;
-  setPreviewPageIndex: (index: number) => void;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export type SurveyAction =
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'LOAD_SURVEY'; payload: SurveyPage[] }
+  | { type: 'ADD_PAGE'; payload: SurveyPage }
+  | { type: 'UPDATE_PAGE'; payload: { index: number; page: SurveyPage } }
+  | { type: 'DELETE_PAGE'; payload: number }
+  | { type: 'SELECT_PAGE'; payload: number }
+  | { type: 'MOVE_PAGE'; payload: { fromIndex: number; toIndex: number } }
+  | { type: 'ADD_QUESTION'; payload: { pageIndex: number; question: Question } }
+  | { type: 'UPDATE_QUESTION'; payload: { pageIndex: number; questionIndex: number; question: Question } }
+  | { type: 'DELETE_QUESTION'; payload: { pageIndex: number; questionIndex: number } }
+  | { type: 'SET_PREVIEW_PAGE'; payload: number }
+  | { type: 'UNDO' }
+  | { type: 'REDO' }
+  | { type: 'CLEAR_HISTORY' };
+
+export interface SurveyContextType {
+  state: SurveyState;
+  dispatch: React.Dispatch<SurveyAction>;
+  // Action creators
+  loadSurvey: (pages: SurveyPage[]) => void;
   addPage: (page: SurveyPage) => void;
   updatePage: (index: number, page: SurveyPage) => void;
   deletePage: (index: number) => void;
@@ -41,4 +64,10 @@ export interface SurveyContextType {
   deleteQuestion: (pageIndex: number, questionIndex: number) => void;
   showPreviousPreviewPage: () => void;
   showNextPreviewPage: () => void;
+  // History actions
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
+  clearHistory: () => void;
 }

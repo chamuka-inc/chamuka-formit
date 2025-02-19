@@ -6,7 +6,11 @@ import { ContextElements } from './ContextElements';
 import { ChevronLeft, ChevronRight, FileText, Info } from 'lucide-react';
 
 export const PagePreview = () => {
-  const { pages, previewPageIndex, showPreviousPreviewPage, showNextPreviewPage } = useSurveyContext();
+  const { 
+    state: { pages, previewPageIndex },
+    showPreviousPreviewPage,
+    showNextPreviewPage
+  } = useSurveyContext();
 
   if (pages.length === 0) {
     return (

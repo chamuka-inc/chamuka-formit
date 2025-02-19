@@ -11,7 +11,12 @@ interface PageContentProps {
 }
 
 export const PageContent = ({ onEditPage, onAddQuestion }: PageContentProps) => {
-  const { pages, currentPageIndex, deleteQuestion, deletePage } = useSurveyContext();
+  const { 
+    state: { pages, currentPageIndex },
+    deleteQuestion,
+    deletePage
+  } = useSurveyContext();
+  
   const currentPage = pages[currentPageIndex];
 
   const handleDeletePage = () => {
