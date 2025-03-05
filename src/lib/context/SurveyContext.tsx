@@ -18,25 +18,43 @@ export const useSurveyContext = () => {
   return context;
 };
 
-export const SurveyContextProvider = ({ children }: { children: React.ReactNode }) => {
+export const SurveyContextProvider = ({ 
+  children,
+  initialPages = []
+}: { 
+  children: React.ReactNode;
+  initialPages?: SurveyPage[];
+}) => {
+  console.log('SurveyContextProvider initialPages:', initialPages);
+  
   const [history, dispatch] = useReducer(createHistoryReducer(surveyReducer), {
     past: [],
     present: {
       ...initialState,
+      pages: initialPages.length > 0 ? initialPages : initialState.pages,
+      currentPageIndex: initialPages.length > 0 ? 0 : -1,
+      isLoading: false,
       loadingStates: {
         savingPage: false,
         savingQuestion: false,
-        loadingSurvey: true
+        loadingSurvey: false
       }
     },
     future: [],
   });
 
   const state = history.present;
+  console.log('SurveyContext state:', state);
 
   useEffect(() => {
-    loadFromLocalStorage();
-  }, []);
+    console.log('SurveyContext useEffect initialPages.length:', initialPages.length);
+    if (initialPages.length > 0) {
+      // If we have initialPages, load them directly
+      loadSurvey(initialPages);
+    } else if (initialPages.length === 0) {
+      loadFromLocalStorage();
+    }
+  }, [initialPages.length]);
 
   useEffect(() => {
     if (!state.isLoading) {
@@ -49,7 +67,7 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
       const loadedState = storageManager.load();
       if (loadedState) {
         dispatch({ type: 'LOAD_SURVEY', payload: loadedState.pages });
-      } else {
+      } else if (initialPages.length === 0) {
         setupSampleSurvey();
       }
     } catch (error) {
@@ -124,30 +142,94 @@ export const SurveyContextProvider = ({ children }: { children: React.ReactNode 
   }, []);
 
   const setupSampleSurvey = () => {
+    console.log('Setting up sample survey');
     const samplePages: SurveyPage[] = [
       {
-        title: "Customer Satisfaction Survey - Page 1",
-        questions: [
-          {
-            contextElements: [
-              { type: 'paragraph', content: 'We value your input! Please provide your contact information below.' },
-              { type: 'image', content: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80' }
-            ],
-            type: "text",
-            text: "What is your name?"
+        title: "Customer Feedback Survey - Introduction",
+        questions: [],
+        contextElements: [
+          { 
+            type: 'paragraph', 
+            content: 'Welcome to our customer feedback survey! We value your input and would like to hear about your experience with our products and services.' 
+          },
+          { 
+            type: 'image', 
+            content: 'https://images.unsplash.com/photo-1556155092-490a1ba16284?auto=format&fit=crop&w=600&q=80' 
           },
           {
-            type: "text",
-            text: "What is your email address?"
+            type: 'paragraph',
+            content: 'This survey will take approximately 5 minutes to complete. Your responses will help us improve our offerings.'
           }
         ]
       },
       {
-        title: "Information Page - About Us",
+        title: "Personal Information",
+        questions: [
+          {
+            id: "q1",
+            type: "text",
+            text: "What is your full name?",
+            required: true,
+            contextElements: [
+              { type: 'paragraph', content: 'Please provide your contact information below.' }
+            ]
+          },
+          {
+            id: "q2",
+            type: "text",
+            text: "What is your email address?",
+            required: true
+          },
+          {
+            id: "q3",
+            type: "radio",
+            text: "How often do you use our products?",
+            required: true,
+            options: ["Daily", "Weekly", "Monthly", "Rarely", "First time user"]
+          }
+        ]
+      },
+      {
+        title: "Product Feedback",
+        questions: [
+          {
+            id: "q4",
+            type: "radio",
+            text: "How would you rate our product quality?",
+            required: true,
+            options: ["Excellent", "Good", "Average", "Below Average", "Poor"]
+          },
+          {
+            id: "q5",
+            type: "checkbox",
+            text: "Which features do you use most often? (Select all that apply)",
+            required: false,
+            options: ["Feature A", "Feature B", "Feature C", "Feature D", "Feature E"]
+          },
+          {
+            id: "q6",
+            type: "text",
+            text: "What improvements would you suggest for our products?",
+            required: false
+          }
+        ]
+      },
+      {
+        title: "Thank You",
         questions: [],
         contextElements: [
-          { type: 'paragraph', content: 'Discover our journey. We are dedicated to innovation and excellence.' },
-          { type: 'image', content: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80' }
+          { 
+            type: 'paragraph', 
+            content: 'Thank you for completing our survey! Your feedback is invaluable to us.' 
+          },
+          { 
+            type: 'image', 
+            content: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80' 
+          },
+          {
+            type: 'paragraph',
+            content: 'We appreciate your time and will use your feedback to improve our products and services.'
+          }
         ]
       }
     ];

@@ -8,8 +8,10 @@ export interface ContextElement {
 export type QuestionType = 'text' | 'radio' | 'checkbox';
 
 export interface Question {
+  id?: string;
   type: QuestionType;
   text: string;
+  required?: boolean;
   options?: string[];
   contextElements?: ContextElement[];
 }
