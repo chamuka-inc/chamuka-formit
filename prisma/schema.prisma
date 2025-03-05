@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -22,6 +21,7 @@ model User {
   isAdmin        Boolean   @default(false)
   accounts       Account[]
   sessions       Session[]
+  surveys        Survey[]
 }
 
 model Account {
@@ -47,13 +47,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-enum UserRole {
-  user
-  admin
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Allowlist {
@@ -68,4 +62,104 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Survey {
+  id               String       @id @default(cuid())
+  title            String
+  description      String?
+  status           SurveyStatus @default(draft)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  userId           String
+  isProFeature     Boolean      @default(false)
+  customEndpoint   String?
+  publicShareToken String       @unique @default(cuid())
+  submissions      Submission[]
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pages            SurveyPage[]
+}
+
+model SurveyPage {
+  id              String           @id @default(cuid())
+  title           String
+  description     String?
+  orderIndex      Int
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  surveyId        String
+  contextElements ContextElement[]
+  questions       Question[]
+  survey          Survey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+}
+
+model Question {
+  id              String             @id @default(cuid())
+  text            String
+  type            QuestionType
+  required        Boolean            @default(false)
+  orderIndex      Int
+  options         String[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  pageId          String
+  contextElements ContextElement[]
+  page            SurveyPage         @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  responses       QuestionResponse[]
+}
+
+model ContextElement {
+  id         String             @id @default(cuid())
+  type       ContextElementType
+  content    String
+  orderIndex Int
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  pageId     String?
+  questionId String?
+  page       SurveyPage?        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  question   Question?          @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Submission {
+  id          String             @id @default(cuid())
+  submittedAt DateTime           @default(now())
+  surveyId    String
+  submitterIp String?
+  userAgent   String?
+  responses   QuestionResponse[]
+  survey      Survey             @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+}
+
+model QuestionResponse {
+  id           String     @id @default(cuid())
+  submissionId String
+  questionId   String
+  value        String
+  createdAt    DateTime   @default(now())
+  question     Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+  user
+  admin
+}
+
+enum SurveyStatus {
+  draft
+  published
+  archived
+}
+
+enum QuestionType {
+  text
+  radio
+  checkbox
+}
+
+enum ContextElementType {
+  paragraph
+  image
+  video
 }

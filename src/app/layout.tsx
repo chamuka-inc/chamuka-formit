@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   description: "A modern survey builder application",
 };
 
+// This is the root layout that wraps all pages
 export default function RootLayout({
   children,
 }: {

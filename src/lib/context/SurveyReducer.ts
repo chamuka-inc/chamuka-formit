@@ -15,6 +15,8 @@ export const initialState: SurveyState = {
 };
 
 export function surveyReducer(state: SurveyState = initialState, action: SurveyAction): SurveyState {
+  console.log('SurveyReducer action:', action.type, action);
+
   // Validate action before processing
   const actionErrors = validateAction(state, action);
   if (actionErrors.length > 0) {
@@ -36,14 +38,31 @@ export function surveyReducer(state: SurveyState = initialState, action: SurveyA
       break;
 
     case 'LOAD_SURVEY':
+      console.log('LOAD_SURVEY payload:', action.payload);
+      
+      // Ensure we have valid pages with required properties
+      const validatedPages = action.payload.map(page => ({
+        title: page.title || 'Untitled Page',
+        questions: (page.questions || []).map(q => ({
+          id: q.id || `q-${Math.random().toString(36).substr(2, 9)}`,
+          type: q.type || 'text',
+          text: q.text || 'Untitled Question',
+          required: q.required !== undefined ? q.required : false,
+          options: q.options || [],
+          contextElements: q.contextElements || []
+        })),
+        contextElements: page.contextElements || []
+      }));
+      
       newState = {
         ...state,
-        pages: action.payload,
-        currentPageIndex: action.payload.length > 0 ? 0 : -1,
+        pages: validatedPages,
+        currentPageIndex: validatedPages.length > 0 ? 0 : -1,
         previewPageIndex: 0,
         isLoading: false,
         error: null,
       };
+      console.log('LOAD_SURVEY newState:', newState);
       break;
 
     case 'ADD_PAGE':
@@ -178,5 +197,6 @@ export function surveyReducer(state: SurveyState = initialState, action: SurveyA
     };
   }
 
+  console.log('SurveyReducer returning newState:', newState);
   return newState;
 } 
