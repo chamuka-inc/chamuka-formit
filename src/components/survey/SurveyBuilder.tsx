@@ -40,18 +40,6 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
   } = useSurveyContext();
   
   // Mutations for saving and publishing
-  const updateSurveyMutation = api.survey.update.useMutation({
-    onSuccess: () => {
-      setLastSaved(new Date());
-      setIsSaving(false);
-      toast.success('Survey saved successfully');
-    },
-    onError: (error) => {
-      setIsSaving(false);
-      toast.error(`Error saving survey: ${error.message}`);
-    }
-  });
-  
   const saveSurveyDataMutation = api.survey.saveSurveyData.useMutation({
     onSuccess: (data) => {
       console.log('Survey data saved successfully:', data);

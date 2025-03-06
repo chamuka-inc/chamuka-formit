@@ -1,6 +1,7 @@
 "use client";
 
 import { ContextElement } from '@/lib/types';
+import ReactMarkdown from 'react-markdown';
 
 interface ContextElementsProps {
   elements?: ContextElement[];
@@ -16,9 +17,9 @@ export const ContextElements = ({ elements }: ContextElementsProps) => {
       {elements.map((element, index) => {
         if (element.type === 'paragraph') {
           return (
-            <p key={index} className="text-base text-gray-700 dark:text-gray-300">
-              {element.content}
-            </p>
+            <div key={index} className="prose dark:prose-invert max-w-none">
+              <ReactMarkdown>{element.content}</ReactMarkdown>
+            </div>
           );
         } else if (element.type === 'image') {
           return (

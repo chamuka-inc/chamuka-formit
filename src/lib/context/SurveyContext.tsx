@@ -152,7 +152,7 @@ export const SurveyContextProvider = ({
         contextElements: [
           { 
             type: 'paragraph', 
-            content: 'Welcome to our customer feedback survey! We value your input and would like to hear about your experience with our products and services.' 
+            content: '# Welcome to our Customer Feedback Survey!\n\nWe value your input and would like to hear about your experience with our products and services.\n\n**Your feedback matters** and will help us improve our offerings.' 
           },
           { 
             type: 'image', 
@@ -160,7 +160,7 @@ export const SurveyContextProvider = ({
           },
           {
             type: 'paragraph',
-            content: 'This survey will take approximately 5 minutes to complete. Your responses will help us improve our offerings.'
+            content: '## Important Information\n\n- This survey will take approximately 5 minutes to complete\n- All responses are confidential\n- Your honest feedback is appreciated'
           }
         ]
       },
@@ -222,7 +222,7 @@ export const SurveyContextProvider = ({
         contextElements: [
           { 
             type: 'paragraph', 
-            content: 'Thank you for completing our survey! Your feedback is invaluable to us.' 
+            content: '# Thank You!\n\n**Your feedback is invaluable to us.**\n\nWe will carefully review your responses and use them to:\n\n1. Improve our products\n2. Enhance our services\n3. Better serve our customers' 
           },
           { 
             type: 'image', 
@@ -230,7 +230,7 @@ export const SurveyContextProvider = ({
           },
           {
             type: 'paragraph',
-            content: 'We appreciate your time and will use your feedback to improve our products and services.'
+            content: '> We appreciate your time and commitment to helping us grow.\n\n*If you have any additional feedback, please feel free to [contact us](mailto:support@example.com).*'
           }
         ]
       }
