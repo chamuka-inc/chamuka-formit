@@ -25,36 +25,46 @@ export default function SurveyAnalyticsPage() {
   const downloadCSV = () => {
     if (!survey || !submissions) return;
     
+    // Parse survey data
+    const surveyData = survey.data ? (typeof survey.data === 'object' ? survey.data as any : { pages: [] }) : { pages: [] };
+    const surveyPages = Array.isArray(surveyData.pages) ? surveyData.pages : [];
+    
     // Prepare headers
     let headers = ['Submission ID', 'Submission Date'];
     const questionMap = new Map();
     
     // Collect all questions from all pages
-    survey.pages.forEach(page => {
-      page.questions.forEach(question => {
-        questionMap.set(question.id, question.text);
-        headers.push(question.text);
-      });
+    surveyPages.forEach((page: any) => {
+      if (page.questions) {
+        page.questions.forEach((question: any) => {
+          questionMap.set(question.id, question.text);
+          headers.push(question.text);
+        });
+      }
     });
     
     // Create CSV content
     let csvContent = headers.join(',') + '\n';
     
     // Add submission data
-    submissions.forEach(submission => {
+    submissions.forEach((submission) => {
       let row = [
         submission.id,
         new Date(submission.submittedAt).toLocaleString()
       ];
       
+      // Get the submission data
+      const submissionData = submission.data ? (typeof submission.data === 'object' ? submission.data as any : { responses: {} }) : { responses: {} };
+      const responses = submissionData.responses || {};
+      
       // Initialize all question values as empty
       const responseValues = Array(questionMap.size).fill('');
       
       // Fill in responses
-      submission.responses.forEach(response => {
-        const questionIndex = Array.from(questionMap.keys()).indexOf(response.questionId);
+      Object.entries(responses).forEach(([questionId, value]) => {
+        const questionIndex = Array.from(questionMap.keys()).indexOf(questionId);
         if (questionIndex >= 0) {
-          responseValues[questionIndex] = `"${response.value.replace(/"/g, '""')}"`;
+          responseValues[questionIndex] = `"${String(value).replace(/"/g, '""')}"`;
         }
       });
       
@@ -222,10 +232,10 @@ export default function SurveyAnalyticsPage() {
                         Submitted At
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        # Responses
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         User Agent
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions
                       </th>
                     </tr>
                   </thead>
@@ -238,11 +248,18 @@ export default function SurveyAnalyticsPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                           {new Date(submission.submittedAt).toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                          {submission.responses.length}
-                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate max-w-xs">
                           {submission.userAgent || 'Unknown'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                          <button
+                            onClick={() => {
+                              toast.info('Response details coming soon');
+                            }}
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          >
+                            View Details
+                          </button>
                         </td>
                       </tr>
                     ))}

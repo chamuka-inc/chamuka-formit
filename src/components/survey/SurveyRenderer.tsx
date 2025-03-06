@@ -76,8 +76,10 @@ export default function SurveyRenderer({
   });
   
   // Get the current page
-  const currentPage = surveyData?.pages[currentPageIndex];
-  const totalPages = surveyData?.pages.length || 0;
+  const surveyData1 = surveyData?.data ? (typeof surveyData.data === 'object' ? surveyData.data as any : { pages: [] }) : { pages: [] };
+  const pages = Array.isArray(surveyData1.pages) ? surveyData1.pages : [];
+  const currentPage = pages[currentPageIndex];
+  const totalPages = pages.length || 0;
   
   // Handle response changes
   const handleResponseChange = (questionId: string, value: string) => {
@@ -126,16 +128,13 @@ export default function SurveyRenderer({
     // Prepare the submission data
     setIsSubmitting(true);
     
-    // Transform responses to the required format
-    const formattedResponses = Object.entries(responses).map(([questionId, value]) => ({
-      questionId,
-      value
-    }));
-    
-    // Submit the responses
+    // Submit the responses with the full JSON data
     submitMutation.mutate({
       surveyId: surveyData?.id || '',
-      responses: formattedResponses
+      data: {
+        responses,
+        submittedAt: new Date().toISOString()
+      }
     });
   };
   
