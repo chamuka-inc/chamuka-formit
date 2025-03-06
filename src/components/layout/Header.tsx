@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { Menu, X, ChevronDown, FileText, Home, User, LogOut, Settings, LayoutGrid, BarChart3, Bell } from 'lucide-react';
+import { Menu, X, ChevronDown, FileText, Home, User, LogOut, Settings, LayoutGrid, BarChart3, Bell, Sparkles } from 'lucide-react';
+import { CreditCounter } from '@/components/CreditCounter';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -101,6 +102,11 @@ export default function Header() {
           
           {/* Desktop right section */}
           <div className="hidden lg:flex lg:items-center lg:gap-x-4">
+            {/* AI Credits */}
+            <div className="hidden md:flex items-center">
+              <CreditCounter />
+            </div>
+            
             {/* Notifications */}
             <div className="relative">
               <button
@@ -234,6 +240,16 @@ export default function Header() {
                     <span className="text-sm font-medium text-gray-900 dark:text-white">Theme</span>
                     <ThemeToggle />
                   </div>
+                  <Link
+                    href="/credits"
+                    className="block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 mb-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className="flex items-center">
+                      <Sparkles className="mr-2 h-5 w-5" />
+                      Credits
+                    </div>
+                  </Link>
                   <Link
                     href="/settings"
                     className="block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"

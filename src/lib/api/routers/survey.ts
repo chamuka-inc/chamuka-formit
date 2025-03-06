@@ -3,6 +3,9 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 import { db } from '@/lib/db';
 import { TRPCError } from '@trpc/server';
 import { parseJsonResponse, generateChatCompletion } from '@/lib/aiClient';
+import { aiCreditCheck } from '../middleware/creditCheck';
+import { recordCreditTransaction, refundCredits } from '@/lib/utils/credits';
+import { CreditTransactionType } from "@/lib/types";
 
 // Input schema for creating a survey
 const createSurveySchema = z.object({
@@ -370,6 +373,7 @@ export const surveyRouter = createTRPCRouter({
   // Generate survey with AI
   generateWithAI: protectedProcedure
     .input(generateSurveySchema)
+    .use(aiCreditCheck)
     .mutation(async ({ ctx, input }) => {
       try {
         const userId = ctx.session.user.id;
@@ -441,6 +445,16 @@ export const surveyRouter = createTRPCRouter({
           },
         });
         
+        // Record the AI generation transaction
+        await db.creditTransaction.create({
+          data: {
+            userId: ctx.session.user.id,
+            credits: -1,
+            amount: 0,
+            type: CreditTransactionType.AI
+          }
+        });
+        
         return {
           success: true,
           survey,
@@ -448,6 +462,17 @@ export const surveyRouter = createTRPCRouter({
         };
       } catch (error) {
         console.error('AI survey generation error:', error);
+        
+        // If generation failed, refund the AI credit since it wasn't actually used
+        try {
+          await db.user.update({
+            where: { id: ctx.session.user.id },
+            data: { credits: { increment: 1 } }
+          });
+        } catch (refundError) {
+          console.error('Failed to refund AI credit:', refundError);
+        }
+        
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to generate survey with AI',

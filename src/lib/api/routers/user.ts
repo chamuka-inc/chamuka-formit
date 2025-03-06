@@ -49,6 +49,8 @@ export const userRouter = createTRPCRouter({
         name: true,
         email: true,
         image: true,
+        credits: true,
+        lastCreditReset: true,
       },
     });
     

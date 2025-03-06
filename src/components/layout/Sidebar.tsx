@@ -15,8 +15,10 @@ import {
   Home,
   Tag,
   Star,
-  MessageSquare
+  MessageSquare,
+  Sparkles
 } from 'lucide-react';
+import { api } from '@/lib/trpc/react';
 
 type SidebarItemProps = {
   href: string;
@@ -107,6 +109,8 @@ export default function Sidebar({ className = '' }: { className?: string }) {
     return false;
   };
 
+  const { data: credits } = api.credits.getCredits.useQuery();
+
   return (
     <aside className={`w-64 bg-white dark:bg-gray-800 h-full border-r border-gray-200 dark:border-gray-700 ${className}`}>
       <div className="flex flex-col h-full p-4">
@@ -127,6 +131,13 @@ export default function Sidebar({ className = '' }: { className?: string }) {
               title="Create Survey"
               active={pathname === '/surveys/create'}
               isNew={false}
+            />
+            <SidebarItem
+              href="/credits"
+              icon={<Sparkles className="h-5 w-5" />}
+              title="Credits"
+              active={isActive('/credits')}
+              badge={credits?.credits?.toString()}
             />
           </div>
         </div>
@@ -154,15 +165,15 @@ export default function Sidebar({ className = '' }: { className?: string }) {
           
           <div className="mt-6 px-4 py-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg mx-2">
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-xs text-blue-700 dark:text-blue-400 uppercase tracking-wider">Free Plan</span>
-              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">3/5 surveys</span>
+              <span className="font-medium text-xs text-blue-700 dark:text-blue-400 uppercase tracking-wider">Credits</span>
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">{credits?.credits || 0} remaining</span>
             </div>
             <div className="w-full bg-white/50 dark:bg-white/10 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '60%' }}></div>
+              <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${Math.min(100, (credits?.credits || 0) * 20)}%` }}></div>
             </div>
-            <button className="mt-3 text-xs font-medium text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-              Upgrade to Pro →
-            </button>
+            <Link href="/credits" className="mt-3 text-xs font-medium text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 block">
+              Get more credits →
+            </Link>
           </div>
         </div>
       </div>
