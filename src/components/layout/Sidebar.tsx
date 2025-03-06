@@ -14,7 +14,6 @@ import {
   LayoutGrid,
   Home,
   Tag,
-  Users,
   Star,
   MessageSquare
 } from 'lucide-react';
@@ -129,49 +128,6 @@ export default function Sidebar({ className = '' }: { className?: string }) {
               active={pathname === '/surveys/create'}
               isNew={false}
             />
-          </div>
-        </div>
-
-        <div className="px-2 mb-2">
-          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium mb-2 ml-2">
-            Collaborate
-          </div>
-          <div className="space-y-1 mb-2">
-            <SidebarSection 
-              title="Teams" 
-              icon={<Users className="h-5 w-5" />}
-              defaultOpen={pathname.includes('/teams')}
-              badge="3"
-            >
-              <SidebarItem
-                href="/teams"
-                icon={<Users className="h-4 w-4" />}
-                title="All Teams"
-                active={pathname === '/teams'}
-              />
-              <SidebarItem
-                href="/teams/create"
-                icon={<PlusCircle className="h-4 w-4" />}
-                title="Create Team"
-                active={pathname === '/teams/create'}
-              />
-              {pathname.includes('/teams/') && pathname !== '/teams/create' && !pathname.includes('/settings') && (
-                <SidebarItem
-                  href={pathname}
-                  icon={<Users className="h-4 w-4" />}
-                  title="Team Details"
-                  active={true}
-                />
-              )}
-              {pathname.includes('/teams/') && pathname.includes('/settings') && (
-                <SidebarItem
-                  href={pathname}
-                  icon={<Settings className="h-4 w-4" />}
-                  title="Team Settings"
-                  active={true}
-                />
-              )}
-            </SidebarSection>
           </div>
         </div>
 
