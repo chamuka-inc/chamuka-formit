@@ -47,6 +47,15 @@ export default function VerifyRequest() {
                 </Link>
               </li>
             </ul>
+            <div className="pt-4">
+              <Link
+                href="/auth/signin"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brandBlue-100 dark:bg-brandBlue-900 px-4 py-2 text-brandBlue-600 dark:text-brandBlue-400 hover:bg-brandBlue-200 dark:hover:bg-brandBlue-800 transition-colors"
+              >
+                <Mail className="h-4 w-4" />
+                Send another verification email
+              </Link>
+            </div>
           </div>
         </div>
       </div>

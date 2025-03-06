@@ -24,17 +24,6 @@ export default function DashboardPage() {
     }
   });
   
-  // Create sample surveys mutation
-  const createSamplesMutation = api.survey.createSamples.useMutation({
-    onSuccess: () => {
-      toast.success('Sample surveys created successfully');
-      refetch();
-    },
-    onError: (error: any) => {
-      toast.error(`Error creating sample surveys: ${error.message}`);
-    }
-  });
-  
   // State for delete confirmation
   const [surveyToDelete, setSurveyToDelete] = useState<string | null>(null);
   
@@ -54,11 +43,6 @@ export default function DashboardPage() {
   // Handle cancel delete
   const handleCancelDelete = () => {
     setSurveyToDelete(null);
-  };
-
-  // Handle create sample surveys
-  const handleCreateSamples = () => {
-    createSamplesMutation.mutate();
   };
   
   // Format date for display
@@ -154,16 +138,6 @@ export default function DashboardPage() {
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage and analyze your surveys</p>
         </div>
         <div className="flex space-x-3">
-          {process.env.NODE_ENV === 'development' && (
-            <button
-              onClick={handleCreateSamples}
-              className="inline-flex items-center px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded-md shadow-sm transition-colors"
-              disabled={createSamplesMutation.isPending}
-            >
-              <Database className="w-5 h-5 mr-1.5" />
-              {createSamplesMutation.isPending ? 'Creating...' : 'Create Samples'}
-            </button>
-          )}
           <Link 
             href="/surveys/create" 
             className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-sm transition-colors"
@@ -316,16 +290,6 @@ export default function DashboardPage() {
               : 'Create your first survey to start collecting feedback and valuable data from your audience.'}
           </p>
           <div className="flex justify-center space-x-4">
-            {process.env.NODE_ENV === 'development' && (
-              <button
-                onClick={handleCreateSamples}
-                className="inline-flex items-center px-5 py-2.5 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded-md shadow-sm transition-colors"
-                disabled={createSamplesMutation.isPending}
-              >
-                <Database className="w-5 h-5 mr-2" />
-                {createSamplesMutation.isPending ? 'Creating...' : 'Create Samples'}
-              </button>
-            )}
             <Link 
               href="/surveys/create" 
               className="inline-flex items-center px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md shadow-sm transition-colors"

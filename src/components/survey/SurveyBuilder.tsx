@@ -140,16 +140,15 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
       description: currentSurvey?.description,
       pages: pages.map(page => ({
         title: page.title,
-        questions: page.questions.map(q => ({
+        questions: (page.questions || []).map(q => ({
           text: q.text,
           type: q.type,
           required: q.required,
-          options: q.options,
+          options: q.options || [],
         })),
-        contextElements: page.contextElements.map(ce => ({
+        contextElements: (page.contextElements || []).map(ce => ({
           type: ce.type,
           content: ce.content,
-          orderIndex: ce.orderIndex || 0,
         })),
       })),
     };
@@ -158,8 +157,7 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     updateSurveyMutation.mutate({
       id: surveyId,
       title: survey.title,
-      description: survey.description,
-      pages: survey.pages
+      description: survey.description || undefined,
     });
   };
   
@@ -175,6 +173,7 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     // Prepare the survey data with published status
     publishSurveyMutation.mutate({
       id: surveyId,
+      title: currentSurvey?.title || 'Untitled Survey',
       status: 'published',
     });
   };
