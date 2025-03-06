@@ -1,3 +1,4 @@
+import React from "react";
 import { getServerAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -33,7 +34,7 @@ export default async function Home() {
               </Link>
               <Link
                 href="/auth/signin"
-                className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-brandBlue-500 to-brandBlue-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-brandBlue-500/20 transition-all hover:from-brandBlue-600 hover:to-brandBlue-700 hover:shadow-xl hover:shadow-brandBlue-500/30"
+                className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 shadow-lg shadow-brandBlue-500/20 transition-all hover:bg-neutral-50 dark:hover:bg-neutral-700"
               >
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -61,7 +62,7 @@ export default async function Home() {
                 <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/auth/signin"
-                    className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-brandBlue-500 to-brandBlue-600 px-6 py-3 text-base font-medium text-white shadow-lg shadow-brandBlue-500/20 transition-all hover:from-brandBlue-600 hover:to-brandBlue-700 hover:shadow-xl hover:shadow-brandBlue-500/30"
+                    className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-brandBlue-500 to-brandBlue-600 px-6 py-3 text-base font-medium text-neutral-900 shadow-lg shadow-brandBlue-500/20 transition-all hover:from-brandBlue-600 hover:to-brandBlue-700 hover:shadow-xl hover:shadow-brandBlue-500/30 dark:text-white"
                   >
                     Get Started for Free
                     <ArrowRight className="ml-2 h-5 w-5" />

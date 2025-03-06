@@ -82,11 +82,6 @@ export const authOptions: NextAuthOptions = {
         const email = user?.email;
         if (!email) return false;
 
-        // Development bypass
-        if (process.env.NODE_ENV === 'development') {
-          return true;
-        }
-
         /*
         // Enable this to restrict sign-ins to certain domains or allowlist
         const domainCheck = ALLOWED_DOMAINS.some((d) => email.endsWith(d));
