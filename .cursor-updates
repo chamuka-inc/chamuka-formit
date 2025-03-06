@@ -94,6 +94,8 @@
 - Integrated Google's Gemini model (gemini-2.0-flash-exp) as the default AI model for survey generation, with proper parameter handling and type safety.
 - Refactored survey data storage to persist complete survey JSON as a single object instead of using multiple tables, simplifying the database schema and API while maintaining full functionality.
 - Simplified page list sidebar design: removed badges and icons in favor of minimal text description for questions and info blocks counts
+- Added middleware to protect authenticated routes using session-based authentication
+- Enhanced (authenticated) layout with client-side session checks and loading states
 
 # 2024-03-06
 - Fixed survey builder persistence issue with auto-save functionality and proper database updates.
