@@ -23,7 +23,6 @@ declare module "next-auth/adapters" {
     login?: string;
     role?: UserRole;
     dashboardEnabled?: boolean;
-    isTeamAdmin?: boolean;
   }
 }
 
@@ -39,7 +38,6 @@ declare module "next-auth" {
       dashboardEnabled?: boolean;
       isAdmin?: boolean;
       expires?: string;
-      isTeamAdmin?: boolean;
     };
     accessToken?: string;
   }
@@ -52,7 +50,6 @@ declare module "next-auth" {
     role?: UserRole;
     login?: string;
     expires?: string;
-    isTeamAdmin?: boolean;
     isAdmin?: boolean;
   }
 }

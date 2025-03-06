@@ -99,3 +99,9 @@
 
 # 2024-03-06
 - Fixed survey builder persistence issue with auto-save functionality and proper database updates.
+
+- Removed teams functionality for MVP simplification, including:
+  - Deleted all team-related pages and routes
+  - Removed teams section from sidebar navigation
+  - Removed team-related migration
+  - Removed isTeamAdmin field from auth interfaces
