@@ -99,12 +99,15 @@
 - Implemented settings functionality with user profile, account security, notifications, and appearance settings
 - Created user router with tRPC endpoints for managing user settings
 - Updated Header component to display the actual user email instead of hardcoded value
+- Implemented AI credit system with Prisma schema updates, tRPC middleware, and user interface components.
+- Added transaction history tracking for AI credit usage with proper recording of successful AI generations and credit purchases.
 
 # 2024-03-06
 - Fixed survey builder persistence issue with auto-save functionality and proper database updates.
-
 - Removed teams functionality for MVP simplification, including:
   - Deleted all team-related pages and routes
   - Removed teams section from sidebar navigation
   - Removed team-related migration
   - Removed isTeamAdmin field from auth interfaces
+- Refactored the credit system to be more generic, supporting different transaction types beyond AI usage, with updated schema, middleware, and UI components.
+- Implemented CreditTransactionType enum for improved type safety and consistency across the credit system.

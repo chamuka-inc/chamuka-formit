@@ -2,6 +2,7 @@ import { createCallerFactory, createTRPCRouter } from "./trpc";
 import { surveyRouter } from "./routers/survey";
 import { aiSurveyRouter } from "./routers/aiSurvey";
 import { userRouter } from "./routers/user";
+import { creditsRouter } from "./routers/credits";
 // import all routers here
 
 /**
@@ -13,6 +14,7 @@ export const appRouter = createTRPCRouter({
   survey: surveyRouter,
   aiSurvey: aiSurveyRouter,
   user: userRouter,
+  credits: creditsRouter,
   // add routers here
 });
 

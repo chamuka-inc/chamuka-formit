@@ -83,3 +83,11 @@ export interface SurveyContextType {
   redo: () => void;
   clearHistory: () => void;
 }
+
+export enum CreditTransactionType {
+  AI = "ai",
+  PURCHASE = "purchase",
+  EXPORT = "export",
+  ANALYTICS = "analytics",
+  REFUND = "refund"
+}

@@ -16,6 +16,9 @@ export default function CreateSurveyPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiGenerationError, setAiGenerationError] = useState<string | null>(null);
   
+  // Get trpc utils for cache invalidation
+  const utils = api.useUtils();
+  
   // Create survey mutation
   const createMutation = api.survey.create.useMutation({
     onSuccess: (data) => {
@@ -31,12 +34,16 @@ export default function CreateSurveyPage() {
   const generateMutation = api.survey.generateWithAI.useMutation({
     onSuccess: (data) => {
       toast.success('Survey generated successfully with AI');
+      // Invalidate the credits query to refresh the credit count
+      utils.credits.getAICredits.invalidate();
       router.push(`/surveys/${data.survey.id}/edit`);
     },
     onError: (error) => {
       setAiGenerationError(error.message);
       toast.error(`Error generating survey: ${error.message}`);
       setIsGenerating(false);
+      // Also invalidate on error to show the refunded credit
+      utils.credits.getAICredits.invalidate();
     }
   });
   
