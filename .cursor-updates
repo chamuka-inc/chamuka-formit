@@ -87,3 +87,8 @@
   - Plan usage visualization with upgrade prompt
   - Mobile-friendly design with improved sidebar toggle
   - Consistent styling across both main app sidebar and page list sidebar
+- Fixed TypeScript errors in survey components by properly typing optional arrays, fixing import casing, and updating mutation parameters to match API requirements.
+- Enhanced authentication flow with improved email configuration using Resend, development bypass for testing, better error handling with specific messages, and added resend button to verification page.
+- Created a modern marketing home page with hero section, features, and responsive design, and updated signout flow to redirect users to the marketing page after signing out.
+- Updated email provider configuration to use standard SMTP environment variables (EMAIL_SERVER_HOST, EMAIL_SERVER_PORT, EMAIL_SERVER_USER, EMAIL_SERVER_PASSWORD, EMAIL_FROM) for better compatibility.
+- Integrated Google's Gemini model (gemini-2.0-flash-exp) as the default AI model for survey generation, with proper parameter handling and type safety.

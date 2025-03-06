@@ -93,22 +93,6 @@ export const publicProcedure = t.procedure;
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (process.env.NODE_ENV === 'development') {
-    return next({
-      ctx: {
-        session: {
-          user: {
-            id: 'dev-user',
-            email: 'dev@example.com',
-            name: 'Development User',
-            role: UserRole.admin,
-            isAdmin: true,
-          },
-        },
-      },
-    });
-  }
-
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({
       code: "UNAUTHORIZED",

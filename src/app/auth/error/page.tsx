@@ -26,7 +26,13 @@ function ErrorContent() {
           </h1>
           <p className="mt-3 text-neutral-600 dark:text-neutral-300">
             {error === "AccessDenied"
-              ? "Access denied."
+              ? "Access denied. You do not have permission to access this resource."
+              : error === "Verification"
+              ? "The verification link has expired or has already been used. Please try signing in again."
+              : error === "Configuration"
+              ? "There is a problem with the server configuration. Please contact support."
+              : error === "EmailSignin"
+              ? "The email sign-in attempt failed. Please try again."
               : "An error occurred during authentication. Please try again."}
           </p>
         </div>

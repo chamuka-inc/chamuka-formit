@@ -170,12 +170,19 @@ export async function generateChatCompletion(
 
     // Handle Gemini models directly
     if (modelId.includes("gemini")) {
-      const geminiResp = await generateGeminiWebResponse(
-        messages,
-        model,
-        false,
-      );
-      return geminiResp.text;
+      const { temperature, max_tokens } = additionalOptions;
+      const geminiModel = genAI.getGenerativeModel({
+        model: modelId,
+        generationConfig: {
+          temperature: temperature ? Number(temperature) : 0.7,
+          maxOutputTokens: max_tokens ? Number(max_tokens) : undefined,
+        },
+      });
+
+      const prompt = messages.map((m) => m.content).join("\n");
+      const result = await geminiModel.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
     }
 
     // Handle OpenAI and Perplexity models

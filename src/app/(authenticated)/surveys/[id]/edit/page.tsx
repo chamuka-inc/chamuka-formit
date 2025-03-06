@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
@@ -8,6 +8,11 @@ import { ArrowLeft, Loader2, Pencil, Save, Share, CheckCircle, X, ExternalLink, 
 import { api } from '@/lib/trpc/react';
 import { SurveyBuilder } from '@/components/survey/SurveyBuilder';
 import { SurveyShareModal } from '@/components/survey/SurveyShareModal';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Button } from '@/components/ui/button';
+import { formatDistanceToNow } from 'date-fns';
+import { QuestionType, SurveyPage, ContextElementType } from '@/lib/types';
 
 export default function EditSurveyPage() {
   // Use useParams hook to get the id
@@ -29,11 +34,15 @@ export default function EditSurveyPage() {
   const { data: survey, isLoading, error, refetch } = api.survey.getById.useQuery({ id }, {
     retry: 3,
     retryDelay: 1000,
-    onError: (err) => {
-      console.error('Error fetching survey:', err);
-      toast.error("Error loading survey: " + err.message);
-    }
   });
+  
+  // Handle query error
+  useEffect(() => {
+    if (error) {
+      console.error('Error fetching survey:', error);
+      toast.error("Error loading survey: " + error.message);
+    }
+  }, [error]);
   
   // Update survey details mutation
   const updateSurveyMutation = api.survey.update.useMutation({
@@ -72,14 +81,6 @@ export default function EditSurveyPage() {
     }
   }, [survey]);
   
-  // Handle errors
-  useEffect(() => {
-    if (error) {
-      toast.error("Error loading survey: " + error.message);
-      router.push('/dashboard');
-    }
-  }, [error, router]);
-  
   // Handle updating the survey title and description
   const handleUpdateSurveyDetails = () => {
     if (!title.trim()) {
@@ -112,10 +113,10 @@ export default function EditSurveyPage() {
     });
   };
   
-  // Publish the survey
+  // Handle publishing the survey
   const handlePublishSurvey = () => {
-    if (!id) {
-      toast.error('Cannot publish: No survey ID');
+    if (!survey) {
+      toast.error("Cannot publish: Survey data not loaded");
       return;
     }
     
@@ -124,6 +125,7 @@ export default function EditSurveyPage() {
     // Prepare the survey data with published status
     publishSurveyMutation.mutate({
       id,
+      title: survey.title,
       status: 'published',
     });
   };
@@ -187,7 +189,7 @@ export default function EditSurveyPage() {
       questions: [
         {
           id: `q-${Math.random().toString(36).substr(2, 9)}`,
-          type: 'text',
+          type: 'text' as const,
           text: 'What would you like to know?',
           required: true,
           options: [],
@@ -196,8 +198,9 @@ export default function EditSurveyPage() {
       ],
       contextElements: [
         {
-          type: 'paragraph',
-          content: 'Welcome to our survey! Please answer the following questions.'
+          type: 'paragraph' as const,
+          content: 'Welcome to our survey! Please answer the following questions.',
+          orderIndex: 0
         }
       ]
     }

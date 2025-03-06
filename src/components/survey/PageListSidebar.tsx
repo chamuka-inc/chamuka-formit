@@ -101,12 +101,12 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                           {page.title || 'Untitled Page'}
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
-                          {page.questions?.length > 0 && (
+                          {page.questions && page.questions.length > 0 && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
                               {page.questions.length} Q
                             </span>
                           )}
-                          {page.contextElements?.length > 0 && (
+                          {page.contextElements && page.contextElements.length > 0 && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
                               {page.contextElements.length} CE
                             </span>
