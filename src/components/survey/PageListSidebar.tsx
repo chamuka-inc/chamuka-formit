@@ -100,17 +100,13 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                         }`}>
                           {page.title || 'Untitled Page'}
                         </h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          {page.questions && page.questions.length > 0 && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                              {page.questions.length} Q
-                            </span>
-                          )}
-                          {page.contextElements && page.contextElements.length > 0 && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                              {page.contextElements.length} CE
-                            </span>
-                          )}
+                        <div className="mt-1">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {[
+                              page.questions && page.questions.length ? `${page.questions.length} ${page.questions.length === 1 ? 'question' : 'questions'}` : null,
+                              page.contextElements && page.contextElements.length ? `${page.contextElements.length} info ${page.contextElements.length === 1 ? 'block' : 'blocks'}` : null
+                            ].filter(Boolean).join(' · ')}
+                          </span>
                         </div>
                       </div>
                     </div>
