@@ -41,6 +41,10 @@ function validateQuestion(question: Question, path: string[] = []): ValidationEr
       }
 
       if (element.type === 'image' || element.type === 'video') {
+        // Skip URL validation in development mode
+        if (process.env.NODE_ENV === 'development') {
+          return;
+        }
         try {
           new URL(element.content);
         } catch {
@@ -90,6 +94,10 @@ function validatePage(page: SurveyPage, index: number): ValidationError[] {
         }
 
         if (element.type === 'image' || element.type === 'video') {
+          // Skip URL validation in development mode
+          if (process.env.NODE_ENV === 'development') {
+            return;
+          }
           try {
             new URL(element.content);
           } catch {
