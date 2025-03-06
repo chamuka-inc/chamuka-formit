@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Menu, X, ChevronDown, FileText, Home, User, LogOut, Settings, LayoutGrid, BarChart3, Bell } from 'lucide-react';
 
@@ -11,6 +12,7 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
   
   const isActive = (path: string) => {
     if (path === '/' && pathname === '/') return true;
@@ -40,6 +42,9 @@ export default function Header() {
   };
   
   const surveyInfo = getSurveyInfo();
+
+  // Get user email from session
+  const userEmail = session?.user?.email || 'No email available';
 
   return (
     <header className="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40 shadow-sm">
@@ -138,7 +143,7 @@ export default function Header() {
                 <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Signed in as</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">user@example.com</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{userEmail}</p>
                   </div>
                   <Link
                     href="/settings"

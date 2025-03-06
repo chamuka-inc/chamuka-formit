@@ -96,6 +96,9 @@
 - Simplified page list sidebar design: removed badges and icons in favor of minimal text description for questions and info blocks counts
 - Added middleware to protect authenticated routes using session-based authentication
 - Enhanced (authenticated) layout with client-side session checks and loading states
+- Implemented settings functionality with user profile, account security, notifications, and appearance settings
+- Created user router with tRPC endpoints for managing user settings
+- Updated Header component to display the actual user email instead of hardcoded value
 
 # 2024-03-06
 - Fixed survey builder persistence issue with auto-save functionality and proper database updates.

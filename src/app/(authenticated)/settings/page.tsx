@@ -1,29 +1,130 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { User, Settings, Lock, Bell, Moon, Sun, Monitor, Check } from 'lucide-react';
+import { api as trpc } from '@/lib/trpc/react';
+import { useSession } from 'next-auth/react';
 
 export default function SettingsPage() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<'profile' | 'account' | 'notifications' | 'appearance'>('profile');
   const [loading, setLoading] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  
+  // Form states
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [bio, setBio] = useState('');
+  
+  // Password states
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // Notification states
+  const [emailNotifications, setEmailNotifications] = useState({
+    surveyResponses: true,
+    weeklySummary: true,
+    productUpdates: false,
+  });
+  const [pushNotifications, setPushNotifications] = useState({
+    newResponses: true,
+    surveyCompletion: false,
+  });
 
+  // tRPC mutations
+  const updateProfileMutation = trpc.user.updateProfile.useMutation({
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
+      setLoading(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile");
+      setLoading(false);
+    }
+  });
+
+  const updatePasswordMutation = trpc.user.updatePassword.useMutation({
+    onSuccess: () => {
+      toast.success("Password updated successfully");
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update password");
+    }
+  });
+
+  const updateNotificationsMutation = trpc.user.updateNotifications.useMutation({
+    onSuccess: () => {
+      toast.success("Notification preferences updated");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update notification preferences");
+    }
+  });
+
+  const updateAppearanceMutation = trpc.user.updateAppearance.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Theme changed to ${data.theme}`);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update appearance preferences");
+    }
+  });
+
+  // Fetch user profile data
+  const { data: userData, isLoading: isLoadingUser } = trpc.user.getProfile.useQuery();
+  
+  // Update form when profile data is loaded
+  useEffect(() => {
+    if (userData) {
+      setName(userData.name || '');
+      setEmail(userData.email || '');
+    } else if (session?.user) {
+      // Fallback to session data if userData is not available
+      setName(session.user.name || '');
+      setEmail(session.user.email || '');
+    }
+  }, [userData, session]);
+
+  // Handle form submissions
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      toast.success("Profile updated successfully");
-    }, 1000);
+    updateProfileMutation.mutate({
+      name,
+      bio,
+    });
+  };
+  
+  const handleUpdatePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    
+    updatePasswordMutation.mutate({
+      currentPassword,
+      newPassword,
+    });
+  };
+  
+  const handleSaveNotifications = () => {
+    updateNotificationsMutation.mutate({
+      emailNotifications,
+      pushNotifications,
+    });
   };
   
   const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
     setTheme(newTheme);
-    // In a real app, you would save this to user preferences and update the theme
-    toast.success(`Theme changed to ${newTheme}`);
+    updateAppearanceMutation.mutate({ theme: newTheme });
   };
 
   return (
@@ -87,66 +188,76 @@ export default function SettingsPage() {
             {activeTab === 'profile' && (
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Profile Information</h2>
-                <form onSubmit={handleSaveProfile}>
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="name">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      defaultValue="John Doe"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    />
+                {isLoadingUser && !session ? (
+                  <div className="flex justify-center py-8">
+                    <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
                   </div>
-                  
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="email">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      defaultValue="john.doe@example.com"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-                  
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="bio">
-                      Bio
-                    </label>
-                    <textarea
-                      id="bio"
-                      name="bio"
-                      rows={4}
-                      defaultValue="Product Manager with over 5 years of experience in SaaS and consumer products."
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-                  
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {loading ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Saving...
-                        </>
-                      ) : (
-                        'Save Changes'
-                      )}
-                    </button>
-                  </div>
-                </form>
+                ) : (
+                  <form onSubmit={handleSaveProfile}>
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="name">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="email">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={email}
+                        disabled
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 dark:bg-gray-600"
+                      />
+                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Email cannot be changed</p>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="bio">
+                        Bio
+                      </label>
+                      <textarea
+                        id="bio"
+                        name="bio"
+                        rows={4}
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    
+                    <div>
+                      <button
+                        type="submit"
+                        disabled={loading || updateProfileMutation.isPending}
+                        className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading || updateProfileMutation.isPending ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Saving...
+                          </>
+                        ) : (
+                          'Save Changes'
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             )}
             
@@ -156,7 +267,7 @@ export default function SettingsPage() {
                 
                 <div className="mb-8">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Change Password</h3>
-                  <div className="space-y-4">
+                  <form onSubmit={handleUpdatePassword} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="current-password">
                         Current Password
@@ -165,6 +276,8 @@ export default function SettingsPage() {
                         type="password"
                         id="current-password"
                         name="current_password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                       />
                     </div>
@@ -177,6 +290,8 @@ export default function SettingsPage() {
                         type="password"
                         id="new-password"
                         name="new_password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                       />
                     </div>
@@ -189,19 +304,32 @@ export default function SettingsPage() {
                         type="password"
                         id="confirm-password"
                         name="confirm_password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                       />
                     </div>
                     
                     <div>
                       <button
-                        type="button"
-                        className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        type="submit"
+                        disabled={updatePasswordMutation.isPending}
+                        className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Update Password
+                        {updatePasswordMutation.isPending ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Updating...
+                          </>
+                        ) : (
+                          'Update Password'
+                        )}
                       </button>
                     </div>
-                  </div>
+                  </form>
                 </div>
                 
                 <div>
@@ -232,7 +360,14 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between">
                         <label className="text-sm text-gray-700 dark:text-gray-300">Survey Responses</label>
                         <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                          <input type="checkbox" name="survey_responses" id="survey-responses" defaultChecked className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                          <input 
+                            type="checkbox" 
+                            name="survey_responses" 
+                            id="survey-responses" 
+                            checked={emailNotifications.surveyResponses}
+                            onChange={(e) => setEmailNotifications({...emailNotifications, surveyResponses: e.target.checked})}
+                            className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" 
+                          />
                           <label htmlFor="survey-responses" className="block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer"></label>
                         </div>
                       </div>
@@ -240,7 +375,14 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between">
                         <label className="text-sm text-gray-700 dark:text-gray-300">Weekly Summary</label>
                         <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                          <input type="checkbox" name="weekly_summary" id="weekly-summary" defaultChecked className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                          <input 
+                            type="checkbox" 
+                            name="weekly_summary" 
+                            id="weekly-summary" 
+                            checked={emailNotifications.weeklySummary}
+                            onChange={(e) => setEmailNotifications({...emailNotifications, weeklySummary: e.target.checked})}
+                            className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" 
+                          />
                           <label htmlFor="weekly-summary" className="block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer"></label>
                         </div>
                       </div>
@@ -248,7 +390,14 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between">
                         <label className="text-sm text-gray-700 dark:text-gray-300">Product Updates</label>
                         <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                          <input type="checkbox" name="product_updates" id="product-updates" className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                          <input 
+                            type="checkbox" 
+                            name="product_updates" 
+                            id="product-updates" 
+                            checked={emailNotifications.productUpdates}
+                            onChange={(e) => setEmailNotifications({...emailNotifications, productUpdates: e.target.checked})}
+                            className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" 
+                          />
                           <label htmlFor="product-updates" className="block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer"></label>
                         </div>
                       </div>
@@ -261,7 +410,14 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between">
                         <label className="text-sm text-gray-700 dark:text-gray-300">New Responses</label>
                         <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                          <input type="checkbox" name="new_responses" id="new-responses" defaultChecked className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                          <input 
+                            type="checkbox" 
+                            name="new_responses" 
+                            id="new-responses" 
+                            checked={pushNotifications.newResponses}
+                            onChange={(e) => setPushNotifications({...pushNotifications, newResponses: e.target.checked})}
+                            className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" 
+                          />
                           <label htmlFor="new-responses" className="block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer"></label>
                         </div>
                       </div>
@@ -269,7 +425,14 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between">
                         <label className="text-sm text-gray-700 dark:text-gray-300">Survey Completion</label>
                         <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                          <input type="checkbox" name="survey_completion" id="survey-completion" className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                          <input 
+                            type="checkbox" 
+                            name="survey_completion" 
+                            id="survey-completion" 
+                            checked={pushNotifications.surveyCompletion}
+                            onChange={(e) => setPushNotifications({...pushNotifications, surveyCompletion: e.target.checked})}
+                            className="checked:bg-blue-500 outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" 
+                          />
                           <label htmlFor="survey-completion" className="block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer"></label>
                         </div>
                       </div>
@@ -279,9 +442,21 @@ export default function SettingsPage() {
                   <div className="pt-4">
                     <button
                       type="button"
-                      className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      onClick={handleSaveNotifications}
+                      disabled={updateNotificationsMutation.isPending}
+                      className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Save Preferences
+                      {updateNotificationsMutation.isPending ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Saving...
+                        </>
+                      ) : (
+                        'Save Preferences'
+                      )}
                     </button>
                   </div>
                 </div>
@@ -355,15 +530,6 @@ export default function SettingsPage() {
                         )}
                       </button>
                     </div>
-                  </div>
-                  
-                  <div className="pt-4">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Save Preferences
-                    </button>
                   </div>
                 </div>
               </div>
