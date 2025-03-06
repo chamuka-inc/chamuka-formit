@@ -52,6 +52,20 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     }
   });
   
+  const saveSurveyDataMutation = api.survey.saveSurveyData.useMutation({
+    onSuccess: (data) => {
+      console.log('Survey data saved successfully:', data);
+      setLastSaved(new Date());
+      setIsSaving(false);
+      toast.success('Survey data saved successfully');
+    },
+    onError: (error) => {
+      console.error('Error saving survey data:', error);
+      setIsSaving(false);
+      toast.error(`Error saving survey data: ${error.message}`);
+    }
+  });
+  
   const publishSurveyMutation = api.survey.update.useMutation({
     onSuccess: () => {
       setIsPublishing(false);
@@ -133,33 +147,72 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     
     setIsSaving(true);
     
-    // Prepare the survey data
-    const survey = {
-      id: surveyId,
-      title: currentSurvey?.title || 'Untitled Survey',
-      description: currentSurvey?.description,
+    // Prepare the complete survey data payload
+    const surveyData = {
       pages: pages.map(page => ({
-        title: page.title,
+        title: page.title || 'Untitled Page',
         questions: (page.questions || []).map(q => ({
-          text: q.text,
-          type: q.type,
-          required: q.required,
+          id: q.id || `q-${Math.random().toString(36).substr(2, 9)}`,
+          text: q.text || '',
+          type: q.type || 'text',
+          required: q.required !== undefined ? q.required : false,
           options: q.options || [],
+          contextElements: q.contextElements || [],
         })),
         contextElements: (page.contextElements || []).map(ce => ({
           type: ce.type,
-          content: ce.content,
+          content: ce.content || '',
         })),
       })),
     };
     
-    // Call the API to update the survey
-    updateSurveyMutation.mutate({
+    // Save the survey data using the saveSurveyData mutation
+    saveSurveyDataMutation.mutate({
       id: surveyId,
-      title: survey.title,
-      description: survey.description || undefined,
+      data: surveyData,
     });
   };
+  
+  // Automatically save survey when pages change
+  useEffect(() => {
+    // Skip saving during initial render or if already saving
+    if (!surveyId || pages.length === 0 || isSaving) return;
+    
+    console.log('Pages changed, scheduling autosave...');
+    const timeoutId = setTimeout(() => {
+      console.log('Executing autosave...');
+      // Create a function reference to avoid dependency issues
+      const saveData = () => {
+        const surveyData = {
+          pages: pages.map(page => ({
+            title: page.title || 'Untitled Page',
+            questions: (page.questions || []).map(q => ({
+              id: q.id || `q-${Math.random().toString(36).substr(2, 9)}`,
+              text: q.text || '',
+              type: q.type || 'text',
+              required: q.required !== undefined ? q.required : false,
+              options: q.options || [],
+              contextElements: q.contextElements || [],
+            })),
+            contextElements: (page.contextElements || []).map(ce => ({
+              type: ce.type,
+              content: ce.content || '',
+            })),
+          })),
+        };
+        
+        setIsSaving(true);
+        saveSurveyDataMutation.mutate({
+          id: surveyId,
+          data: surveyData,
+        });
+      };
+      
+      saveData();
+    }, 2000); // Save 2 seconds after changes stop
+    
+    return () => clearTimeout(timeoutId);
+  }, [JSON.stringify(pages), surveyId]); // Use JSON.stringify to properly detect changes
   
   // Publish the survey
   const handlePublishSurvey = () => {

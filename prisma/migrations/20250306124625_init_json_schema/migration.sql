@@ -4,12 +4,6 @@ CREATE TYPE "UserRole" AS ENUM ('user', 'admin');
 -- CreateEnum
 CREATE TYPE "SurveyStatus" AS ENUM ('draft', 'published', 'archived');
 
--- CreateEnum
-CREATE TYPE "QuestionType" AS ENUM ('text', 'radio', 'checkbox');
-
--- CreateEnum
-CREATE TYPE "ContextElementType" AS ENUM ('paragraph', 'image', 'video');
-
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -83,50 +77,9 @@ CREATE TABLE "Survey" (
     "isProFeature" BOOLEAN NOT NULL DEFAULT false,
     "customEndpoint" TEXT,
     "publicShareToken" TEXT NOT NULL,
+    "data" JSONB,
 
     CONSTRAINT "Survey_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "SurveyPage" (
-    "id" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "description" TEXT,
-    "orderIndex" INTEGER NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "surveyId" TEXT NOT NULL,
-
-    CONSTRAINT "SurveyPage_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Question" (
-    "id" TEXT NOT NULL,
-    "text" TEXT NOT NULL,
-    "type" "QuestionType" NOT NULL,
-    "required" BOOLEAN NOT NULL DEFAULT false,
-    "orderIndex" INTEGER NOT NULL,
-    "options" TEXT[],
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "pageId" TEXT NOT NULL,
-
-    CONSTRAINT "Question_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "ContextElement" (
-    "id" TEXT NOT NULL,
-    "type" "ContextElementType" NOT NULL,
-    "content" TEXT NOT NULL,
-    "orderIndex" INTEGER NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "pageId" TEXT,
-    "questionId" TEXT,
-
-    CONSTRAINT "ContextElement_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -136,19 +89,9 @@ CREATE TABLE "Submission" (
     "surveyId" TEXT NOT NULL,
     "submitterIp" TEXT,
     "userAgent" TEXT,
+    "data" JSONB,
 
     CONSTRAINT "Submission_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "QuestionResponse" (
-    "id" TEXT NOT NULL,
-    "submissionId" TEXT NOT NULL,
-    "questionId" TEXT NOT NULL,
-    "value" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "QuestionResponse_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -182,22 +125,4 @@ ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Survey" ADD CONSTRAINT "Survey_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SurveyPage" ADD CONSTRAINT "SurveyPage_surveyId_fkey" FOREIGN KEY ("surveyId") REFERENCES "Survey"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Question" ADD CONSTRAINT "Question_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "SurveyPage"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ContextElement" ADD CONSTRAINT "ContextElement_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "SurveyPage"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ContextElement" ADD CONSTRAINT "ContextElement_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Submission" ADD CONSTRAINT "Submission_surveyId_fkey" FOREIGN KEY ("surveyId") REFERENCES "Survey"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "QuestionResponse" ADD CONSTRAINT "QuestionResponse_submissionId_fkey" FOREIGN KEY ("submissionId") REFERENCES "Submission"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "QuestionResponse" ADD CONSTRAINT "QuestionResponse_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question"("id") ON DELETE CASCADE ON UPDATE CASCADE;

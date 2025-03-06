@@ -8,11 +8,6 @@ import { ArrowLeft, Loader2, Pencil, Save, Share, CheckCircle, X, ExternalLink, 
 import { api } from '@/lib/trpc/react';
 import { SurveyBuilder } from '@/components/survey/SurveyBuilder';
 import { SurveyShareModal } from '@/components/survey/SurveyShareModal';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Button } from '@/components/ui/button';
-import { formatDistanceToNow } from 'date-fns';
-import { QuestionType, SurveyPage, ContextElementType } from '@/lib/types';
 
 export default function EditSurveyPage() {
   // Use useParams hook to get the id
@@ -44,6 +39,25 @@ export default function EditSurveyPage() {
     }
   }, [error]);
   
+  // Set title and description from survey data
+  useEffect(() => {
+    if (survey) {
+      setTitle(survey.title || 'Untitled Survey');
+      setDescription(survey.description || '');
+    }
+  }, [survey]);
+  
+  // Make sure any time survey changes, we update the local state with the latest data
+  useEffect(() => {
+    if (survey?.data && typeof survey.data === 'object') {
+      const data = survey.data as any;
+      if (Array.isArray(data.pages) && data.pages.length > 0) {
+        // We already have the data loaded from surveyPages/pagesForBuilder,
+        // this just ensures reactivity if the survey data changes
+      }
+    }
+  }, [survey]);
+  
   // Update survey details mutation
   const updateSurveyMutation = api.survey.update.useMutation({
     onSuccess: () => {
@@ -72,14 +86,6 @@ export default function EditSurveyPage() {
       toast.error(`Error publishing survey: ${error.message}`);
     }
   });
-  
-  // Set title and description from survey data
-  useEffect(() => {
-    if (survey) {
-      setTitle(survey.title || 'Untitled Survey');
-      setDescription(survey.description || '');
-    }
-  }, [survey]);
   
   // Handle updating the survey title and description
   const handleUpdateSurveyDetails = () => {
@@ -169,18 +175,8 @@ export default function EditSurveyPage() {
   }
   
   // Map survey data to the format expected by SurveyBuilder
-  const surveyPages = survey?.pages?.map(page => ({
-    title: page.title || 'Untitled Page',
-    questions: (page.questions || []).map(q => ({
-      id: q.id || `q-${Math.random().toString(36).substr(2, 9)}`,
-      type: q.type,
-      text: q.text || '',
-      required: q.required || false,
-      options: q.options || [],
-      contextElements: q.contextElements || []
-    })) || [],
-    contextElements: page.contextElements || []
-  })) || [];
+  const surveyData = survey?.data ? (typeof survey.data === 'object' ? survey.data as any : { pages: [] }) : { pages: [] };
+  const surveyPages = Array.isArray(surveyData.pages) ? surveyData.pages : [];
   
   // If we have no pages but have a survey, create a default page
   const pagesForBuilder = surveyPages.length > 0 ? surveyPages : [
@@ -200,7 +196,6 @@ export default function EditSurveyPage() {
         {
           type: 'paragraph' as const,
           content: 'Welcome to our survey! Please answer the following questions.',
-          orderIndex: 0
         }
       ]
     }
@@ -333,7 +328,7 @@ export default function EditSurveyPage() {
       <div className="flex-1">
         <SurveyBuilder 
           initialPages={pagesForBuilder} 
-          hideHeader={true} // Pass prop to hide the duplicate header
+          hideHeader={true}
         />
       </div>
       

@@ -51,6 +51,8 @@ export const SurveyContextProvider = ({
     if (initialPages.length > 0) {
       // If we have initialPages, load them directly
       loadSurvey(initialPages);
+      // Clear local storage to prevent conflicts with database data
+      storageManager.clear();
     } else if (initialPages.length === 0) {
       loadFromLocalStorage();
     }
