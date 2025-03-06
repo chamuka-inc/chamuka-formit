@@ -94,7 +94,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${
           sidebarOpen ? 'lg:ml-64' : ''
         }`}>
-          <div className="p-4 md:p-6 lg:p-8">
+          <div>
             {children}
           </div>
         </main>

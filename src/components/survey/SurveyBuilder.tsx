@@ -301,17 +301,17 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
       )}
 
       {/* Main Content with Enhanced Container */}
-      <main className="w-full h-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="max-w-[1600px] mx-auto rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl">
-          <div className="p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-6 lg:hidden">
+      <main className="w-full h-full">
+        <div className="max-w-[1600px] mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm">
+          <div className="p-3 sm:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 lg:hidden">
               <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
               {activeTab === 'builder' && (
                 <button
                   onClick={toggleSidebar}
-                  className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="p-1.5 sm:p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
                 </button>
               )}
             </div>
@@ -319,19 +319,30 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
               <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
             </div>
 
-            <div className="mb-12">
+            <div className="mb-8 sm:mb-12">
               {activeTab === 'builder' ? (
-                <div className="flex flex-col lg:flex-row gap-6">
+                <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
                   {/* Sidebar for mobile */}
                   <div
                     className={`
-                      fixed inset-0 z-40 lg:hidden transition-transform duration-300 transform
+                      fixed inset-0 z-50 lg:hidden transition-transform duration-300 transform
                       ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     `}
                   >
-                    <div className="absolute inset-0 bg-black/40" onClick={toggleSidebar} />
-                    <div className="relative w-80 h-full bg-white dark:bg-gray-800 p-4 overflow-y-auto">
-                      <PageListSidebar onAddPage={handleOpenPageModal} />
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" onClick={toggleSidebar} />
+                    <div className="relative w-[85%] max-w-[320px] h-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+                      <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
+                        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Pages</h2>
+                        <button
+                          onClick={toggleSidebar}
+                          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </div>
+                      <div className="p-4">
+                        <PageListSidebar onAddPage={handleOpenPageModal} />
+                      </div>
                     </div>
                   </div>
                   

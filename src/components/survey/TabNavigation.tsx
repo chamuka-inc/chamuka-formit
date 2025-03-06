@@ -9,11 +9,11 @@ interface TabNavigationProps {
 
 export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) => {
   return (
-    <div className="inline-flex p-1 rounded-xl bg-gray-100 dark:bg-gray-700/50 backdrop-blur-sm">
+    <div className="inline-flex p-0.5 sm:p-1 rounded-lg sm:rounded-xl bg-gray-100 dark:bg-gray-700/50 backdrop-blur-sm">
       <button
         onClick={() => onTabChange('builder')}
         className={`
-          flex items-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200
+          flex items-center gap-1 sm:gap-2 px-2.5 sm:px-6 py-2 sm:py-3 rounded-md sm:rounded-lg font-medium text-xs sm:text-sm transition-all duration-200
           ${activeTab === 'builder'
             ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
             : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
@@ -21,12 +21,12 @@ export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) =>
         `}
       >
         <PencilRuler className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-        <span className="whitespace-nowrap">Builder</span>
+        <span>Builder</span>
       </button>
       <button
         onClick={() => onTabChange('preview')}
         className={`
-          flex items-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200
+          flex items-center gap-1 sm:gap-2 px-2.5 sm:px-6 py-2 sm:py-3 rounded-md sm:rounded-lg font-medium text-xs sm:text-sm transition-all duration-200
           ${activeTab === 'preview'
             ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
             : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
@@ -34,7 +34,7 @@ export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) =>
         `}
       >
         <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-        <span className="whitespace-nowrap">Preview</span>
+        <span>Preview</span>
       </button>
     </div>
   );

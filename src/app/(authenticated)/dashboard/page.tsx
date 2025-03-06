@@ -130,7 +130,7 @@ export default function DashboardPage() {
   }
   
   return (
-    <div>
+    <div className="p-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>

@@ -189,34 +189,33 @@ export default function Header() {
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10">
                 <div className="space-y-2 py-6">
-                  <Link
-                    href="/dashboard"
-                    className={`block rounded-lg px-3 py-2 text-base font-semibold leading-7 flex items-center ${
-                      pathname === '/' || isActive('/dashboard')
-                        ? 'text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-gray-700'
-                        : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <LayoutGrid className="mr-2 h-5 w-5" />
-                    Dashboard
-                  </Link>
-                  
-                  {navigation.map((item) => (
+                  {/* Only show the Dashboard link once */}
+                  {pathname === '/' || isActive('/dashboard') ? (
                     <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`block rounded-lg px-3 py-2 text-base font-semibold leading-7 flex items-center ${
-                        item.active
-                          ? 'text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-gray-700'
-                          : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
+                      href="/dashboard"
+                      className={`rounded-lg px-3 py-2 text-base font-semibold leading-7 flex items-center text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-gray-700`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      {item.icon}
-                      <span className="ml-2">{item.name}</span>
+                      <LayoutGrid className="mr-2 h-5 w-5" />
+                      Dashboard
                     </Link>
-                  ))}
+                  ) : (
+                    navigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`block rounded-lg px-3 py-2 text-base font-semibold leading-7 flex items-center ${
+                          item.active
+                            ? 'text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-gray-700'
+                            : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.icon}
+                        <span className="ml-2">{item.name}</span>
+                      </Link>
+                    ))
+                  )}
                   
                   {/* Show current survey info if on a survey page */}
                   {surveyInfo && (
