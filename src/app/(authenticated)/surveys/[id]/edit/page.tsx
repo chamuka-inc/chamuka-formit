@@ -81,7 +81,6 @@ export default function EditSurveyPage() {
     onSuccess: () => {
       setLastSaved(new Date());
       setIsSaving(false);
-      toast.success("Survey details updated");
       setIsEditingTitle(false);
       refetch();
     },
@@ -262,10 +261,12 @@ export default function EditSurveyPage() {
                   <div className='mt-1 flex gap-2'>
                     <button
                       onClick={handleUpdateSurveyDetails}
-                      className='rounded bg-white px-3 py-1 text-xs text-blue-600 hover:bg-white/90'
+                      className='flex w-[80px] items-center justify-center rounded bg-white px-3 py-1 text-xs text-blue-600 hover:bg-white/90'
                       disabled={updateSurveyMutation.isPending}
                     >
-                      {updateSurveyMutation.isPending ? "Saving..." : "Save"}
+                      <span className='whitespace-nowrap'>
+                        {updateSurveyMutation.isPending ? "Saving..." : "Save"}
+                      </span>
                     </button>
                     <button
                       onClick={() => {
@@ -318,19 +319,26 @@ export default function EditSurveyPage() {
                 <button
                   onClick={handleSaveSurvey}
                   disabled={isSaving}
-                  className='flex items-center rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30'
+                  className='relative flex w-[100px] items-center justify-center rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30'
                 >
-                  <Save className='mr-1.5 h-4 w-4' />
-                  {isSaving ? "Saving..." : "Save"}
+                  <Save className='mr-1.5 h-4 w-4 flex-shrink-0' />
+                  <span className='whitespace-nowrap'>
+                    {isSaving ? "Saving..." : "Save"}
+                  </span>
+                  {lastSaved && !isSaving && (
+                    <span className='absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-green-400'></span>
+                  )}
                 </button>
 
                 <button
                   onClick={handlePublishSurvey}
                   disabled={isPublishing}
-                  className='flex items-center rounded-md bg-white/90 px-3 py-1.5 text-sm font-medium text-blue-600 transition-colors hover:bg-white'
+                  className='flex w-[120px] items-center justify-center rounded-md bg-white/90 px-3 py-1.5 text-sm font-medium text-blue-600 transition-colors hover:bg-white'
                 >
-                  <Share className='mr-1.5 h-4 w-4' />
-                  {isPublishing ? "Publishing..." : "Publish"}
+                  <Share className='mr-1.5 h-4 w-4 flex-shrink-0' />
+                  <span className='whitespace-nowrap'>
+                    {isPublishing ? "Publishing..." : "Publish"}
+                  </span>
                 </button>
 
                 {/* Share button - only shown for published surveys */}
@@ -419,16 +427,6 @@ export default function EditSurveyPage() {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Autosave notification */}
-      {isSaving && (
-        <div className='fixed bottom-4 right-4 flex items-center rounded-md bg-white px-4 py-2 shadow-md dark:bg-gray-800'>
-          <div className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent'></div>
-          <span className='text-sm text-gray-600 dark:text-gray-300'>
-            Saving...
-          </span>
         </div>
       )}
 

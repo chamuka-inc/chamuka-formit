@@ -100,6 +100,7 @@
 - Updated Header component to display the actual user email instead of hardcoded value
 - Implemented AI credit system with Prisma schema updates, tRPC middleware, and user interface components.
 - Added transaction history tracking for AI credit usage with proper recording of successful AI generations and credit purchases.
+- Made saved feedback in the builder more subtle by replacing toast notifications with a green dot indicator on the save button and fixed layout shift issues with buttons.
 
 # 2024-03-06
 - Fixed survey builder persistence issue with auto-save functionality and proper database updates.

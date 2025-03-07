@@ -55,7 +55,6 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
       console.log("Survey data saved successfully:", data);
       setLastSaved(new Date());
       setIsSaving(false);
-      toast.success("Survey data saved successfully");
     },
     onError: (error) => {
       console.error("Error saving survey data:", error);
@@ -284,19 +283,26 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
                 <button
                   onClick={handleSaveSurvey}
                   disabled={isSaving}
-                  className='flex items-center rounded-md bg-white/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/30'
+                  className='relative flex w-[100px] items-center justify-center rounded-md bg-white/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/30'
                 >
-                  <Save className='mr-1.5 h-4 w-4' />
-                  {isSaving ? "Saving..." : "Save"}
+                  <Save className='mr-1.5 h-4 w-4 flex-shrink-0' />
+                  <span className='whitespace-nowrap'>
+                    {isSaving ? "Saving..." : "Save"}
+                  </span>
+                  {lastSaved && !isSaving && (
+                    <span className='absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-green-400'></span>
+                  )}
                 </button>
 
                 <button
                   onClick={handlePublishSurvey}
                   disabled={isPublishing}
-                  className='flex items-center rounded-md bg-white/90 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-white'
+                  className='flex w-[120px] items-center justify-center rounded-md bg-white/90 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-white'
                 >
-                  <Share className='mr-1.5 h-4 w-4' />
-                  {isPublishing ? "Publishing..." : "Publish"}
+                  <Share className='mr-1.5 h-4 w-4 flex-shrink-0' />
+                  <span className='whitespace-nowrap'>
+                    {isPublishing ? "Publishing..." : "Publish"}
+                  </span>
                 </button>
               </div>
             </div>
@@ -466,16 +472,6 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Autosave notification */}
-      {isSaving && (
-        <div className='fixed bottom-4 right-4 flex items-center rounded-md bg-white px-4 py-2 shadow-md dark:bg-gray-800'>
-          <div className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent'></div>
-          <span className='text-sm text-gray-600 dark:text-gray-300'>
-            Saving...
-          </span>
         </div>
       )}
     </div>
