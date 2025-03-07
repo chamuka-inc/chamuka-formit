@@ -4,8 +4,7 @@
 - Performed build check on Next.js app with tRPC and Tailwind configuration
 - Successfully ran production build with Prisma generation and Next.js compilation
 - Fixed dynamic route warning by adding force-dynamic config to root page
-- Added Storybook with Button component and stories, updated .cursorrules with Storybook guidelines
-- Captured screenshot of Button component stories in Storybook
+- Removed Storybook and all related dependencies, configurations, and documentation.
 - Implemented a modern survey builder application with a beautiful UI and dark mode support, including components for questions, pages, context elements, and modals.
 - Enhanced the survey builder UI/UX with:
   - Modern header design with grid pattern and gradient background
