@@ -19,9 +19,8 @@ export default function CreditsPage() {
       </div>
 
       <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
-        <div>
+        <div className='md:col-span-1'>
           <CreditPurchaseForm />
-          <TransactionHistory />
         </div>
 
         <div className='col-span-1 space-y-6 md:col-span-2'>
@@ -55,6 +54,10 @@ export default function CreditsPage() {
               </li>
             </ul>
           </div>
+        </div>
+
+        <div className='col-span-1 md:col-span-3'>
+          <TransactionHistory />
         </div>
       </div>
     </div>
