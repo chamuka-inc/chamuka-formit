@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { ArrowLeft, BarChart, Download, FileText } from "lucide-react";
 import { api } from "@/lib/trpc/react";
+import SubmissionDetailsModal from "@/components/survey/SubmissionDetailsModal";
 
 export default function SurveyAnalyticsPage() {
   const params = useParams();
@@ -13,6 +14,8 @@ export default function SurveyAnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "submissions">(
     "overview",
   );
+  const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch survey data
   const {
@@ -103,6 +106,17 @@ export default function SurveyAnalyticsPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // Open submission details modal
+  const openSubmissionDetails = (submission: any) => {
+    setSelectedSubmission(submission);
+    setIsModalOpen(true);
+  };
+
+  // Close submission details modal
+  const closeSubmissionDetails = () => {
+    setIsModalOpen(false);
   };
 
   // Loading state
@@ -322,9 +336,7 @@ export default function SurveyAnalyticsPage() {
                         </td>
                         <td className='whitespace-nowrap px-6 py-4 text-right text-sm'>
                           <button
-                            onClick={() => {
-                              toast.info("Response details coming soon");
-                            }}
+                            onClick={() => openSubmissionDetails(submission)}
                             className='text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300'
                           >
                             View Details
@@ -349,6 +361,14 @@ export default function SurveyAnalyticsPage() {
           )}
         </div>
       )}
+
+      {/* Submission Details Modal */}
+      <SubmissionDetailsModal
+        isOpen={isModalOpen}
+        onClose={closeSubmissionDetails}
+        submission={selectedSubmission}
+        surveyData={survey?.data}
+      />
     </div>
   );
 }
