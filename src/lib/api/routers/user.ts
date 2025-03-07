@@ -39,7 +39,7 @@ export const userRouter = createTRPCRouter({
   // Get current user profile
   getProfile: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-    
+
     const user = await db.user.findUnique({
       where: {
         id: userId,
@@ -53,23 +53,23 @@ export const userRouter = createTRPCRouter({
         lastCreditReset: true,
       },
     });
-    
+
     if (!user) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "User not found",
       });
     }
-    
+
     return user;
   }),
-  
+
   // Update user profile
   updateProfile: protectedProcedure
     .input(updateProfileSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      
+
       const updatedUser = await db.user.update({
         where: {
           id: userId,
@@ -83,16 +83,16 @@ export const userRouter = createTRPCRouter({
           email: true,
         },
       });
-      
+
       return updatedUser;
     }),
-  
+
   // Update user password
   updatePassword: protectedProcedure
     .input(updatePasswordSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      
+
       // Get the user with the hashed password
       const user = await db.user.findUnique({
         where: {
@@ -102,17 +102,17 @@ export const userRouter = createTRPCRouter({
           hashedPassword: true,
         },
       });
-      
+
       if (!user || !user.hashedPassword) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Cannot update password for this account type",
         });
       }
-      
+
       // Hash the new password
       const hashedPassword = await hash(input.newPassword, 10);
-      
+
       // Update the user's password
       await db.user.update({
         where: {
@@ -122,31 +122,31 @@ export const userRouter = createTRPCRouter({
           hashedPassword,
         },
       });
-      
+
       return { success: true };
     }),
-  
+
   // Update notification preferences
   updateNotifications: protectedProcedure
     .input(updateNotificationsSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      
+
       // In a real app, you would store these preferences in a user_preferences table
       // For now, we'll just return success
-      
+
       return { success: true };
     }),
-  
+
   // Update appearance preferences
   updateAppearance: protectedProcedure
     .input(updateAppearanceSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      
+
       // In a real app, you would store these preferences in a user_preferences table
       // For now, we'll just return success
-      
+
       return { success: true, theme: input.theme };
     }),
-}); 
+});

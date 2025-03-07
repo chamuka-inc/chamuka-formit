@@ -28,7 +28,7 @@ const config = {
           DEFAULT: "hsl(var(--foreground) / <alpha-value>)",
           secondary: "hsl(var(--foreground-secondary) / <alpha-value>)",
         },
-        
+
         // UI Elements
         border: {
           DEFAULT: "hsl(var(--border) / <alpha-value>)",
@@ -39,7 +39,7 @@ const config = {
           focus: "hsl(var(--input-focus) / <alpha-value>)",
         },
         ring: "hsl(var(--ring) / <alpha-value>)",
-        
+
         // Brand colors
         primary: {
           DEFAULT: "hsl(var(--primary) / <alpha-value>)",
@@ -51,7 +51,7 @@ const config = {
           foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
           hover: "hsl(var(--secondary-hover) / <alpha-value>)",
         },
-        
+
         // Feedback colors
         success: {
           DEFAULT: "hsl(var(--success) / <alpha-value>)",
@@ -65,7 +65,7 @@ const config = {
           DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
           foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
         },
-        
+
         // Utility colors
         muted: {
           DEFAULT: "hsl(var(--muted) / <alpha-value>)",
@@ -117,10 +117,7 @@ const config = {
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    require("@tailwindcss/typography"),
-  ],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
 
 export default config;

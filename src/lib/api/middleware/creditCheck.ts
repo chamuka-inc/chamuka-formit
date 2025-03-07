@@ -6,7 +6,10 @@ import { CreditTransactionType } from "@/lib/types";
  * Middleware to check if a user has enough credits and reserve them
  * The actual transaction record should be created after successful operation
  */
-export const createCreditCheckMiddleware = (creditAmount = 1, type = CreditTransactionType.AI) => {
+export const createCreditCheckMiddleware = (
+  creditAmount = 1,
+  type = CreditTransactionType.AI,
+) => {
   return async ({ ctx, next }: { ctx: any; next: any }) => {
     // Ensure user is authenticated
     if (!ctx.session || !ctx.session.user) {
@@ -39,7 +42,7 @@ export const createCreditCheckMiddleware = (creditAmount = 1, type = CreditTrans
     // Decrement the credits - just reserve them, don't create a transaction yet
     await db.user.update({
       where: { id: user.id },
-      data: { credits: { decrement: creditAmount } }
+      data: { credits: { decrement: creditAmount } },
     });
 
     // Continue with the enhanced context - we'll create the transaction after successful operation
@@ -49,12 +52,15 @@ export const createCreditCheckMiddleware = (creditAmount = 1, type = CreditTrans
         user,
         creditReservation: {
           amount: creditAmount,
-          type
-        }
-      }
+          type,
+        },
+      },
     });
   };
 };
 
 // For easier use in trpc routers - with default values for AI credit check
-export const aiCreditCheck = createCreditCheckMiddleware(1, CreditTransactionType.AI); 
+export const aiCreditCheck = createCreditCheckMiddleware(
+  1,
+  CreditTransactionType.AI,
+);

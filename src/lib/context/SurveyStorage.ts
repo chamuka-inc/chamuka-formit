@@ -1,8 +1,8 @@
-import { SurveyState } from '../types';
+import { SurveyState } from "../types";
 
 function debounce<T extends (...args: any[]) => void>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
 
@@ -18,7 +18,10 @@ export interface StorageManager {
   clear: () => void;
 }
 
-export function createStorageManager(key: string, debounceMs = 1000): StorageManager {
+export function createStorageManager(
+  key: string,
+  debounceMs = 1000,
+): StorageManager {
   const debouncedSave = debounce((state: SurveyState) => {
     try {
       const serializedState = JSON.stringify({
@@ -27,7 +30,7 @@ export function createStorageManager(key: string, debounceMs = 1000): StorageMan
       });
       localStorage.setItem(key, serializedState);
     } catch (error) {
-      console.error('Failed to save state to localStorage:', error);
+      console.error("Failed to save state to localStorage:", error);
     }
   }, debounceMs);
 
@@ -46,11 +49,11 @@ export function createStorageManager(key: string, debounceMs = 1000): StorageMan
         loadingStates: {
           savingPage: false,
           savingQuestion: false,
-          loadingSurvey: false
-        }
+          loadingSurvey: false,
+        },
       };
     } catch (error) {
-      console.error('Failed to load state from localStorage:', error);
+      console.error("Failed to load state from localStorage:", error);
       return null;
     }
   };
@@ -59,7 +62,7 @@ export function createStorageManager(key: string, debounceMs = 1000): StorageMan
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      console.error('Failed to clear state from localStorage:', error);
+      console.error("Failed to clear state from localStorage:", error);
     }
   };
 
@@ -68,4 +71,4 @@ export function createStorageManager(key: string, debounceMs = 1000): StorageMan
     load,
     clear,
   };
-} 
+}

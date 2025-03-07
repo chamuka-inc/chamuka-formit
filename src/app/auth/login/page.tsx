@@ -1,9 +1,9 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
   // Redirect to the signin page
-  redirect('/auth/signin');
-  
+  redirect("/auth/signin");
+
   // This return is just to satisfy TypeScript
   return null;
-} 
+}

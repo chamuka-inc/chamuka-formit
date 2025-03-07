@@ -1,11 +1,11 @@
-export type ContextElementType = 'paragraph' | 'image' | 'video';
+export type ContextElementType = "paragraph" | "image" | "video";
 
 export interface ContextElement {
   type: ContextElementType;
   content: string;
 }
 
-export type QuestionType = 'text' | 'radio' | 'checkbox';
+export type QuestionType = "text" | "radio" | "checkbox";
 
 export interface Question {
   id?: string;
@@ -36,21 +36,27 @@ export interface SurveyState {
 }
 
 export type SurveyAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'LOAD_SURVEY'; payload: SurveyPage[] }
-  | { type: 'ADD_PAGE'; payload: SurveyPage }
-  | { type: 'UPDATE_PAGE'; payload: { index: number; page: SurveyPage } }
-  | { type: 'DELETE_PAGE'; payload: number }
-  | { type: 'SELECT_PAGE'; payload: number }
-  | { type: 'MOVE_PAGE'; payload: { fromIndex: number; toIndex: number } }
-  | { type: 'ADD_QUESTION'; payload: { pageIndex: number; question: Question } }
-  | { type: 'UPDATE_QUESTION'; payload: { pageIndex: number; questionIndex: number; question: Question } }
-  | { type: 'DELETE_QUESTION'; payload: { pageIndex: number; questionIndex: number } }
-  | { type: 'SET_PREVIEW_PAGE'; payload: number }
-  | { type: 'UNDO' }
-  | { type: 'REDO' }
-  | { type: 'CLEAR_HISTORY' };
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "LOAD_SURVEY"; payload: SurveyPage[] }
+  | { type: "ADD_PAGE"; payload: SurveyPage }
+  | { type: "UPDATE_PAGE"; payload: { index: number; page: SurveyPage } }
+  | { type: "DELETE_PAGE"; payload: number }
+  | { type: "SELECT_PAGE"; payload: number }
+  | { type: "MOVE_PAGE"; payload: { fromIndex: number; toIndex: number } }
+  | { type: "ADD_QUESTION"; payload: { pageIndex: number; question: Question } }
+  | {
+      type: "UPDATE_QUESTION";
+      payload: { pageIndex: number; questionIndex: number; question: Question };
+    }
+  | {
+      type: "DELETE_QUESTION";
+      payload: { pageIndex: number; questionIndex: number };
+    }
+  | { type: "SET_PREVIEW_PAGE"; payload: number }
+  | { type: "UNDO" }
+  | { type: "REDO" }
+  | { type: "CLEAR_HISTORY" };
 
 export interface SurveyContextType {
   state: SurveyState;
@@ -64,7 +70,11 @@ export interface SurveyContextType {
   movePageUp: (index: number) => void;
   movePageDown: (index: number) => void;
   addQuestion: (pageIndex: number, question: Question) => void;
-  updateQuestion: (pageIndex: number, questionIndex: number, question: Question) => void;
+  updateQuestion: (
+    pageIndex: number,
+    questionIndex: number,
+    question: Question,
+  ) => void;
   deleteQuestion: (pageIndex: number, questionIndex: number) => void;
   showPreviousPreviewPage: () => void;
   showNextPreviewPage: () => void;
@@ -89,5 +99,5 @@ export enum CreditTransactionType {
   PURCHASE = "purchase",
   EXPORT = "export",
   ANALYTICS = "analytics",
-  REFUND = "refund"
+  REFUND = "refund",
 }
