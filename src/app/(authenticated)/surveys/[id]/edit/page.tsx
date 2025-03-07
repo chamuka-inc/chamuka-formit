@@ -14,10 +14,12 @@ import {
   X,
   ExternalLink,
   FileText,
+  Sparkles,
 } from "lucide-react";
 import { api } from "@/lib/trpc/react";
 import { SurveyBuilder } from "@/components/survey/SurveyBuilder";
 import { SurveyShareModal } from "@/components/survey/SurveyShareModal";
+import { RefineSurveyModal } from "@/components/survey/RefineSurveyModal";
 
 export default function EditSurveyPage() {
   // Use useParams hook to get the id
@@ -33,6 +35,7 @@ export default function EditSurveyPage() {
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [refineModalOpen, setRefineModalOpen] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   // Fetch survey data
@@ -181,6 +184,17 @@ export default function EditSurveyPage() {
     router.push("/dashboard");
   };
 
+  // Open the refine survey modal
+  const handleOpenRefineModal = () => {
+    setRefineModalOpen(true);
+  };
+
+  // Handle successful refinement
+  const handleRefinementSuccess = () => {
+    refetch();
+    toast.success("Survey has been refined with AI!");
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -231,8 +245,8 @@ export default function EditSurveyPage() {
       {/* Unified Header */}
       <div className='relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-500 dark:via-indigo-500 dark:to-purple-500'>
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-        <div className='relative z-10 w-full px-4 py-5 sm:px-6 lg:px-8'>
-          <div className='mx-auto flex max-w-[1600px] flex-col justify-between gap-4 md:flex-row md:items-center'>
+        <div className='relative z-10 w-full px-3 py-4 sm:px-6 sm:py-5 lg:px-8'>
+          <div className='mx-auto flex max-w-[1600px] flex-col justify-between gap-3 md:flex-row md:items-center md:gap-4'>
             <div className='flex items-center gap-2'>
               <Link
                 href='/dashboard'
@@ -242,7 +256,7 @@ export default function EditSurveyPage() {
               </Link>
 
               {isEditingTitle ? (
-                <div className='flex flex-1 flex-col gap-2'>
+                <div className='flex w-full flex-1 flex-col gap-2 sm:w-auto'>
                   <input
                     type='text'
                     value={title}
@@ -281,21 +295,21 @@ export default function EditSurveyPage() {
                   </div>
                 </div>
               ) : (
-                <div className='flex-1'>
+                <div className='flex-1 overflow-hidden'>
                   <div className='flex items-center gap-2'>
-                    <h1 className='text-lg font-semibold text-white sm:text-xl'>
+                    <h1 className='truncate text-lg font-semibold text-white sm:text-xl'>
                       {survey?.title || "Untitled Survey"}
                     </h1>
                     <button
                       onClick={() => setIsEditingTitle(true)}
-                      className='rounded-full p-1 text-white/70 hover:bg-white/10 hover:text-white'
+                      className='flex-shrink-0 rounded-full p-1 text-white/70 hover:bg-white/10 hover:text-white'
                       title='Edit survey details'
                     >
                       <Pencil className='h-4 w-4' />
                     </button>
                   </div>
                   {survey?.description && (
-                    <p className='mt-1 text-xs text-white/80 sm:text-sm'>
+                    <p className='mt-1 line-clamp-1 text-xs text-white/80 sm:text-sm'>
                       {survey.description}
                     </p>
                   )}
@@ -303,25 +317,36 @@ export default function EditSurveyPage() {
               )}
             </div>
 
-            <div className='flex items-center gap-3'>
+            <div className='mt-2 flex flex-wrap items-center gap-2 md:mt-0 md:gap-3'>
               {lastSaved && (
                 <span className='hidden text-xs text-white/70 md:inline-flex'>
                   Last saved: {lastSaved.toLocaleTimeString()}
                 </span>
               )}
 
-              <div className='flex space-x-2'>
-                <span className='flex items-center rounded-md border border-white/10 bg-white/20 px-3 py-1.5 text-xs font-medium text-white/90'>
-                  <FileText className='mr-1.5 h-3.5 w-3.5 opacity-80' />
+              <div className='flex w-full flex-wrap gap-2 sm:w-auto sm:flex-nowrap'>
+                <span className='flex items-center rounded-md border border-white/10 bg-white/20 px-2 py-1.5 text-xs font-medium text-white/90 sm:px-3'>
+                  <FileText className='mr-1 h-3.5 w-3.5 opacity-80 sm:mr-1.5' />
                   {surveyPages.length} page{surveyPages.length !== 1 ? "s" : ""}
                 </span>
+
+                {/* Add the Refine with AI button here */}
+                <button
+                  onClick={handleOpenRefineModal}
+                  className='flex flex-grow items-center justify-center rounded-md bg-white/20 px-2 py-1.5 text-sm font-medium text-white hover:bg-white/30 sm:flex-grow-0 sm:px-3'
+                  title='Refine survey with AI'
+                >
+                  <Sparkles className='mr-1 h-4 w-4 text-yellow-300 sm:mr-1.5' />
+                  AI Refine
+                </button>
 
                 <button
                   onClick={handleSaveSurvey}
                   disabled={isSaving}
-                  className='relative flex w-[100px] items-center justify-center rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30'
+                  className='relative flex flex-grow items-center justify-center rounded-md bg-white/20 px-2 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30 sm:w-auto sm:flex-grow-0 sm:px-3'
+                  title='Save survey'
                 >
-                  <Save className='mr-1.5 h-4 w-4 flex-shrink-0' />
+                  <Save className='mr-1 h-4 w-4 flex-shrink-0 sm:mr-1.5' />
                   <span className='whitespace-nowrap'>
                     {isSaving ? "Saving..." : "Save"}
                   </span>
@@ -333,9 +358,14 @@ export default function EditSurveyPage() {
                 <button
                   onClick={handlePublishSurvey}
                   disabled={isPublishing}
-                  className='flex w-[120px] items-center justify-center rounded-md bg-white/90 px-3 py-1.5 text-sm font-medium text-blue-600 transition-colors hover:bg-white'
+                  className='flex flex-grow items-center justify-center rounded-md bg-white/90 px-2 py-1.5 text-sm font-medium text-blue-600 transition-colors hover:bg-white sm:w-auto sm:flex-grow-0 sm:px-3'
+                  title={
+                    survey?.status === "published"
+                      ? "Update published survey"
+                      : "Publish survey"
+                  }
                 >
-                  <Share className='mr-1.5 h-4 w-4 flex-shrink-0' />
+                  <Share className='mr-1 h-4 w-4 flex-shrink-0 sm:mr-1.5' />
                   <span className='whitespace-nowrap'>
                     {isPublishing ? "Publishing..." : "Publish"}
                   </span>
@@ -345,9 +375,10 @@ export default function EditSurveyPage() {
                 {survey?.status === "published" && (
                   <button
                     onClick={handleOpenShareModal}
-                    className='ml-2 inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
+                    className='flex flex-grow items-center justify-center rounded-md border border-transparent bg-green-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:ml-2 sm:flex-grow-0'
+                    title='Share survey'
                   >
-                    <Share className='mr-1 h-4 w-4' />
+                    <Share className='mr-1 h-4 w-4 sm:mr-1.5' />
                     Share
                   </button>
                 )}
@@ -437,6 +468,16 @@ export default function EditSurveyPage() {
           onClose={() => setShareModalOpen(false)}
           surveyId={id}
           publicShareToken={survey.publicShareToken}
+        />
+      )}
+
+      {/* Refine Survey Modal */}
+      {refineModalOpen && id && (
+        <RefineSurveyModal
+          surveyId={id}
+          isOpen={refineModalOpen}
+          onClose={() => setRefineModalOpen(false)}
+          onSuccess={handleRefinementSuccess}
         />
       )}
     </div>
