@@ -1,14 +1,13 @@
-import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '../trpc';
-import { generateChatCompletion } from '@/lib/aiClient';
-import { aiCreditCheck } from '../middleware/creditCheck';
-import { db } from '@/lib/db';
-import { recordCreditTransaction, refundCredits } from '@/lib/utils/credits';
-import { CreditTransactionType } from '@/lib/types';
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { generateChatCompletion } from "@/lib/aiClient";
+import { aiCreditCheck } from "../middleware/creditCheck";
+import { db } from "@/lib/db";
+import { CreditTransactionType } from "@/lib/types";
 
 // Schema for the AI form generation input
 const generateFormSchema = z.object({
-  prompt: z.string().min(1, 'Prompt is required'),
+  prompt: z.string().min(1, "Prompt is required"),
   maxPages: z.number().min(1).max(10).default(5),
 });
 
@@ -19,7 +18,7 @@ export const aiSurveyRouter = createTRPCRouter({
     .use(aiCreditCheck)
     .mutation(async ({ ctx, input }) => {
       const { prompt, maxPages } = input;
-      
+
       try {
         // Generate a system message for the AI
         const systemMessage = `
@@ -56,19 +55,19 @@ export const aiSurveyRouter = createTRPCRouter({
           
           Respond ONLY with the valid JSON, nothing else.
         `;
-        
+
         // Prepare the AI messages
         const messages = [
           { role: "system" as const, content: systemMessage },
-          { role: "user" as const, content: prompt }
+          { role: "user" as const, content: prompt },
         ];
-        
+
         // Generate the form structure using AI
-        const aiResponse = await generateChatCompletion(messages, 'O1', {
+        const aiResponse = await generateChatCompletion(messages, "O1", {
           temperature: 0.7,
           max_tokens: 4000,
         });
-        
+
         // Parse the JSON response
         let formStructure;
         try {
@@ -76,47 +75,52 @@ export const aiSurveyRouter = createTRPCRouter({
           formStructure = JSON.parse(aiResponse);
         } catch (parseError) {
           // If direct parsing fails, try to extract JSON from a code block
-          const jsonMatch = aiResponse.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+          const jsonMatch = aiResponse.match(
+            /```(?:json)?\s*(\{[\s\S]*\})\s*```/,
+          );
           if (jsonMatch && jsonMatch[1]) {
             formStructure = JSON.parse(jsonMatch[1]);
           } else {
-            throw new Error('Failed to parse AI response as JSON');
+            throw new Error("Failed to parse AI response as JSON");
           }
         }
-        
+
         // Validate the structure
         if (!Array.isArray(formStructure)) {
           formStructure = [formStructure]; // Convert to array if single page
         }
-        
+
         // AI generation was successful - record the transaction
         await db.creditTransaction.create({
           data: {
             userId: ctx.session.user.id,
             credits: -1,
             amount: 0,
-            type: CreditTransactionType.AI
-          }
+            type: CreditTransactionType.AI,
+          },
         });
-        
+
         // Return the form structure
-        return { 
-          success: true, 
-          pages: formStructure 
+        return {
+          success: true,
+          pages: formStructure,
         };
       } catch (error) {
-        console.error('Error generating form structure:', error);
-        
+        console.error("Error generating form structure:", error);
+
         // Refund the AI credit since generation failed
         await db.user.update({
           where: { id: ctx.session.user.id },
-          data: { credits: { increment: 1 } }
+          data: { credits: { increment: 1 } },
         });
-        
-        return { 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Unknown error during form generation' 
+
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Unknown error during form generation",
         };
       }
     }),
-}); 
+});

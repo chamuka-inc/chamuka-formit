@@ -258,7 +258,7 @@ export const SpeechToTextArea = forwardRef<
 
     return (
       <div
-        className="relative flex flex-col"
+        className='relative flex flex-col'
         style={{
           minHeight: minHeight,
         }}
@@ -266,9 +266,9 @@ export const SpeechToTextArea = forwardRef<
         <motion.div
           className={`${
             waveformActive
-              ? "border-aurora-500/50 bg-gradient-to-r from-aurora-500/30 via-aurora-50/30 to-aurora-500/30 text-transparent"
+              ? "border-aurora-500/50 from-aurora-500/30 via-aurora-50/30 to-aurora-500/30 bg-gradient-to-r text-transparent"
               : ""
-          } hide-scrollbar flex h-full w-full items-center overflow-hidden overflow-y-scroll rounded-2xl  border-aurora-100 bg-aurora-50/30 dark:border-sky-600/30 dark:bg-slate-700`}
+          } hide-scrollbar border-aurora-100 bg-aurora-50/30 flex h-full w-full items-center overflow-hidden overflow-y-scroll rounded-2xl dark:border-sky-600/30 dark:bg-slate-700`}
           animate={{
             padding: waveformActive ? "1.5rem" : "0.375rem",
           }}
@@ -301,12 +301,12 @@ export const SpeechToTextArea = forwardRef<
             }}
             disabled={waveformActive}
           />
-          <div className="hide-scrollbar mr-2 mt-auto flex flex-row space-x-4">
+          <div className='hide-scrollbar mr-2 mt-auto flex flex-row space-x-4'>
             <button
-              type="button"
+              type='button'
               className={`${
                 waveformActive
-                  ? "z-20 mr-5 text-blossom-500 hover:text-blossom-700"
+                  ? "text-blossom-500 hover:text-blossom-700 z-20 mr-5"
                   : "text-aurora-500 hover:text-aurora-600"
               } transform text-xl dark:text-gray-300 dark:hover:text-gray-500`}
               onClick={isRecording ? stopRecording : startRecording}
@@ -324,10 +324,10 @@ export const SpeechToTextArea = forwardRef<
             </button>
             {onSubmit && (
               <button
-                type="button"
+                type='button'
                 className={`${
                   waveformActive ? "hidden" : ""
-                } flex h-8 w-8 items-center justify-center rounded-full bg-aurora-500 text-white transition-colors hover:bg-aurora-600 focus-visible:outline-none disabled:bg-gray-300 dark:bg-sky-600 dark:hover:bg-sky-700 dark:disabled:bg-gray-600`}
+                } bg-aurora-500 hover:bg-aurora-600 flex h-8 w-8 items-center justify-center rounded-full text-white transition-colors focus-visible:outline-none disabled:bg-gray-300 dark:bg-sky-600 dark:hover:bg-sky-700 dark:disabled:bg-gray-600`}
                 disabled={
                   !value.trim() || isLoading || waveformActive || isUploading
                 }
@@ -335,30 +335,30 @@ export const SpeechToTextArea = forwardRef<
                   e.preventDefault();
                   void handleSubmit();
                 }}
-                aria-label="Send message - or use cmd + enter"
+                aria-label='Send message - or use cmd + enter'
               >
                 {/* Send button icon */}
                 <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
                 >
                   {/* SVG path */}
                   <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M11.3939 6.67973C11.7286 6.34499 12.2714 6.34499 12.6061 6.67973L16.4633 10.537C16.798 10.8717 16.798 11.4145 16.4633 11.7492C16.1286 12.084 15.5857 12.084 15.251 11.7492L12.8571 9.35534V16.7143C12.8571 17.1877 12.4734 17.5714 12 17.5714C11.5266 17.5714 11.1429 17.1877 11.1429 16.7143V9.35534L8.74902 11.7492C8.41428 12.084 7.87144 12.084 7.53669 11.7492C7.20195 11.4145 7.20195 10.8717 7.53669 10.537L11.3939 6.67973Z"
-                    fill="currentColor"
+                    fillRule='evenodd'
+                    clipRule='evenodd'
+                    d='M11.3939 6.67973C11.7286 6.34499 12.2714 6.34499 12.6061 6.67973L16.4633 10.537C16.798 10.8717 16.798 11.4145 16.4633 11.7492C16.1286 12.084 15.5857 12.084 15.251 11.7492L12.8571 9.35534V16.7143C12.8571 17.1877 12.4734 17.5714 12 17.5714C11.5266 17.5714 11.1429 17.1877 11.1429 16.7143V9.35534L8.74902 11.7492C8.41428 12.084 7.87144 12.084 7.53669 11.7492C7.20195 11.4145 7.20195 10.8717 7.53669 10.537L11.3939 6.67973Z'
+                    fill='currentColor'
                   />
                 </svg>
               </button>
             )}
           </div>
           {waveformActive && (
-            <div className="absolute left-1/2 top-5 flex -translate-x-1/2 transform justify-center">
-              <div className="flex">
+            <div className='absolute left-1/2 top-5 flex -translate-x-1/2 transform justify-center'>
+              <div className='flex'>
                 {heights.map((height, index) => {
                   const centerIndex = heights.length / 2;
                   const distanceFromCenter = Math.abs(index - centerIndex);
@@ -373,16 +373,13 @@ export const SpeechToTextArea = forwardRef<
                         adjustedHeight > 100
                           ? "bg-aurora-500"
                           : adjustedHeight > 50
-                          ? "bg-aurora-500/80"
-                          : "bg-aurora-500/40"
+                            ? "bg-aurora-500/80"
+                            : "bg-aurora-500/40"
                       }`}
                       style={{
                         height: "50px",
                         transformOrigin: "center",
-                        marginLeft: `${Math.max(
-                          Math.round(maxHeight / 30),
-                          6,
-                        )}px`,
+                        marginLeft: `${Math.max(Math.round(maxHeight / 30), 6)}px`,
                       }}
                       animate={{
                         scaleY: Math.max(adjustedHeight, 20) / 128,

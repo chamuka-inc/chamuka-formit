@@ -1,0 +1,8 @@
+.next
+build
+node_modules
+public
+.vercel
+coverage
+storybook-static
+*.md 

@@ -15,18 +15,22 @@ export async function recordCreditTransaction(
     amount?: number;
     type?: CreditTransactionType;
     description?: string;
-  }
+  },
 ) {
-  const { amount = 0, type = CreditTransactionType.AI, description } = options || {};
-  
+  const {
+    amount = 0,
+    type = CreditTransactionType.AI,
+    description,
+  } = options || {};
+
   return db.creditTransaction.create({
     data: {
       userId,
       credits,
       amount,
       type,
-      description
-    }
+      description,
+    },
   });
 }
 
@@ -39,23 +43,23 @@ export async function recordCreditTransaction(
 export async function refundCredits(
   userId: string,
   credits: number,
-  type = CreditTransactionType.REFUND
+  type = CreditTransactionType.REFUND,
 ) {
   if (credits <= 0) return;
-  
+
   // Update the user's credit balance
   await db.user.update({
     where: { id: userId },
     data: {
       credits: {
-        increment: credits
-      }
-    }
+        increment: credits,
+      },
+    },
   });
-  
+
   // Record a refund transaction
   await recordCreditTransaction(userId, credits, {
     type,
-    description: `Refunded ${credits} credits due to failed operation`
+    description: `Refunded ${credits} credits due to failed operation`,
   });
-} 
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, ReactNode } from 'react';
+import { Component, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -24,13 +24,13 @@ export class SurveyErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-          <h2 className="text-red-700 font-semibold">Something went wrong</h2>
-          <p className="text-red-600 mt-2">Please try refreshing the page</p>
+        <div className='rounded-md border border-red-200 bg-red-50 p-4'>
+          <h2 className='font-semibold text-red-700'>Something went wrong</h2>
+          <p className='mt-2 text-red-600'>Please try refreshing the page</p>
         </div>
       );
     }
 
     return this.props.children;
   }
-} 
+}

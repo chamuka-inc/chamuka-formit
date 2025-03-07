@@ -1,24 +1,26 @@
-import Link from 'next/link';
-import { AlertCircle } from 'lucide-react';
+import Link from "next/link";
+import { AlertCircle } from "lucide-react";
 
 export default function SurveyNotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full text-center">
-        <div className="flex justify-center mb-4">
-          <AlertCircle className="h-16 w-16 text-red-500" />
+    <div className='flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-900 sm:px-6 lg:px-8'>
+      <div className='w-full max-w-md text-center'>
+        <div className='mb-4 flex justify-center'>
+          <AlertCircle className='h-16 w-16 text-red-500' />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Survey Not Found</h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-8">
+        <h1 className='mb-2 text-3xl font-bold text-gray-900 dark:text-white'>
+          Survey Not Found
+        </h1>
+        <p className='mb-8 text-gray-600 dark:text-gray-300'>
           The survey you're looking for doesn't exist or has been removed.
         </p>
-        <Link 
-          href="/"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        <Link
+          href='/'
+          className='inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
         >
           Go to Homepage
         </Link>
       </div>
     </div>
   );
-} 
+}

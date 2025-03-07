@@ -1,4 +1,4 @@
-import { SurveyState, SurveyAction } from '../types';
+import { SurveyState, SurveyAction } from "../types";
 
 export interface HistoryState<T> {
   past: T[];
@@ -7,25 +7,28 @@ export interface HistoryState<T> {
 }
 
 export type HistoryAction<T> =
-  | { type: 'PUSH'; payload: T }
-  | { type: 'UNDO' }
-  | { type: 'REDO' }
-  | { type: 'CLEAR' };
+  | { type: "PUSH"; payload: T }
+  | { type: "UNDO" }
+  | { type: "REDO" }
+  | { type: "CLEAR" };
 
 const MAX_HISTORY_LENGTH = 50;
 
-export function historyReducer<T>(state: HistoryState<T>, action: HistoryAction<T>): HistoryState<T> {
+export function historyReducer<T>(
+  state: HistoryState<T>,
+  action: HistoryAction<T>,
+): HistoryState<T> {
   const { past, present, future } = state;
 
   switch (action.type) {
-    case 'PUSH':
+    case "PUSH":
       return {
         past: [...past.slice(-MAX_HISTORY_LENGTH + 1), present],
         present: action.payload,
         future: [],
       };
 
-    case 'UNDO':
+    case "UNDO":
       if (past.length === 0) return state;
 
       const previous = past[past.length - 1];
@@ -37,7 +40,7 @@ export function historyReducer<T>(state: HistoryState<T>, action: HistoryAction<
         future: [present, ...future],
       };
 
-    case 'REDO':
+    case "REDO":
       if (future.length === 0) return state;
 
       const next = future[0];
@@ -49,7 +52,7 @@ export function historyReducer<T>(state: HistoryState<T>, action: HistoryAction<
         future: newFuture,
       };
 
-    case 'CLEAR':
+    case "CLEAR":
       return {
         past: [],
         present: present,
@@ -61,12 +64,17 @@ export function historyReducer<T>(state: HistoryState<T>, action: HistoryAction<
   }
 }
 
-export function createHistoryReducer(reducer: (state: SurveyState, action: SurveyAction) => SurveyState) {
-  return (state: HistoryState<SurveyState>, action: SurveyAction | HistoryAction<SurveyState>) => {
+export function createHistoryReducer(
+  reducer: (state: SurveyState, action: SurveyAction) => SurveyState,
+) {
+  return (
+    state: HistoryState<SurveyState>,
+    action: SurveyAction | HistoryAction<SurveyState>,
+  ) => {
     if (
-      action.type === 'UNDO' ||
-      action.type === 'REDO' ||
-      action.type === 'CLEAR'
+      action.type === "UNDO" ||
+      action.type === "REDO" ||
+      action.type === "CLEAR"
     ) {
       return historyReducer(state, action);
     }
@@ -76,7 +84,7 @@ export function createHistoryReducer(reducer: (state: SurveyState, action: Surve
       return state;
     }
 
-    return historyReducer(state, { type: 'PUSH', payload: newPresent });
+    return historyReducer(state, { type: "PUSH", payload: newPresent });
   };
 }
 
@@ -94,4 +102,4 @@ export function canUndo(state: HistoryState<any>): boolean {
 
 export function canRedo(state: HistoryState<any>): boolean {
   return state.future.length > 0;
-} 
+}

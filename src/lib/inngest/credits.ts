@@ -12,43 +12,43 @@ export const resetCreditsFunction = inngest.createFunction(
   async ({ step }) => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     // Find users whose credits need to be reset (last reset was more than 30 days ago)
     const { count } = await step.run("find-users-to-reset", async () => {
       const usersToReset = await db.user.findMany({
         where: {
           lastCreditReset: {
-            lt: thirtyDaysAgo
-          }
+            lt: thirtyDaysAgo,
+          },
         },
         select: {
-          id: true
-        }
+          id: true,
+        },
       });
-      
+
       return { count: usersToReset.length };
     });
-    
+
     // Reset credits for eligible users
     await step.run("reset-credits", async () => {
       await db.user.updateMany({
         where: {
           lastCreditReset: {
-            lt: thirtyDaysAgo
-          }
+            lt: thirtyDaysAgo,
+          },
         },
         data: {
           credits: 5,
-          lastCreditReset: new Date()
-        }
+          lastCreditReset: new Date(),
+        },
       });
-      
+
       return { success: true, usersUpdated: count };
     });
-    
-    return { 
-      success: true, 
-      message: `Reset credits for ${count} users` 
+
+    return {
+      success: true,
+      message: `Reset credits for ${count} users`,
     };
-  }
-); 
+  },
+);

@@ -13,7 +13,7 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
-    <NextThemeProvider {...props} attribute="class">
+    <NextThemeProvider {...props} attribute='class'>
       {children}
     </NextThemeProvider>
   );

@@ -1,8 +1,18 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Question, ContextElement, ContextElementType } from '@/lib/types';
-import { X, MessageSquare, CheckSquare, AlignLeft, Plus, Trash2, Type, Image, Video } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Question, ContextElement, ContextElementType } from "@/lib/types";
+import {
+  X,
+  MessageSquare,
+  CheckSquare,
+  AlignLeft,
+  Plus,
+  Trash2,
+  Type,
+  Image,
+  Video,
+} from "lucide-react";
 
 interface QuestionModalProps {
   isOpen: boolean;
@@ -17,17 +27,19 @@ export const QuestionModal = ({
   currentQuestion,
   onSave,
 }: QuestionModalProps) => {
-  const [questionText, setQuestionText] = useState('');
-  const [questionType, setQuestionType] = useState<'text' | 'radio' | 'checkbox'>('text');
+  const [questionText, setQuestionText] = useState("");
+  const [questionType, setQuestionType] = useState<
+    "text" | "radio" | "checkbox"
+  >("text");
   const [options, setOptions] = useState<string[]>([]);
-  const [newOption, setNewOption] = useState('');
+  const [newOption, setNewOption] = useState("");
   const [contextElements, setContextElements] = useState<ContextElement[]>([]);
   const [newContextElement, setNewContextElement] = useState<{
     type: ContextElementType;
     content: string;
   }>({
-    type: 'paragraph',
-    content: '',
+    type: "paragraph",
+    content: "",
   });
 
   useEffect(() => {
@@ -37,19 +49,19 @@ export const QuestionModal = ({
       setOptions(currentQuestion.options || []);
       setContextElements(currentQuestion.contextElements || []);
     } else {
-      setQuestionText('');
-      setQuestionType('text');
+      setQuestionText("");
+      setQuestionType("text");
       setOptions([]);
       setContextElements([]);
     }
-    setNewOption('');
-    setNewContextElement({ type: 'paragraph', content: '' });
+    setNewOption("");
+    setNewContextElement({ type: "paragraph", content: "" });
   }, [isOpen, currentQuestion]);
 
   const handleAddOption = () => {
     if (newOption.trim()) {
       setOptions([...options, newOption.trim()]);
-      setNewOption('');
+      setNewOption("");
     }
   };
 
@@ -60,7 +72,7 @@ export const QuestionModal = ({
   const handleAddContextElement = () => {
     if (newContextElement.content.trim()) {
       setContextElements([...contextElements, { ...newContextElement }]);
-      setNewContextElement({ ...newContextElement, content: '' });
+      setNewContextElement({ ...newContextElement, content: "" });
     }
   };
 
@@ -72,7 +84,9 @@ export const QuestionModal = ({
     const newQuestion: Question = {
       text: questionText,
       type: questionType,
-      options: ['radio', 'checkbox'].includes(questionType) ? options : undefined,
+      options: ["radio", "checkbox"].includes(questionType)
+        ? options
+        : undefined,
       contextElements: contextElements.length > 0 ? contextElements : undefined,
     };
     onSave(newQuestion);
@@ -88,78 +102,91 @@ export const QuestionModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-fade-in"
+    <div className='fixed inset-0 z-50 flex items-center justify-center'>
+      <div
+        className='fixed inset-0 animate-fade-in bg-black/40 backdrop-blur-sm transition-opacity'
         onClick={onClose}
       />
-      <div className="relative w-11/12 max-w-2xl animate-fade-in">
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-2xl">
+      <div className='relative w-11/12 max-w-2xl animate-fade-in'>
+        <div className='relative overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800'>
           {/* Header */}
-          <div className="relative px-8 py-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              <QuestionTypeIcon className="h-6 w-6 text-blue-500 dark:text-blue-400" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {currentQuestion ? 'Edit Question' : 'Add Question'}
+          <div className='relative border-b border-gray-200 px-8 py-6 dark:border-gray-700'>
+            <div className='flex items-center gap-3'>
+              <QuestionTypeIcon className='h-6 w-6 text-blue-500 dark:text-blue-400' />
+              <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
+                {currentQuestion ? "Edit Question" : "Add Question"}
               </h2>
             </div>
             <button
               onClick={onClose}
-              className="absolute right-6 top-6 p-2 rounded-full text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className='absolute right-6 top-6 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-500 dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-gray-400'
             >
-              <X className="h-5 w-5" />
+              <X className='h-5 w-5' />
             </button>
           </div>
 
           {/* Content */}
-          <div className="px-8 py-6 max-h-[calc(80vh-8rem)] overflow-y-auto">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="question-text" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className='max-h-[calc(80vh-8rem)] overflow-y-auto px-8 py-6'>
+            <div className='space-y-6'>
+              <div className='space-y-2'>
+                <label
+                  htmlFor='question-text'
+                  className='block text-sm font-medium text-gray-700 dark:text-gray-300'
+                >
                   Question Text
                 </label>
                 <textarea
-                  id="question-text"
+                  id='question-text'
                   value={questionText}
                   onChange={(e) => setQuestionText(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-shadow resize-none"
-                  placeholder="Enter your question here..."
+                  className='w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400'
+                  placeholder='Enter your question here...'
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className='space-y-2'>
+                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
                   Question Type
                 </label>
-                <div className="grid grid-cols-3 gap-4">
+                <div className='grid grid-cols-3 gap-4'>
                   {[
-                    { type: 'text', label: 'Text Input', icon: AlignLeft },
-                    { type: 'radio', label: 'Single Choice', icon: MessageSquare },
-                    { type: 'checkbox', label: 'Multiple Choice', icon: CheckSquare },
+                    { type: "text", label: "Text Input", icon: AlignLeft },
+                    {
+                      type: "radio",
+                      label: "Single Choice",
+                      icon: MessageSquare,
+                    },
+                    {
+                      type: "checkbox",
+                      label: "Multiple Choice",
+                      icon: CheckSquare,
+                    },
                   ].map(({ type, label, icon: Icon }) => (
                     <button
                       key={type}
-                      type="button"
+                      type='button'
                       onClick={() => setQuestionType(type as any)}
-                      className={`
-                        flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all
-                        ${questionType === type
-                          ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-500/10'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'
-                        }
-                      `}
+                      className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+                        questionType === type
+                          ? "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10"
+                          : "border-gray-200 hover:border-blue-500 dark:border-gray-700 dark:hover:border-blue-400"
+                      } `}
                     >
-                      <Icon className={`h-6 w-6 ${
-                        questionType === type
-                          ? 'text-blue-500 dark:text-blue-400'
-                          : 'text-gray-400 dark:text-gray-500'
-                      }`} />
-                      <span className={`text-sm font-medium ${
-                        questionType === type
-                          ? 'text-blue-700 dark:text-blue-400'
-                          : 'text-gray-700 dark:text-gray-300'
-                      }`}>
+                      <Icon
+                        className={`h-6 w-6 ${
+                          questionType === type
+                            ? "text-blue-500 dark:text-blue-400"
+                            : "text-gray-400 dark:text-gray-500"
+                        }`}
+                      />
+                      <span
+                        className={`text-sm font-medium ${
+                          questionType === type
+                            ? "text-blue-700 dark:text-blue-400"
+                            : "text-gray-700 dark:text-gray-300"
+                        }`}
+                      >
                         {label}
                       </span>
                     </button>
@@ -168,138 +195,147 @@ export const QuestionModal = ({
               </div>
 
               {/* Context Elements Section */}
-              <div className="space-y-4 pt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className='space-y-4 pt-4'>
+                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
                   Question Context
                 </label>
 
-                <div className="space-y-3">
+                <div className='space-y-3'>
                   {contextElements.map((element, index) => (
                     <div
                       key={index}
-                      className="group flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                      className='group flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800'
                     >
-                      {element.type === 'paragraph' && <Type className="h-5 w-5 mt-0.5 text-gray-400" />}
-                      {element.type === 'image' && <Image className="h-5 w-5 mt-0.5 text-gray-400" />}
-                      {element.type === 'video' && <Video className="h-5 w-5 mt-0.5 text-gray-400" />}
-                      <div className="flex-1">
-                        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          {element.type.charAt(0).toUpperCase() + element.type.slice(1)}
+                      {element.type === "paragraph" && (
+                        <Type className='mt-0.5 h-5 w-5 text-gray-400' />
+                      )}
+                      {element.type === "image" && (
+                        <Image className='mt-0.5 h-5 w-5 text-gray-400' />
+                      )}
+                      {element.type === "video" && (
+                        <Video className='mt-0.5 h-5 w-5 text-gray-400' />
+                      )}
+                      <div className='flex-1'>
+                        <div className='mb-1 text-xs font-medium text-gray-500 dark:text-gray-400'>
+                          {element.type.charAt(0).toUpperCase() +
+                            element.type.slice(1)}
                         </div>
-                        <div className="text-gray-700 dark:text-gray-300">{element.content}</div>
+                        <div className='text-gray-700 dark:text-gray-300'>
+                          {element.content}
+                        </div>
                       </div>
                       <button
                         onClick={() => handleRemoveContextElement(index)}
-                        className="p-1 rounded-md text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className='rounded-md p-1 text-gray-400 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-red-400'
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className='h-4 w-4' />
                       </button>
                     </div>
                   ))}
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex gap-3">
+                <div className='space-y-3'>
+                  <div className='flex gap-3'>
                     <select
                       value={newContextElement.type}
-                      onChange={(e) => setNewContextElement({
-                        ...newContextElement,
-                        type: e.target.value as ContextElementType
-                      })}
-                      className="px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                      onChange={(e) =>
+                        setNewContextElement({
+                          ...newContextElement,
+                          type: e.target.value as ContextElementType,
+                        })
+                      }
+                      className='rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100'
                     >
-                      <option value="paragraph">Paragraph</option>
-                      <option value="image">Image URL</option>
-                      <option value="video">Video URL</option>
+                      <option value='paragraph'>Paragraph</option>
+                      <option value='image'>Image URL</option>
+                      <option value='video'>Video URL</option>
                     </select>
                     <input
-                      type="text"
+                      type='text'
                       value={newContextElement.content}
-                      onChange={(e) => setNewContextElement({
-                        ...newContextElement,
-                        content: e.target.value
-                      })}
-                      onKeyDown={(e) => e.key === 'Enter' && handleAddContextElement()}
-                      placeholder={
-                        newContextElement.type === 'paragraph'
-                          ? "Add explanatory text..."
-                          : newContextElement.type === 'image'
-                          ? "Add image URL..."
-                          : "Add video URL..."
+                      onChange={(e) =>
+                        setNewContextElement({
+                          ...newContextElement,
+                          content: e.target.value,
+                        })
                       }
-                      className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-shadow"
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && handleAddContextElement()
+                      }
+                      placeholder={
+                        newContextElement.type === "paragraph"
+                          ? "Add explanatory text..."
+                          : newContextElement.type === "image"
+                            ? "Add image URL..."
+                            : "Add video URL..."
+                      }
+                      className='flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400'
                     />
                     <button
                       onClick={handleAddContextElement}
                       disabled={!newContextElement.content.trim()}
-                      className={`
-                        inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors
-                        ${newContextElement.content.trim()
-                          ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400'
-                          : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                        }
-                      `}
+                      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 font-medium transition-colors ${
+                        newContextElement.content.trim()
+                          ? "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20"
+                          : "cursor-not-allowed bg-gray-50 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
+                      } `}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className='h-4 w-4' />
                       Add Context
                     </button>
                   </div>
                 </div>
               </div>
 
-              {['radio', 'checkbox'].includes(questionType) && (
-                <div className="space-y-4 pt-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {["radio", "checkbox"].includes(questionType) && (
+                <div className='space-y-4 pt-4'>
+                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
                     Answer Options
                   </label>
-                  
-                  <div className="space-y-3">
+
+                  <div className='space-y-3'>
                     {options.map((option, index) => (
                       <div
                         key={index}
-                        className="group flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                        className='group flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800'
                       >
                         <input
                           type={questionType}
                           disabled
-                          className={`
-                            h-4 w-4 border-2 transition-colors
-                            ${questionType === 'radio' ? 'rounded-full' : 'rounded'}
-                            border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700
-                          `}
+                          className={`h-4 w-4 border-2 transition-colors ${questionType === "radio" ? "rounded-full" : "rounded"} border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700`}
                         />
-                        <span className="flex-1 text-gray-700 dark:text-gray-300">{option}</span>
+                        <span className='flex-1 text-gray-700 dark:text-gray-300'>
+                          {option}
+                        </span>
                         <button
                           onClick={() => handleRemoveOption(index)}
-                          className="p-1 rounded-md text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className='rounded-md p-1 text-gray-400 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-red-400'
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className='h-4 w-4' />
                         </button>
                       </div>
                     ))}
                   </div>
 
-                  <div className="flex gap-3">
+                  <div className='flex gap-3'>
                     <input
-                      type="text"
+                      type='text'
                       value={newOption}
                       onChange={(e) => setNewOption(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleAddOption()}
-                      placeholder="Add a new option..."
-                      className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-shadow"
+                      onKeyDown={(e) => e.key === "Enter" && handleAddOption()}
+                      placeholder='Add a new option...'
+                      className='flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400'
                     />
                     <button
                       onClick={handleAddOption}
                       disabled={!newOption.trim()}
-                      className={`
-                        inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors
-                        ${newOption.trim()
-                          ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400'
-                          : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                        }
-                      `}
+                      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 font-medium transition-colors ${
+                        newOption.trim()
+                          ? "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20"
+                          : "cursor-not-allowed bg-gray-50 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
+                      } `}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className='h-4 w-4' />
                       Add Option
                     </button>
                   </div>
@@ -309,26 +345,30 @@ export const QuestionModal = ({
           </div>
 
           {/* Footer */}
-          <div className="sticky bottom-0 px-8 py-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex justify-end gap-4">
+          <div className='sticky bottom-0 border-t border-gray-200 bg-gray-50 px-8 py-6 dark:border-gray-700 dark:bg-gray-800/50'>
+            <div className='flex justify-end gap-4'>
               <button
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium transition-colors"
+                className='rounded-lg border border-gray-200 px-6 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700'
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                disabled={!questionText.trim() || ((['radio', 'checkbox'].includes(questionType)) && options.length < 2)}
-                className={`
-                  px-6 py-2.5 rounded-lg font-medium transition-all
-                  ${(questionText.trim() && (!['radio', 'checkbox'].includes(questionType) || options.length >= 2))
-                    ? 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white transform hover:scale-[1.02]'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                  }
-                `}
+                disabled={
+                  !questionText.trim() ||
+                  (["radio", "checkbox"].includes(questionType) &&
+                    options.length < 2)
+                }
+                className={`rounded-lg px-6 py-2.5 font-medium transition-all ${
+                  questionText.trim() &&
+                  (!["radio", "checkbox"].includes(questionType) ||
+                    options.length >= 2)
+                    ? "transform bg-blue-500 text-white hover:scale-[1.02] hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                    : "cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
+                } `}
               >
-                {currentQuestion ? 'Save Changes' : 'Create Question'}
+                {currentQuestion ? "Save Changes" : "Create Question"}
               </button>
             </div>
           </div>
@@ -336,4 +376,4 @@ export const QuestionModal = ({
       </div>
     </div>
   );
-}; 
+};

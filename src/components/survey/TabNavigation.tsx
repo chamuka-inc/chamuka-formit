@@ -1,41 +1,40 @@
 "use client";
 
-import { PencilRuler, Eye } from 'lucide-react';
+import { PencilRuler, Eye } from "lucide-react";
 
 interface TabNavigationProps {
-  activeTab: 'builder' | 'preview';
-  onTabChange: (tab: 'builder' | 'preview') => void;
+  activeTab: "builder" | "preview";
+  onTabChange: (tab: "builder" | "preview") => void;
 }
 
-export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) => {
+export const TabNavigation = ({
+  activeTab,
+  onTabChange,
+}: TabNavigationProps) => {
   return (
-    <div className="inline-flex p-0.5 sm:p-1 rounded-lg sm:rounded-xl bg-gray-100 dark:bg-gray-700/50 backdrop-blur-sm">
+    <div className='inline-flex rounded-lg bg-gray-100 p-0.5 backdrop-blur-sm dark:bg-gray-700/50 sm:rounded-xl sm:p-1'>
       <button
-        onClick={() => onTabChange('builder')}
-        className={`
-          flex items-center gap-1 sm:gap-2 px-2.5 sm:px-6 py-2 sm:py-3 rounded-md sm:rounded-lg font-medium text-xs sm:text-sm transition-all duration-200
-          ${activeTab === 'builder'
-            ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
-            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
-          }
-        `}
+        onClick={() => onTabChange("builder")}
+        className={`flex items-center gap-1 rounded-md px-2.5 py-2 text-xs font-medium transition-all duration-200 sm:gap-2 sm:rounded-lg sm:px-6 sm:py-3 sm:text-sm ${
+          activeTab === "builder"
+            ? "bg-white text-blue-600 shadow-sm dark:bg-gray-800 dark:text-blue-400"
+            : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
+        } `}
       >
-        <PencilRuler className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <PencilRuler className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
         <span>Builder</span>
       </button>
       <button
-        onClick={() => onTabChange('preview')}
-        className={`
-          flex items-center gap-1 sm:gap-2 px-2.5 sm:px-6 py-2 sm:py-3 rounded-md sm:rounded-lg font-medium text-xs sm:text-sm transition-all duration-200
-          ${activeTab === 'preview'
-            ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
-            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
-          }
-        `}
+        onClick={() => onTabChange("preview")}
+        className={`flex items-center gap-1 rounded-md px-2.5 py-2 text-xs font-medium transition-all duration-200 sm:gap-2 sm:rounded-lg sm:px-6 sm:py-3 sm:text-sm ${
+          activeTab === "preview"
+            ? "bg-white text-blue-600 shadow-sm dark:bg-gray-800 dark:text-blue-400"
+            : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
+        } `}
       >
-        <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <Eye className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
         <span>Preview</span>
       </button>
     </div>
   );
-}; 
+};
