@@ -64,6 +64,30 @@ export const userRouter = createTRPCRouter({
     return user;
   }),
 
+  // Get user credits
+  getCredits: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        credits: true,
+        lastCreditReset: true,
+      },
+    });
+
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+
+    return user;
+  }),
+
   // Update user profile
   updateProfile: protectedProcedure
     .input(updateProfileSchema)
