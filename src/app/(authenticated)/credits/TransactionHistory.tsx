@@ -20,7 +20,7 @@ export function TransactionHistory() {
 
   if (isLoading) {
     return (
-      <div className='animate-pulse space-y-3'>
+      <div className='w-full animate-pulse space-y-3'>
         <div className='h-10 rounded bg-gray-200 dark:bg-gray-800'></div>
         <div className='h-10 rounded bg-gray-200 dark:bg-gray-800'></div>
         <div className='h-10 rounded bg-gray-200 dark:bg-gray-800'></div>
@@ -30,7 +30,7 @@ export function TransactionHistory() {
 
   if (!transactions || transactions.length === 0) {
     return (
-      <div className='py-6 text-center text-muted-foreground'>
+      <div className='w-full py-6 text-center text-muted-foreground'>
         <p>No transaction history yet.</p>
       </div>
     );
@@ -57,74 +57,76 @@ export function TransactionHistory() {
   };
 
   return (
-    <div className='mt-6'>
+    <div className='w-full'>
       <h3 className='mb-3 text-lg font-medium'>Transaction History</h3>
-      <div className='overflow-hidden rounded-lg border'>
-        <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
-          <thead className='bg-gray-50 dark:bg-gray-800'>
-            <tr>
-              <th
-                scope='col'
-                className='px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
-              >
-                Date
-              </th>
-              <th
-                scope='col'
-                className='px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
-              >
-                Type
-              </th>
-              <th
-                scope='col'
-                className='px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
-              >
-                Credits
-              </th>
-              <th
-                scope='col'
-                className='px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
-              >
-                Amount
-              </th>
-            </tr>
-          </thead>
-          <tbody className='divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900'>
-            {transactions.map((transaction) => (
-              <tr key={transaction.id}>
-                <td className='whitespace-nowrap px-4 py-3 text-sm text-gray-700 dark:text-gray-300'>
-                  {formatDistanceToNow(new Date(transaction.createdAt), {
-                    addSuffix: true,
-                  })}
-                </td>
-                <td className='whitespace-nowrap px-4 py-3 text-sm'>
-                  <span
-                    className={
-                      transaction.credits > 0
-                        ? "text-green-600 dark:text-green-400"
-                        : "text-blue-600 dark:text-blue-400"
-                    }
-                  >
-                    {getTransactionTypeDisplay(transaction)}
-                  </span>
-                </td>
-                <td className='whitespace-nowrap px-4 py-3 text-sm'>
-                  <span
-                    className={`font-medium ${transaction.credits > 0 ? "text-green-600 dark:text-green-400" : "text-blue-600 dark:text-blue-400"}`}
-                  >
-                    {transaction.credits > 0 ? "+" : ""}
-                    {transaction.credits}
-                  </span>
-                </td>
-                <td className='whitespace-nowrap px-4 py-3 text-sm text-gray-700 dark:text-gray-300'>
-                  {transaction.amount > 0
-                    ? `$${(transaction.amount / 100).toFixed(2)}`
-                    : "—"}
-                </td>
+      <div className='w-full rounded-lg border'>
+        <div className='max-h-[300px] w-full overflow-y-auto'>
+          <table className='w-full table-fixed divide-y divide-gray-200 dark:divide-gray-700'>
+            <thead className='sticky top-0 bg-gray-50 dark:bg-gray-800'>
+              <tr>
+                <th
+                  scope='col'
+                  className='w-1/4 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
+                >
+                  Date
+                </th>
+                <th
+                  scope='col'
+                  className='w-1/4 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
+                >
+                  Type
+                </th>
+                <th
+                  scope='col'
+                  className='w-1/4 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
+                >
+                  Credits
+                </th>
+                <th
+                  scope='col'
+                  className='w-1/4 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
+                >
+                  Amount
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className='divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900'>
+              {transactions.map((transaction) => (
+                <tr key={transaction.id}>
+                  <td className='truncate px-4 py-3 text-sm text-gray-700 dark:text-gray-300'>
+                    {formatDistanceToNow(new Date(transaction.createdAt), {
+                      addSuffix: true,
+                    })}
+                  </td>
+                  <td className='truncate px-4 py-3 text-sm'>
+                    <span
+                      className={
+                        transaction.credits > 0
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-blue-600 dark:text-blue-400"
+                      }
+                    >
+                      {getTransactionTypeDisplay(transaction)}
+                    </span>
+                  </td>
+                  <td className='truncate px-4 py-3 text-sm'>
+                    <span
+                      className={`font-medium ${transaction.credits > 0 ? "text-green-600 dark:text-green-400" : "text-blue-600 dark:text-blue-400"}`}
+                    >
+                      {transaction.credits > 0 ? "+" : ""}
+                      {transaction.credits}
+                    </span>
+                  </td>
+                  <td className='truncate px-4 py-3 text-sm text-gray-700 dark:text-gray-300'>
+                    {transaction.amount > 0
+                      ? `$${(transaction.amount / 100).toFixed(2)}`
+                      : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
