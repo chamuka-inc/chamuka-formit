@@ -3,8 +3,9 @@
 import React, { Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import Link from "next/link";
+import PublicLayout from "@/components/layout/PublicLayout";
 
 function SignInContent() {
   const [email, setEmail] = React.useState("");
@@ -19,75 +20,67 @@ function SignInContent() {
   };
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white to-neutral-50 px-4 dark:from-neutral-900 dark:to-neutral-950'>
-      <Link
-        href='/'
-        className='group absolute left-4 top-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200'
-      >
-        <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-        Back
-      </Link>
-
-      <div className='w-full max-w-md space-y-8'>
-        <div className='text-center'>
-          <h1 className='text-4xl font-bold'>
-            <span className='from-brandBlue-500 to-brandBlue-700 dark:from-brandBlue-400 dark:to-brandBlue-600 bg-gradient-to-r bg-clip-text text-transparent'>
-              Welcome
-            </span>
-          </h1>
-          <p className='mt-3 text-neutral-600 dark:text-neutral-300'>
-            Enter your email to sign in or create an account
-          </p>
-        </div>
-
-        <div className='rounded-2xl bg-white p-8 shadow-xl dark:bg-neutral-800/50'>
-          <form onSubmit={handleSubmit} className='space-y-6'>
-            <div>
-              <label
-                htmlFor='email'
-                className='block text-sm font-medium text-neutral-700 dark:text-neutral-300'
-              >
-                Email address
-              </label>
-              <div className='mt-2'>
-                <input
-                  id='email'
-                  name='email'
-                  type='email'
-                  autoComplete='email'
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className='focus:border-brandBlue-500 dark:focus:border-brandBlue-400 focus:ring-brandBlue-500 dark:focus:ring-brandBlue-400 block w-full rounded-lg border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-500 shadow-sm dark:border-neutral-600 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-400'
-                  placeholder='you@example.com'
-                />
-              </div>
-            </div>
-
-            <button
-              type='submit'
-              disabled={isLoading}
-              className='from-brandBlue-500 to-brandBlue-600 shadow-brandBlue-500/20 hover:from-brandBlue-600 hover:to-brandBlue-700 hover:shadow-brandBlue-500/30 focus:ring-brandBlue-500 group relative flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r px-4 py-3 text-gray-900 shadow-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white'
-            >
-              <Mail className='h-5 w-5' />
-              {isLoading ? "Sending link..." : "Sign in with Email"}
-            </button>
-          </form>
-
-          <div className='mt-6'>
-            <p className='text-center text-sm text-neutral-600 dark:text-neutral-400'>
-              By signing in, you agree to our{" "}
-              <Link
-                href='https://example.com/legal'
-                className='text-brandBlue-600 dark:text-brandBlue-400 hover:text-brandBlue-500 font-medium'
-              >
-                Privacy Policy
-              </Link>
+    <PublicLayout showBackButton backButtonText='Back to Home'>
+      <div className='flex flex-1 items-center justify-center px-4 py-12'>
+        <div className='w-full max-w-md space-y-8'>
+          <div className='text-center'>
+            <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
+              Welcome to Survey4
+            </h1>
+            <p className='mt-3 text-gray-600 dark:text-gray-300'>
+              Enter your email to sign in or create an account
             </p>
+          </div>
+
+          <div className='rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800'>
+            <form onSubmit={handleSubmit} className='space-y-6'>
+              <div>
+                <label
+                  htmlFor='email'
+                  className='block text-sm font-medium text-gray-700 dark:text-gray-300'
+                >
+                  Email address
+                </label>
+                <div className='mt-2'>
+                  <input
+                    id='email'
+                    name='email'
+                    type='email'
+                    autoComplete='email'
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className='block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400'
+                    placeholder='you@example.com'
+                  />
+                </div>
+              </div>
+
+              <button
+                type='submit'
+                disabled={isLoading}
+                className='group relative flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600'
+              >
+                <Mail className='h-5 w-5' />
+                {isLoading ? "Sending link..." : "Sign in with Email"}
+              </button>
+            </form>
+
+            <div className='mt-6'>
+              <p className='text-center text-sm text-gray-600 dark:text-gray-400'>
+                By signing in, you agree to our{" "}
+                <Link
+                  href='https://example.com/legal'
+                  className='font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400'
+                >
+                  Privacy Policy
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </PublicLayout>
   );
 }
 
