@@ -20,7 +20,7 @@ export default function CreateSurveyPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [creationMode, setCreationMode] = useState<"manual" | "ai">("manual");
+  const [creationMode, setCreationMode] = useState<"manual" | "ai">("ai");
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiGenerationError, setAiGenerationError] = useState<string | null>(
@@ -116,55 +116,8 @@ export default function CreateSurveyPage() {
       <div className='mb-8 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
         <div className='grid grid-cols-1 gap-0 sm:grid-cols-2 sm:gap-0'>
           <button
-            onClick={() => setCreationMode("manual")}
-            className={`group relative flex flex-col items-start p-6 transition-all duration-200 sm:p-8 ${
-              creationMode === "manual"
-                ? "bg-blue-50/80 dark:bg-blue-950/30"
-                : "dark:hover:bg-gray-750/50 bg-transparent hover:bg-gray-50"
-            }`}
-          >
-            <div
-              className={`absolute inset-0 ${creationMode === "manual" ? "border-t-4 border-blue-500 dark:border-blue-400 sm:border-l-4 sm:border-t-0" : "border-transparent"}`}
-            ></div>
-            <div
-              className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${
-                creationMode === "manual"
-                  ? "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300"
-                  : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
-              }`}
-            >
-              <LayoutTemplate className='h-6 w-6' />
-            </div>
-            <h3
-              className={`mb-2 text-lg font-semibold ${
-                creationMode === "manual"
-                  ? "text-blue-800 dark:text-blue-300"
-                  : "text-gray-800 dark:text-gray-300"
-              }`}
-            >
-              Manual Creation
-            </h3>
-            <p
-              className={`text-sm ${
-                creationMode === "manual"
-                  ? "text-blue-700 dark:text-blue-200"
-                  : "text-gray-600 dark:text-gray-400"
-              }`}
-            >
-              Design your survey from scratch with full control over questions
-              and layout.
-            </p>
-
-            {creationMode === "manual" && (
-              <div className='mt-4 flex items-center text-sm font-medium text-blue-600 dark:text-blue-300'>
-                Selected <ArrowRight className='ml-1 h-4 w-4' />
-              </div>
-            )}
-          </button>
-
-          <button
             onClick={() => setCreationMode("ai")}
-            className={`group relative flex flex-col items-start p-6 transition-all duration-200 sm:p-8 ${
+            className={`group relative flex flex-col items-start p-6 text-left transition-all duration-200 sm:p-8 ${
               creationMode === "ai"
                 ? "bg-purple-50/80 dark:bg-purple-950/30"
                 : "dark:hover:bg-gray-750/50 bg-transparent hover:bg-gray-50"
@@ -192,7 +145,7 @@ export default function CreateSurveyPage() {
               AI-Powered Creation
             </h3>
             <p
-              className={`text-sm ${
+              className={`w-full text-left text-sm ${
                 creationMode === "ai"
                   ? "text-purple-700 dark:text-purple-200"
                   : "text-gray-600 dark:text-gray-400"
@@ -207,6 +160,53 @@ export default function CreateSurveyPage() {
               </div>
             )}
           </button>
+
+          <button
+            onClick={() => setCreationMode("manual")}
+            className={`group relative flex flex-col items-start p-6 text-left transition-all duration-200 sm:p-8 ${
+              creationMode === "manual"
+                ? "bg-blue-50/80 dark:bg-blue-950/30"
+                : "dark:hover:bg-gray-750/50 bg-transparent hover:bg-gray-50"
+            }`}
+          >
+            <div
+              className={`absolute inset-0 ${creationMode === "manual" ? "border-t-4 border-blue-500 dark:border-blue-400 sm:border-l-4 sm:border-t-0" : "border-transparent"}`}
+            ></div>
+            <div
+              className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${
+                creationMode === "manual"
+                  ? "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300"
+                  : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+              }`}
+            >
+              <LayoutTemplate className='h-6 w-6' />
+            </div>
+            <h3
+              className={`mb-2 text-lg font-semibold ${
+                creationMode === "manual"
+                  ? "text-blue-800 dark:text-blue-300"
+                  : "text-gray-800 dark:text-gray-300"
+              }`}
+            >
+              Manual Creation
+            </h3>
+            <p
+              className={`w-full text-left text-sm ${
+                creationMode === "manual"
+                  ? "text-blue-700 dark:text-blue-200"
+                  : "text-gray-600 dark:text-gray-400"
+              }`}
+            >
+              Design your survey from scratch with full control over questions
+              and layout.
+            </p>
+
+            {creationMode === "manual" && (
+              <div className='mt-4 flex items-center text-sm font-medium text-blue-600 dark:text-blue-300'>
+                Selected <ArrowRight className='ml-1 h-4 w-4' />
+              </div>
+            )}
+          </button>
         </div>
       </div>
 
@@ -215,7 +215,7 @@ export default function CreateSurveyPage() {
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
           <div className='p-6 sm:p-8'>
             <h2 className='mb-6 flex items-center text-xl font-semibold text-gray-900 dark:text-white'>
-              <LayoutTemplate className='mr-2 h-5 w-5 text-blue-500 dark:text-blue-400' />
+              <LayoutTemplate className='mr-2 h-5 w-5 text-purple-500 dark:text-purple-400' />
               Create Survey Manually
             </h2>
 
@@ -232,7 +232,7 @@ export default function CreateSurveyPage() {
                   id='title'
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
                   placeholder='Enter survey title'
                   required
                 />
@@ -250,7 +250,7 @@ export default function CreateSurveyPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
                   placeholder='Enter survey description'
                 ></textarea>
                 <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
@@ -268,7 +268,7 @@ export default function CreateSurveyPage() {
                 <button
                   type='submit'
                   disabled={createMutation.isPending}
-                  className='inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                  className='inline-flex items-center justify-center rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   {createMutation.isPending ? (
                     <>
