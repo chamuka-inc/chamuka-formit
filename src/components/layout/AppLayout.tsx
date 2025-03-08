@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronLeft } from "lucide-react";
 
 type AppLayoutProps = {
   children: React.ReactNode;
@@ -12,7 +12,6 @@ type AppLayoutProps = {
 export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Handle responsive behavior
   useEffect(() => {
@@ -21,12 +20,27 @@ export default function AppLayout({ children }: AppLayoutProps) {
       if (window.innerWidth < 1024) {
         setSidebarOpen(false);
       } else {
-        setSidebarOpen(true);
+        // Keep current sidebar state on desktop when resizing
+        // If it's the initial load, set it to true
+        if (
+          typeof window !== "undefined" &&
+          !localStorage.getItem("sidebarState")
+        ) {
+          setSidebarOpen(true);
+        }
       }
     };
 
     // Set initial state
     checkScreenSize();
+
+    // Try to load saved sidebar state from localStorage
+    if (typeof window !== "undefined") {
+      const savedState = localStorage.getItem("sidebarState");
+      if (savedState !== null) {
+        setSidebarOpen(savedState === "open");
+      }
+    }
 
     // Add listener for window resize
     window.addEventListener("resize", checkScreenSize);
@@ -35,73 +49,49 @@ export default function AppLayout({ children }: AppLayoutProps) {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // Toggle sidebar visibility with transition handling
+  // Toggle sidebar visibility without transition handling
   const toggleSidebar = () => {
-    setIsTransitioning(true);
     setSidebarOpen(!sidebarOpen);
 
-    // Reset the transitioning state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 300);
+    // Save sidebar state to localStorage
+    if (typeof window !== "undefined") {
+      localStorage.setItem("sidebarState", !sidebarOpen ? "open" : "closed");
+    }
   };
 
   return (
     <div className='flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900'>
       {/* Header - full width, fixed at top */}
-      <div className='sticky top-0 z-40'>
-        <Header />
+      <div className='sticky top-0 z-50'>
+        <Header toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
       </div>
 
       {/* Main content area - below header */}
       <div className='relative flex flex-1 pt-0'>
-        {/* Sidebar - fixed position below header */}
+        {/* Overlay backdrop - visible when sidebar is open on any screen size */}
+        {sidebarOpen && (
+          <div
+            className={`fixed inset-0 z-30 bg-black ${
+              sidebarOpen ? "opacity-50" : "pointer-events-none opacity-0"
+            }`}
+            onClick={toggleSidebar}
+            aria-hidden='true'
+          />
+        )}
+
+        {/* Sidebar - overlays on content without pushing it */}
         <div
-          className={`fixed bottom-0 left-0 top-16 z-30 transition-all duration-300 ease-in-out ${
-            sidebarOpen
-              ? "translate-x-0 shadow-xl lg:shadow-none"
-              : "-translate-x-full"
-          } ${isTransitioning ? "overflow-hidden" : ""} w-72 lg:w-64`}
+          className={`fixed bottom-0 left-0 top-16 z-40 ${
+            sidebarOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"
+          } w-[90%] min-w-[280px] max-w-[320px] sm:w-[65%] md:w-[45%] lg:w-[30%] xl:w-[22%] 2xl:w-[18%]`}
         >
           <div className='h-full overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'>
             <Sidebar className='h-full' />
           </div>
         </div>
 
-        {/* Mobile overlay for closing sidebar */}
-        {sidebarOpen && (
-          <div
-            className={`fixed inset-0 bg-black transition-opacity duration-300 lg:hidden ${
-              sidebarOpen ? "opacity-50" : "pointer-events-none opacity-0"
-            } z-20`}
-            onClick={toggleSidebar}
-            aria-hidden='true'
-          />
-        )}
-
-        {/* Sidebar toggle button - improved styling */}
-        <button
-          className={`fixed bottom-6 left-6 z-30 rounded-full p-3 shadow-lg transition-all duration-300 lg:hidden ${
-            sidebarOpen
-              ? "translate-x-64 transform bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-200"
-              : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl"
-          }`}
-          onClick={toggleSidebar}
-          aria-label='Toggle sidebar'
-        >
-          {sidebarOpen ? (
-            <X className='h-6 w-6' />
-          ) : (
-            <Menu className='h-6 w-6' />
-          )}
-        </button>
-
-        {/* Content area - takes remaining width, with padding when sidebar is visible */}
-        <main
-          className={`min-w-0 flex-1 transition-all duration-300 ease-in-out ${
-            sidebarOpen ? "lg:ml-64" : ""
-          }`}
-        >
+        {/* Content area - full width without shifting */}
+        <main className='min-w-0 flex-1'>
           <div>{children}</div>
         </main>
       </div>

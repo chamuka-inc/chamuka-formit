@@ -5,25 +5,42 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { Menu, X, FileText } from "lucide-react";
+import { Menu, X, FileText, AlignLeft } from "lucide-react";
 import { CreditCounter } from "@/components/CreditCounter";
 import { UserMenu } from "./UserMenu";
 import { NotificationsMenu } from "./NotificationsMenu";
 import { MobileMenu } from "./MobileMenu";
 
-export default function Header() {
+interface HeaderProps {
+  toggleSidebar?: () => void;
+  sidebarOpen?: boolean;
+}
+
+export default function Header({ toggleSidebar, sidebarOpen }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
 
   return (
-    <header className='sticky top-0 z-40 w-full border-b border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
+    <header className='sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
       <div className='mx-auto w-full px-4 sm:px-6'>
         <nav
           className='flex h-16 items-center justify-between'
           aria-label='Global'
         >
-          <div className='flex items-center lg:flex-1'>
+          <div className='flex items-center gap-3 lg:flex-1'>
+            {/* Sidebar toggle button */}
+            {toggleSidebar && (
+              <button
+                type='button'
+                className='inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300'
+                onClick={toggleSidebar}
+                aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+              >
+                <AlignLeft className='h-5 w-5' aria-hidden='true' />
+              </button>
+            )}
+
             <Link href='/' className='flex items-center gap-2'>
               <FileText className='h-8 w-8 text-blue-600 dark:text-blue-400' />
               <span className='text-xl font-semibold text-gray-900 dark:text-white'>

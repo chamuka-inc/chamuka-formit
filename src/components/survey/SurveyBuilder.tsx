@@ -313,7 +313,7 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
 
       {/* Main Content with Enhanced Container */}
       <main className='h-full w-full'>
-        <div className='mx-auto max-w-[1600px] bg-white/80 shadow-sm backdrop-blur-sm dark:bg-gray-800/80'>
+        <div className='mx-auto bg-white/80 shadow-sm backdrop-blur-sm dark:bg-gray-800/80'>
           <div className='p-3 sm:p-6'>
             <div className='mb-4 flex items-center justify-between sm:mb-6 lg:hidden'>
               <TabNavigation
