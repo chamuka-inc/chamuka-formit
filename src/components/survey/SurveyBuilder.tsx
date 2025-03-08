@@ -265,7 +265,7 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
               <div className='flex items-center gap-3'>
                 <Layout className='h-5 w-5 text-white/90 sm:h-6 sm:w-6' />
                 <h1 className='text-lg font-semibold tracking-tight text-white sm:text-xl'>
-                  Survey Builder
+                  Chamuka Fundi
                 </h1>
                 <span className='flex items-center rounded-md border border-white/10 bg-white/20 px-3 py-1.5 text-xs font-medium text-white/90'>
                   <FileText className='mr-1.5 h-3.5 w-3.5 opacity-80' />
