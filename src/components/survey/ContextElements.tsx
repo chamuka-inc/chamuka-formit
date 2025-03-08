@@ -2,6 +2,7 @@
 
 import { ContextElement } from "@/lib/types";
 import ReactMarkdown from "react-markdown";
+import VideoEmbed from "@/components/VideoEmbed";
 
 interface ContextElementsProps {
   elements?: ContextElement[];
@@ -32,18 +33,11 @@ export const ContextElements = ({ elements }: ContextElementsProps) => {
           );
         } else if (element.type === "video") {
           return (
-            <div
+            <VideoEmbed
               key={index}
-              className='aspect-video w-full overflow-hidden rounded-lg shadow-sm'
-            >
-              <iframe
-                src={element.content}
-                title='Video'
-                className='h-full w-full'
-                frameBorder='0'
-                allowFullScreen
-              />
-            </div>
+              url={element.content}
+              className='rounded-lg shadow-sm'
+            />
           );
         }
         return null;
