@@ -11,8 +11,8 @@ import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Survey Builder",
-  description: "A modern survey builder application",
+  title: "Chamuka Fundi",
+  description: "A modern content builder application",
 };
 
 // This is the root layout that wraps all pages
