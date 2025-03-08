@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function SurveysPage() {
+export default function FormsPage() {
   const router = useRouter();
 
   // Redirect to dashboard
@@ -19,7 +19,7 @@ export default function SurveysPage() {
           Redirecting to Dashboard
         </h1>
         <p className='text-gray-600 dark:text-gray-300'>
-          Surveys are now managed from the dashboard...
+          Forms are now managed from the dashboard...
         </p>
       </div>
     </div>

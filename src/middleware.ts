@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
   // Check if the path is under the authenticated routes
   const isAuthenticatedRoute =
     pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/surveys") ||
+    pathname.startsWith("/forms") ||
     pathname.startsWith("/settings");
 
   // Skip middleware for API routes and public routes

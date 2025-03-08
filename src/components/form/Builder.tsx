@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { SurveyContextProvider } from "@/lib/context/SurveyContext";
+import { FormContextProvider } from "@/lib/context/Context";
 import { TabNavigation } from "./TabNavigation";
 import { PageListSidebar } from "./PageListSidebar";
 import { PageContent } from "./PageContent";
 import { PagePreview } from "./PagePreview";
 import { PageModal } from "./PageModal";
 import { QuestionModal } from "./QuestionModal";
-import { useSurveyContext } from "@/lib/context/SurveyContext";
+import { useFormContext } from "@/lib/context/Context";
 import {
   Layout,
   Menu,
@@ -21,14 +21,14 @@ import {
   AlertCircle,
   FileText,
 } from "lucide-react";
-import { Question, SurveyPage } from "@/lib/types";
+import { Question, FormPage } from "@/lib/types";
 import { api } from "@/lib/trpc/react";
 import { toast } from "react-toastify";
 
-const SurveyBuilderContent = ({ hideHeader = false }) => {
+const FormBuilderContent = ({ hideHeader = false }) => {
   const router = useRouter();
   const params = useParams();
-  const surveyId = params?.id as string;
+  const formId = params?.id as string;
 
   const [activeTab, setActiveTab] = useState<"builder" | "preview">("builder");
   const [isPageModalOpen, setIsPageModalOpen] = useState(false);
@@ -47,39 +47,39 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     addQuestion,
     updateQuestion,
     selectPage,
-  } = useSurveyContext();
+  } = useFormContext();
 
   // Mutations for saving and publishing
-  const saveSurveyDataMutation = api.survey.saveSurveyData.useMutation({
+  const saveFormDataMutation = api.form.saveFormData.useMutation({
     onSuccess: (data) => {
-      console.log("Survey data saved successfully:", data);
+      console.log("Form data saved successfully:", data);
       setLastSaved(new Date());
       setIsSaving(false);
     },
     onError: (error) => {
-      console.error("Error saving survey data:", error);
+      console.error("Error saving form data:", error);
       setIsSaving(false);
-      toast.error(`Error saving survey data: ${error.message}`);
+      toast.error(`Error saving form data: ${error.message}`);
     },
   });
 
-  const publishSurveyMutation = api.survey.update.useMutation({
+  const publishFormMutation = api.form.update.useMutation({
     onSuccess: () => {
       setIsPublishing(false);
       setPublishModalOpen(true);
-      toast.success("Survey published successfully");
+      toast.success("Form published successfully");
     },
     onError: (error) => {
       setIsPublishing(false);
-      toast.error(`Error publishing survey: ${error.message}`);
+      toast.error(`Error publishing form: ${error.message}`);
     },
   });
 
-  // Get the current survey
-  const { data: currentSurvey } = api.survey.getById.useQuery(
-    { id: surveyId },
+  // Get the current form
+  const { data: currentForm } = api.form.getById.useQuery(
+    { id: formId },
     {
-      enabled: !!surveyId,
+      enabled: !!formId,
       refetchOnWindowFocus: false,
     },
   );
@@ -113,7 +113,7 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     }, 300);
   };
 
-  const handleSavePage = (page: SurveyPage) => {
+  const handleSavePage = (page: FormPage) => {
     if (currentPageIndex === -1) {
       addPage(page);
     } else {
@@ -138,17 +138,17 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Save the survey
-  const handleSaveSurvey = () => {
-    if (!surveyId || pages.length === 0) {
-      toast.error("Cannot save: No survey ID or no pages");
+  // Save the form
+  const handleSaveForm = () => {
+    if (!formId || pages.length === 0) {
+      toast.error("Cannot save: No form ID or no pages");
       return;
     }
 
     setIsSaving(true);
 
-    // Prepare the complete survey data payload
-    const surveyData = {
+    // Prepare the complete form data payload
+    const formData = {
       pages: pages.map((page) => ({
         title: page.title || "Untitled Page",
         questions: (page.questions || []).map((q) => ({
@@ -166,24 +166,24 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
       })),
     };
 
-    // Save the survey data using the saveSurveyData mutation
-    saveSurveyDataMutation.mutate({
-      id: surveyId,
-      data: surveyData,
+    // Save the form data using the saveFormData mutation
+    saveFormDataMutation.mutate({
+      id: formId,
+      data: formData,
     });
   };
 
-  // Automatically save survey when pages change
+  // Automatically save form when pages change
   useEffect(() => {
     // Skip saving during initial render or if already saving
-    if (!surveyId || pages.length === 0 || isSaving) return;
+    if (!formId || pages.length === 0 || isSaving) return;
 
     console.log("Pages changed, scheduling autosave...");
     const timeoutId = setTimeout(() => {
       console.log("Executing autosave...");
       // Create a function reference to avoid dependency issues
       const saveData = () => {
-        const surveyData = {
+        const formData = {
           pages: pages.map((page) => ({
             title: page.title || "Untitled Page",
             questions: (page.questions || []).map((q) => ({
@@ -202,9 +202,9 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
         };
 
         setIsSaving(true);
-        saveSurveyDataMutation.mutate({
-          id: surveyId,
-          data: surveyData,
+        saveFormDataMutation.mutate({
+          id: formId,
+          data: formData,
         });
       };
 
@@ -212,21 +212,21 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     }, 2000); // Save 2 seconds after changes stop
 
     return () => clearTimeout(timeoutId);
-  }, [JSON.stringify(pages), surveyId]); // Use JSON.stringify to properly detect changes
+  }, [JSON.stringify(pages), formId]); // Use JSON.stringify to properly detect changes
 
-  // Publish the survey
-  const handlePublishSurvey = () => {
-    if (!surveyId || pages.length === 0) {
-      toast.error("Cannot publish: No survey ID or no pages");
+  // Publish the form
+  const handlePublishForm = () => {
+    if (!formId || pages.length === 0) {
+      toast.error("Cannot publish: No form ID or no pages");
       return;
     }
 
     setIsPublishing(true);
 
-    // Prepare the survey data with published status
-    publishSurveyMutation.mutate({
-      id: surveyId,
-      title: currentSurvey?.title || "Untitled Survey",
+    // Prepare the form data with published status
+    publishFormMutation.mutate({
+      id: formId,
+      title: currentForm?.title || "Untitled Form",
       status: "published",
     });
   };
@@ -236,14 +236,12 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
     setPublishModalOpen(false);
   };
 
-  // View the published survey
-  const handleViewPublishedSurvey = () => {
-    if (currentSurvey?.publicShareToken) {
-      window.open(`/s/${currentSurvey.publicShareToken}`, "_blank");
+  // View the published form
+  const handleViewPublishedForm = () => {
+    if (currentForm?.publicShareToken) {
+      window.open(`/s/${currentForm.publicShareToken}`, "_blank");
     } else {
-      toast.error(
-        "Share token not available. Survey may not be published yet.",
-      );
+      toast.error("Share token not available. Form may not be published yet.");
     }
   };
 
@@ -265,7 +263,7 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
               <div className='flex items-center gap-3'>
                 <Layout className='h-5 w-5 text-white/90 sm:h-6 sm:w-6' />
                 <h1 className='text-lg font-semibold tracking-tight text-white sm:text-xl'>
-                  Chamuka Fundi
+                  Chamuka FormIt
                 </h1>
                 <span className='flex items-center rounded-md border border-white/10 bg-white/20 px-3 py-1.5 text-xs font-medium text-white/90'>
                   <FileText className='mr-1.5 h-3.5 w-3.5 opacity-80' />
@@ -281,7 +279,7 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
                 )}
 
                 <button
-                  onClick={handleSaveSurvey}
+                  onClick={handleSaveForm}
                   disabled={isSaving}
                   className='relative flex w-[100px] items-center justify-center rounded-md bg-white/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/30'
                 >
@@ -295,7 +293,7 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
                 </button>
 
                 <button
-                  onClick={handlePublishSurvey}
+                  onClick={handlePublishForm}
                   disabled={isPublishing}
                   className='flex w-[120px] items-center justify-center rounded-md bg-white/90 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-white'
                 >
@@ -424,10 +422,10 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
                 <CheckCircle className='h-6 w-6 text-green-600 dark:text-green-300' />
               </div>
               <h3 className='text-lg font-medium text-gray-900 dark:text-white'>
-                Survey Published Successfully
+                Form Published Successfully
               </h3>
               <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                Your survey is now live and ready to share with respondents.
+                Your form is now live and ready to share with respondents.
               </p>
             </div>
 
@@ -439,13 +437,13 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
                 <input
                   type='text'
                   readOnly
-                  value={`${window.location.origin}/surveys/${surveyId}`}
+                  value={`${window.location.origin}/forms/${formId}`}
                   className='flex-1 rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300'
                 />
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `${window.location.origin}/surveys/${surveyId}`,
+                      `${window.location.origin}/forms/${formId}`,
                     );
                     toast.success("Link copied to clipboard");
                   }}
@@ -458,11 +456,11 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
 
             <div className='mt-6 flex flex-col gap-3 sm:flex-row'>
               <button
-                onClick={handleViewPublishedSurvey}
+                onClick={handleViewPublishedForm}
                 className='flex flex-1 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
               >
                 <ExternalLink className='mr-2 h-4 w-4' />
-                View Survey
+                View Form
               </button>
               <button
                 onClick={handleBackToDashboard}
@@ -478,14 +476,14 @@ const SurveyBuilderContent = ({ hideHeader = false }) => {
   );
 };
 
-export const SurveyBuilder = ({
+export const FormBuilder = ({
   initialPages = [],
   hideHeader = false,
 }: {
-  initialPages?: SurveyPage[];
+  initialPages?: FormPage[];
   hideHeader?: boolean;
 }) => {
-  console.log("SurveyBuilder initialPages:", initialPages);
+  console.log("FormBuilder initialPages:", initialPages);
 
   // Ensure initialPages has the correct structure
   const validatedPages = initialPages.map((page) => ({
@@ -502,8 +500,8 @@ export const SurveyBuilder = ({
   }));
 
   return (
-    <SurveyContextProvider initialPages={validatedPages}>
-      <SurveyBuilderContent hideHeader={hideHeader} />
-    </SurveyContextProvider>
+    <FormContextProvider initialPages={validatedPages}>
+      <FormBuilderContent hideHeader={hideHeader} />
+    </FormContextProvider>
   );
 };

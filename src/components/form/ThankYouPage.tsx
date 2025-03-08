@@ -4,17 +4,17 @@ import React from "react";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 
-interface SurveyThankYouPageProps {
+interface FormThankYouPageProps {
   title?: string;
   message?: string;
   showHomeLink?: boolean;
 }
 
-export function SurveyThankYouPage({
+export function FormThankYouPage({
   title = "Thank You for Your Response!",
   message = "Your submission has been recorded successfully.",
   showHomeLink = true,
-}: SurveyThankYouPageProps) {
+}: FormThankYouPageProps) {
   return (
     <div className='rounded-lg bg-white p-8 text-center shadow-md dark:bg-gray-800'>
       <div className='mb-4 flex justify-center'>

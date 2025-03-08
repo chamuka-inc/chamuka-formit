@@ -3,7 +3,7 @@
 import React from "react";
 import { FileText, CircleCheck, ArrowRight } from "lucide-react";
 
-interface SurveyPageNavigationProps {
+interface FormPageNavigationProps {
   pages: Array<{
     title: string;
     description?: string;
@@ -14,18 +14,18 @@ interface SurveyPageNavigationProps {
   onPageSelect: (pageIndex: number) => void;
 }
 
-export const SurveyPageNavigation = ({
+export const FormPageNavigation = ({
   pages,
   currentPageIndex,
   onPageSelect,
-}: SurveyPageNavigationProps) => {
+}: FormPageNavigationProps) => {
   return (
     <div className='sticky top-4 h-full w-full rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
       <div className='border-b border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50'>
         <div className='flex items-center gap-2'>
           <FileText className='h-4 w-4 text-gray-500 dark:text-gray-400' />
           <h3 className='text-sm font-medium text-gray-700 dark:text-gray-200'>
-            Survey Navigation
+            Form Navigation
           </h3>
         </div>
       </div>

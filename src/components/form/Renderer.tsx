@@ -4,43 +4,39 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { ChevronLeft, ChevronRight, Send, Menu, X } from "lucide-react";
 import { api } from "@/lib/trpc/react";
-import {
-  type SurveyPage,
-  type Question,
-  type ContextElement,
-} from "@/lib/types";
-import { SurveyPageNavigation } from "./SurveyPageNavigation";
+import { type FormPage, type Question, type ContextElement } from "@/lib/types";
+import { FormPageNavigation } from "./PageNavigation";
 
-interface SurveyRendererProps {
-  surveyToken: string;
+interface FormRendererProps {
+  formToken: string;
   onLoad?: () => void;
   onError?: (message: string) => void;
   onComplete?: () => void;
   showImprovedNavigation?: boolean;
 }
 
-export default function SurveyRenderer({
-  surveyToken,
+export default function FormRenderer({
+  formToken,
   onLoad,
   onError,
   onComplete,
   showImprovedNavigation = false,
-}: SurveyRendererProps) {
-  // State for survey data
+}: FormRendererProps) {
+  // State for form data
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [surveyCompleted, setSurveyCompleted] = useState(false);
+  const [formCompleted, setFormCompleted] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
-  // Fetch the survey data using the public share token
+  // Fetch the form data using the public share token
   const {
-    data: surveyData,
+    data: formData,
     isLoading,
     error,
-  } = api.survey.getByShareToken.useQuery(
+  } = api.form.getByShareToken.useQuery(
     {
-      token: surveyToken,
+      token: formToken,
     },
     {
       retry: 1, // Only retry once to avoid excessive error messages
@@ -48,55 +44,55 @@ export default function SurveyRenderer({
     },
   );
 
-  // Call onLoad callback when survey data is loaded
+  // Call onLoad callback when form data is loaded
   useEffect(() => {
-    if (surveyData && !isLoading && onLoad) {
+    if (formData && !isLoading && onLoad) {
       onLoad();
     }
-  }, [surveyData, isLoading, onLoad]);
+  }, [formData, isLoading, onLoad]);
 
-  // Call onError callback when there's an error loading the survey
+  // Call onError callback when there's an error loading the form
   useEffect(() => {
     if (error) {
-      console.error("Error fetching survey by token:", error);
+      console.error("Error fetching form by token:", error);
       if (onError) {
-        onError(error.message || "Failed to load survey");
+        onError(error.message || "Failed to load form");
       }
     }
   }, [error, onError]);
 
-  // Handle case when survey is not found or not published
+  // Handle case when form is not found or not published
   useEffect(() => {
-    if (!isLoading && !surveyData && !error && onError) {
-      onError("Survey not found or not available for viewing");
+    if (!isLoading && !formData && !error && onError) {
+      onError("Form not found or not available for viewing");
     }
-  }, [surveyData, isLoading, error, onError]);
+  }, [formData, isLoading, error, onError]);
 
   // Submission mutation
-  const submitMutation = api.survey.submitResponses.useMutation({
+  const submitMutation = api.form.submitResponses.useMutation({
     onSuccess: () => {
-      toast.success("Survey submitted successfully!");
-      setSurveyCompleted(true);
+      toast.success("Form submitted successfully!");
+      setFormCompleted(true);
       if (onComplete) {
         onComplete();
       }
     },
     onError: (error) => {
-      toast.error(`Error submitting survey: ${error.message}`);
+      toast.error(`Error submitting form: ${error.message}`);
       setIsSubmitting(false);
       if (onError) {
-        onError(`Error submitting survey: ${error.message}`);
+        onError(`Error submitting form: ${error.message}`);
       }
     },
   });
 
   // Get the current page
-  const surveyData1 = surveyData?.data
-    ? typeof surveyData.data === "object"
-      ? (surveyData.data as any)
+  const formData1 = formData?.data
+    ? typeof formData.data === "object"
+      ? (formData.data as any)
       : { pages: [] }
     : { pages: [] };
-  const pages = Array.isArray(surveyData1.pages) ? surveyData1.pages : [];
+  const pages = Array.isArray(formData1.pages) ? formData1.pages : [];
   const currentPage = pages[currentPageIndex];
   const totalPages = pages.length || 0;
 
@@ -155,7 +151,7 @@ export default function SurveyRenderer({
 
     // Submit the responses with the full JSON data
     submitMutation.mutate({
-      surveyId: surveyData?.id || "",
+      formId: formData?.id || "",
       data: {
         responses,
         submittedAt: new Date().toISOString(),
@@ -173,21 +169,21 @@ export default function SurveyRenderer({
   }
 
   // Render error state
-  if (error || !surveyData) {
+  if (error || !formData) {
     return (
       <div className='rounded-lg border border-red-200 bg-red-50 p-6 text-center dark:border-red-800 dark:bg-red-900/20'>
         <h2 className='mb-2 text-lg font-semibold text-red-700 dark:text-red-400'>
-          Error Loading Survey
+          Error Loading Form
         </h2>
         <p className='text-red-600 dark:text-red-300'>
-          {error?.message || "Survey not found or not available"}
+          {error?.message || "Form not found or not available"}
         </p>
       </div>
     );
   }
 
   // Render completion state
-  if (surveyCompleted) {
+  if (formCompleted) {
     return (
       <div className='my-8 rounded-lg border border-green-200 bg-green-50 p-8 text-center dark:border-green-800 dark:bg-green-900/20'>
         <h2 className='mb-3 text-2xl font-bold text-green-700 dark:text-green-400'>
@@ -200,17 +196,17 @@ export default function SurveyRenderer({
     );
   }
 
-  // Render the survey
+  // Render the form
   return (
     <div className='mx-auto w-full p-4'>
-      {/* Survey title section with gradient background */}
+      {/* Form title section with gradient background */}
       <div className='dark:to-gray-850 mb-8 rounded-xl bg-gradient-to-b from-blue-50 to-white p-6 text-center shadow-sm dark:from-gray-800 sm:p-8'>
         <h1 className='text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl'>
-          {surveyData.title}
+          {formData.title}
         </h1>
-        {surveyData.description && (
+        {formData.description && (
           <p className='mx-auto mt-3 max-w-3xl text-gray-600 dark:text-gray-300'>
-            {surveyData.description}
+            {formData.description}
           </p>
         )}
       </div>
@@ -245,7 +241,7 @@ export default function SurveyRenderer({
               sidebarVisible ? "block" : "hidden lg:block"
             } w-full lg:w-1/4 xl:w-1/5`}
           >
-            <SurveyPageNavigation
+            <FormPageNavigation
               pages={pages}
               currentPageIndex={currentPageIndex}
               onPageSelect={(pageIndex) => {
@@ -417,7 +413,7 @@ export default function SurveyRenderer({
               </button>
 
               <div className='hidden items-center gap-1.5 md:flex'>
-                {pages.map((_: SurveyPage, idx: number) => (
+                {pages.map((_: FormPage, idx: number) => (
                   <button
                     key={idx}
                     onClick={() => {
@@ -611,7 +607,7 @@ function RenderContextElement({ element }: { element: ContextElement }) {
       <div className='mb-4'>
         <img
           src={element.content}
-          alt='Survey context'
+          alt='Form context'
           className='h-auto max-w-full rounded-lg'
         />
       </div>
@@ -623,7 +619,7 @@ function RenderContextElement({ element }: { element: ContextElement }) {
       <div className='mb-4'>
         <iframe
           src={element.content}
-          title='Survey video'
+          title='Form video'
           className='aspect-video w-full rounded-lg'
           allowFullScreen
         ></iframe>

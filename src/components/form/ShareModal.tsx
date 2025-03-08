@@ -4,31 +4,31 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { Share, Copy, X, Link, Code } from "lucide-react";
 
-interface SurveyShareModalProps {
+interface FormShareModalProps {
   isOpen: boolean;
   onClose: () => void;
-  surveyId: string;
+  formId: string;
   publicShareToken: string;
 }
 
-export function SurveyShareModal({
+export function FormShareModal({
   isOpen,
   onClose,
-  surveyId,
+  formId,
   publicShareToken,
-}: SurveyShareModalProps) {
+}: FormShareModalProps) {
   const [activeTab, setActiveTab] = useState<"link" | "embed">("link");
 
   if (!isOpen) return null;
 
-  // Get the full URL for the survey
-  const surveyUrl =
+  // Get the full URL for the form
+  const formUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/s/${publicShareToken}`
       : `/s/${publicShareToken}`;
 
-  // Get the embed code for the survey
-  const embedCode = `<iframe src="${surveyUrl}" width="100%" height="600" frameborder="0"></iframe>`;
+  // Get the embed code for the form
+  const embedCode = `<iframe src="${formUrl}" width="100%" height="600" frameborder="0"></iframe>`;
 
   // Handle copying to clipboard
   const handleCopy = (text: string, type: string) => {
@@ -50,7 +50,7 @@ export function SurveyShareModal({
           <div className='flex items-center'>
             <Share className='mr-2 h-5 w-5 text-blue-500' />
             <h3 className='font-medium text-gray-900 dark:text-white'>
-              Share Survey
+              Share Form
             </h3>
           </div>
           <button
@@ -100,11 +100,11 @@ export function SurveyShareModal({
                 <input
                   type='text'
                   readOnly
-                  value={surveyUrl}
+                  value={formUrl}
                   className='w-full flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:w-auto sm:rounded-r-none'
                 />
                 <button
-                  onClick={() => handleCopy(surveyUrl, "Link")}
+                  onClick={() => handleCopy(formUrl, "Link")}
                   className='flex w-full items-center justify-center rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 sm:w-auto sm:rounded-l-none sm:border-l-0'
                 >
                   <Copy className='mr-2 h-4 w-4' />
@@ -113,7 +113,7 @@ export function SurveyShareModal({
               </div>
               <p className='mt-2 text-xs text-gray-500 dark:text-gray-400'>
                 Anyone with this link can view and submit responses to your
-                survey.
+                form.
               </p>
             </div>
           )}
@@ -139,7 +139,7 @@ export function SurveyShareModal({
                 </button>
               </div>
               <p className='mt-2 text-xs text-gray-500 dark:text-gray-400'>
-                Copy this code to embed the survey directly in your website or
+                Copy this code to embed the form directly in your website or
                 application.
               </p>
             </div>

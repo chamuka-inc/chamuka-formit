@@ -6,41 +6,41 @@ import { parseJsonResponse, generateChatCompletion } from "@/lib/aiClient";
 import { aiCreditCheck } from "../middleware/creditCheck";
 import { CreditTransactionType } from "@/lib/types";
 
-// Input schema for creating a survey
-const createSurveySchema = z.object({
+// Input schema for creating a form
+const createFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
 });
 
-// Input schema for updating a survey
-const updateSurveySchema = z.object({
+// Input schema for updating a form
+const updateFormSchema = z.object({
   id: z.string(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   status: z.enum(["draft", "published", "archived"]).optional(),
 });
 
-// Input schema for saving survey data
-const saveSurveyDataSchema = z.object({
+// Input schema for saving form data
+const saveFormDataSchema = z.object({
   id: z.string(),
   data: z.any(),
 });
 
 // Input schema for submissions
 const createSubmissionSchema = z.object({
-  surveyId: z.string(),
+  formId: z.string(),
   data: z.any(),
 });
 
-// Input schema for AI survey generation
-const generateSurveySchema = z.object({
+// Input schema for AI form generation
+const generateFormSchema = z.object({
   prompt: z.string().min(1, "Prompt is required"),
   title: z.string().optional(),
   description: z.string().optional(),
 });
 
-// Input schema for AI survey refinement
-const refineSurveySchema = z.object({
+// Input schema for AI form refinement
+const refineFormSchema = z.object({
   id: z.string(),
   prompt: z.string().min(1, "Refinement instructions are required"),
 });
@@ -56,16 +56,16 @@ const applyRefinementSchema = z.object({
   structure: z.any(), // We'll validate this structure in the procedure
 });
 
-// Export the survey router
-export const surveyRouter = createTRPCRouter({
-  // Create a new survey
+// Export the form router
+export const formRouter = createTRPCRouter({
+  // Create a new form
   create: protectedProcedure
-    .input(createSurveySchema)
+    .input(createFormSchema)
     .mutation(async ({ ctx, input }) => {
-      // Create the survey
+      // Create the form
       const userId = ctx.session.user.id;
 
-      const survey = await db.survey.create({
+      const form = await db.form.create({
         data: {
           title: input.title,
           description: input.description,
@@ -74,15 +74,15 @@ export const surveyRouter = createTRPCRouter({
         },
       });
 
-      return survey;
+      return form;
     }),
 
-  // Get all surveys for the current user
+  // Get all forms for the current user
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
 
-    // Get all surveys for the user
-    let surveys = await db.survey.findMany({
+    // Get all forms for the user
+    let forms = await db.form.findMany({
       where: {
         userId,
       },
@@ -100,70 +100,70 @@ export const surveyRouter = createTRPCRouter({
       },
     });
 
-    return surveys;
+    return forms;
   }),
 
-  // Get a survey by ID (protected - only owner can access)
+  // Get a form by ID (protected - only owner can access)
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      const survey = await db.survey.findUnique({
+      const form = await db.form.findUnique({
         where: {
           id: input.id,
         },
       });
 
-      if (!survey) {
+      if (!form) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Survey not found",
+          message: "Form not found",
         });
       }
 
       // Check if the user is the owner
-      if (survey.userId !== userId) {
+      if (form.userId !== userId) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "You are not authorized to access this survey",
+          message: "You are not authorized to access this form",
         });
       }
 
-      return survey;
+      return form;
     }),
 
-  // Get submissions for a survey
+  // Get submissions for a form
   getSubmissions: protectedProcedure
-    .input(z.object({ surveyId: z.string() }))
+    .input(z.object({ formId: z.string() }))
     .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      // Check if the user is the owner of the survey
-      const survey = await db.survey.findUnique({
+      // Check if the user is the owner of the form
+      const form = await db.form.findUnique({
         where: {
-          id: input.surveyId,
+          id: input.formId,
         },
       });
 
-      if (!survey) {
+      if (!form) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Survey not found",
+          message: "Form not found",
         });
       }
 
-      if (survey.userId !== userId) {
+      if (form.userId !== userId) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "You are not authorized to view submissions for this survey",
+          message: "You are not authorized to view submissions for this form",
         });
       }
 
       // Get the submissions
       const submissions = await db.submission.findMany({
         where: {
-          surveyId: input.surveyId,
+          formId: input.formId,
         },
         orderBy: {
           submittedAt: "desc",
@@ -173,7 +173,7 @@ export const surveyRouter = createTRPCRouter({
       return submissions;
     }),
 
-  // Get a published survey by public share token (public)
+  // Get a published form by public share token (public)
   getByShareToken: publicProcedure
     .input(z.object({ token: z.string() }))
     .query(async ({ input }) => {
@@ -185,55 +185,55 @@ export const surveyRouter = createTRPCRouter({
       }
 
       try {
-        const survey = await db.survey.findUnique({
+        const form = await db.form.findUnique({
           where: {
             publicShareToken: input.token,
             status: "published",
           },
         });
 
-        if (!survey) {
-          console.error(`Survey not found for token: ${input.token}`);
+        if (!form) {
+          console.error(`Form not found for token: ${input.token}`);
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Survey not found or not published",
+            message: "Form not found or not published",
           });
         }
 
-        return survey;
+        return form;
       } catch (error) {
         console.error("Error in getByShareToken:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "An error occurred while retrieving the survey",
+          message: "An error occurred while retrieving the form",
         });
       }
     }),
 
-  // Update a survey
+  // Update a form
   update: protectedProcedure
-    .input(updateSurveySchema)
+    .input(updateFormSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
       // Check if the user is the owner
-      const existingSurvey = await db.survey.findUnique({
+      const existingForm = await db.form.findUnique({
         where: {
           id: input.id,
         },
       });
 
-      if (!existingSurvey) {
+      if (!existingForm) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Survey not found",
+          message: "Form not found",
         });
       }
 
-      if (existingSurvey.userId !== userId) {
+      if (existingForm.userId !== userId) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "You are not authorized to update this survey",
+          message: "You are not authorized to update this form",
         });
       }
 
@@ -245,13 +245,10 @@ export const surveyRouter = createTRPCRouter({
 
       // If status is being updated to 'published' and the current status is not 'published',
       // ensure a public share token is generated
-      if (
-        input.status === "published" &&
-        existingSurvey.status !== "published"
-      ) {
+      if (input.status === "published" && existingForm.status !== "published") {
         updateData.status = input.status;
         // Only regenerate the token if it's not already set
-        if (!existingSurvey.publicShareToken) {
+        if (!existingForm.publicShareToken) {
           // Generate a new CUID for the public share token if one doesn't exist
           const { randomUUID } = require("crypto");
           updateData.publicShareToken = randomUUID();
@@ -261,46 +258,46 @@ export const surveyRouter = createTRPCRouter({
         updateData.status = input.status;
       }
 
-      // Update the survey
-      const updatedSurvey = await db.survey.update({
+      // Update the form
+      const updatedForm = await db.form.update({
         where: {
           id: input.id,
         },
         data: updateData,
       });
 
-      return updatedSurvey;
+      return updatedForm;
     }),
 
-  // Save survey data (pages, questions, etc.)
-  saveSurveyData: protectedProcedure
-    .input(saveSurveyDataSchema)
+  // Save form data (pages, questions, etc.)
+  saveFormData: protectedProcedure
+    .input(saveFormDataSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
       // Check if the user is the owner
-      const existingSurvey = await db.survey.findUnique({
+      const existingForm = await db.form.findUnique({
         where: {
           id: input.id,
         },
       });
 
-      if (!existingSurvey) {
+      if (!existingForm) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Survey not found",
+          message: "Form not found",
         });
       }
 
-      if (existingSurvey.userId !== userId) {
+      if (existingForm.userId !== userId) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "You are not authorized to update this survey",
+          message: "You are not authorized to update this form",
         });
       }
 
-      // Update the survey data
-      const updatedSurvey = await db.survey.update({
+      // Update the form data
+      const updatedForm = await db.form.update({
         where: {
           id: input.id,
         },
@@ -309,38 +306,38 @@ export const surveyRouter = createTRPCRouter({
         },
       });
 
-      return updatedSurvey;
+      return updatedForm;
     }),
 
-  // Delete a survey
+  // Delete a form
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
       // Check if the user is the owner
-      const existingSurvey = await db.survey.findUnique({
+      const existingForm = await db.form.findUnique({
         where: {
           id: input.id,
         },
       });
 
-      if (!existingSurvey) {
+      if (!existingForm) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Survey not found",
+          message: "Form not found",
         });
       }
 
-      if (existingSurvey.userId !== userId) {
+      if (existingForm.userId !== userId) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "You are not authorized to delete this survey",
+          message: "You are not authorized to delete this form",
         });
       }
 
-      // Delete the survey
-      await db.survey.delete({
+      // Delete the form
+      await db.form.delete({
         where: {
           id: input.id,
         },
@@ -349,30 +346,30 @@ export const surveyRouter = createTRPCRouter({
       return { success: true };
     }),
 
-  // Submit survey responses
+  // Submit form responses
   submitResponses: publicProcedure
     .input(createSubmissionSchema)
     .mutation(async ({ input }) => {
       try {
-        // Check if the survey exists and is published
-        const survey = await db.survey.findUnique({
+        // Check if the form exists and is published
+        const form = await db.form.findUnique({
           where: {
-            id: input.surveyId,
+            id: input.formId,
             status: "published",
           },
         });
 
-        if (!survey) {
+        if (!form) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Survey not found or not available for submission",
+            message: "Form not found or not available for submission",
           });
         }
 
         // Create the submission with the response data
         const submission = await db.submission.create({
           data: {
-            surveyId: input.surveyId,
+            formId: input.formId,
             data: input.data,
           },
         });
@@ -388,9 +385,9 @@ export const surveyRouter = createTRPCRouter({
       }
     }),
 
-  // Generate survey with AI
+  // Generate form with AI
   generateWithAI: protectedProcedure
-    .input(generateSurveySchema)
+    .input(generateFormSchema)
     .use(aiCreditCheck)
     .mutation(async ({ ctx, input }) => {
       try {
@@ -398,14 +395,14 @@ export const surveyRouter = createTRPCRouter({
         const { prompt, title, description } = input;
 
         // System prompt for the AI
-        const systemPrompt = `You are an expert survey designer. Create a comprehensive survey based on the user's needs.
+        const systemPrompt = `You are an expert content creator. Create a comprehensive content based on the user's needs.
         
-        Your task is to generate a well-structured JSON survey format following these specifications:
+        Your task is to generate a well-structured JSON content format following these specifications:
         
         1. Return a JSON object with this structure:
         {
-          "title": "Survey Title",
-          "description": "Survey description",
+          "title": "Content Title",
+          "description": "Content description",
           "pages": [
             {
               "title": "Page Title",
@@ -415,28 +412,34 @@ export const surveyRouter = createTRPCRouter({
                   "type": "text|radio|checkbox",
                   "text": "Question text",
                   "required": true|false,
-                  "options": ["Option 1", "Option 2"] // Only for radio/checkbox
+                  "options": ["Option 1", "Option 2"] // Only for radio/checkbox,
+                  "contextElements": [
+                    {
+                      "type": "paragraph|image|video",
+                      "content": "Detailed text content for the paragraph, and valid URL for image or video"
+                    }
+              ]
                 }
               ],
               "contextElements": [
                 {
                   "type": "paragraph|image|video",
-                  "content": "Text content or URL for media"
+                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
                 }
               ]
             }
           ]
         }
         
-        2. Make sure to create a logical flow of questions across multiple pages (2-4 pages recommended)
+        2. Make sure to create a logical flow of content across multiple pages (2-4 pages recommended)
         3. Use appropriate question types (text, radio, checkbox) for different question scenarios
-        4. Add context elements (paragraphs, placeholders for images/videos) to provide context where needed
-        5. For each page, include a clear title and brief description
-        6. Design the survey to collect meaningful, actionable data
+        4. Add context elements (detailed paragraphs, images/videos) to provide context where needed
+        5. For each page, include a clear title and description
+        6. Design the content that satisfies the user's prompt
         
-        Generate a complete survey structure based on this prompt: "${prompt}"`;
+        Generate a complete content structure based on this prompt: "${prompt}"`;
 
-        // Call the AI to generate the survey structure
+        // Call the AI to generate the form structure
         const aiResponse = await generateChatCompletion(
           [
             { role: "system", content: systemPrompt },
@@ -445,21 +448,21 @@ export const surveyRouter = createTRPCRouter({
           "GEMINI_FLASH_WEB",
           {
             temperature: 0.7,
-            max_tokens: 4000,
+            max_tokens: 8192,
           },
         );
 
         // Parse the AI response into a JSON structure
-        const surveyStructure = parseJsonResponse(aiResponse);
+        const formStructure = parseJsonResponse(aiResponse);
 
-        // Create the survey with the generated data
-        const survey = await db.survey.create({
+        // Create the form with the generated data
+        const form = await db.form.create({
           data: {
-            title: title || surveyStructure.title || "AI Generated Survey",
-            description: description || surveyStructure.description || "",
+            title: title || formStructure.title || "AI Generated Form",
+            description: description || formStructure.description || "",
             userId,
             status: "draft",
-            data: surveyStructure,
+            data: formStructure,
           },
         });
 
@@ -475,11 +478,11 @@ export const surveyRouter = createTRPCRouter({
 
         return {
           success: true,
-          survey,
-          structure: surveyStructure,
+          form,
+          structure: formStructure,
         };
       } catch (error) {
-        console.error("AI survey generation error:", error);
+        console.error("AI form generation error:", error);
 
         // If generation failed, refund the AI credit since it wasn't actually used
         try {
@@ -493,55 +496,54 @@ export const surveyRouter = createTRPCRouter({
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to generate survey with AI",
+          message: "Failed to generate form with AI",
           cause: error,
         });
       }
     }),
 
-  // Refine survey with AI
+  // Refine form with AI
   refineWithAI: protectedProcedure
-    .input(refineSurveySchema)
+    .input(refineFormSchema)
     .use(aiCreditCheck)
     .mutation(async ({ ctx, input }) => {
       try {
         const userId = ctx.session.user.id;
         const { id, prompt } = input;
 
-        // Fetch the existing survey
-        const existingSurvey = await db.survey.findUnique({
+        // Fetch the existing form
+        const existingForm = await db.form.findUnique({
           where: {
             id,
             userId,
           },
         });
 
-        if (!existingSurvey) {
+        if (!existingForm) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message:
-              "Survey not found or you don't have permission to access it",
+            message: "Form not found or you don't have permission to access it",
           });
         }
 
-        const existingData = existingSurvey.data as any;
+        const existingData = existingForm.data as any;
 
         // System prompt for the AI
-        const systemPrompt = `You are an expert survey designer. Refine an existing survey based on the user's instructions.
+        const systemPrompt = `You are an expert content designer. Refine an existing content based on the user's instructions.
         
-        Your task is to analyze the existing survey structure and refine it according to the provided instructions.
+        Your task is to analyze the existing content structure and refine it according to the provided instructions.
         
-        Here's the existing survey structure:
+        Here's the existing content structure:
         ${JSON.stringify(existingData, null, 2)}
         
         Follow these guidelines:
-        1. Preserve the overall structure of the survey
+        1. Preserve the overall structure of the content
         2. Make targeted improvements based on the user's instructions
-        3. Improve question clarity, organization, and flow
-        4. Return the complete refined survey JSON with the same structure:
+        3. Improve content clarity, organization, and flow
+        4. Return the complete refined content JSON with the same structure:
         {
-          "title": "Survey Title",
-          "description": "Survey description",
+          "title": "Content Title",
+          "description": "Content description",
           "pages": [
             {
               "title": "Page Title",
@@ -551,22 +553,28 @@ export const surveyRouter = createTRPCRouter({
                   "type": "text|radio|checkbox",
                   "text": "Question text",
                   "required": true|false,
-                  "options": ["Option 1", "Option 2"] // Only for radio/checkbox
+                  "options": ["Option 1", "Option 2"], // Only for radio/checkbox
+                  "contextElements": [
+                      {
+                        "type": "paragraph|image|video",
+                        "content": "Detailed text content for the paragraph, and valid URL for image or video"
+                      }
+                  ]
                 }
               ],
               "contextElements": [
                 {
                   "type": "paragraph|image|video",
-                  "content": "Text content or URL for media"
+                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
                 }
               ]
             }
           ]
         }
         
-        Apply the following refinement instructions to the survey: "${prompt}"`;
+        Apply the following refinement instructions to the content: "${prompt}"`;
 
-        // Call the AI to refine the survey
+        // Call the AI to refine the form
         const aiResponse = await generateChatCompletion(
           [
             { role: "system", content: systemPrompt },
@@ -580,16 +588,16 @@ export const surveyRouter = createTRPCRouter({
         );
 
         // Parse the AI response into a JSON structure
-        const refinedSurveyStructure = parseJsonResponse(aiResponse);
+        const refinedFormStructure = parseJsonResponse(aiResponse);
 
-        // Update the survey with the refined data
-        const updatedSurvey = await db.survey.update({
+        // Update the form with the refined data
+        const updatedForm = await db.form.update({
           where: {
             id,
             userId,
           },
           data: {
-            data: refinedSurveyStructure,
+            data: refinedFormStructure,
           },
         });
 
@@ -600,17 +608,17 @@ export const surveyRouter = createTRPCRouter({
             credits: -1,
             amount: 0,
             type: CreditTransactionType.AI,
-            description: "Survey refinement",
+            description: "Form refinement",
           },
         });
 
         return {
           success: true,
-          survey: updatedSurvey,
-          structure: refinedSurveyStructure,
+          form: updatedForm,
+          structure: refinedFormStructure,
         };
       } catch (error) {
-        console.error("AI survey refinement error:", error);
+        console.error("AI form refinement error:", error);
 
         // If refinement failed, refund the AI credit
         try {
@@ -624,7 +632,7 @@ export const surveyRouter = createTRPCRouter({
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to refine survey with AI",
+          message: "Failed to refine form with AI",
           cause: error,
         });
       }
@@ -639,40 +647,39 @@ export const surveyRouter = createTRPCRouter({
         const userId = ctx.session.user.id;
         const { id, prompt } = input;
 
-        // Fetch the existing survey
-        const existingSurvey = await db.survey.findUnique({
+        // Fetch the existing form
+        const existingForm = await db.form.findUnique({
           where: {
             id,
             userId,
           },
         });
 
-        if (!existingSurvey) {
+        if (!existingForm) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message:
-              "Survey not found or you don't have permission to access it",
+            message: "Form not found or you don't have permission to access it",
           });
         }
 
-        const existingData = existingSurvey.data as any;
+        const existingData = existingForm.data as any;
 
         // System prompt for the AI - same as refineWithAI
-        const systemPrompt = `You are an expert survey designer. Refine an existing survey based on the user's instructions.
+        const systemPrompt = `You are an expert content designer. Refine an existing content based on the user's instructions.
         
-        Your task is to analyze the existing survey structure and refine it according to the provided instructions.
+        Your task is to analyze the existing content structure and refine it according to the provided instructions.
         
-        Here's the existing survey structure:
+        Here's the existing content structure:
         ${JSON.stringify(existingData, null, 2)}
         
         Follow these guidelines:
-        1. Preserve the overall structure of the survey
+        1. Preserve the overall structure of the content
         2. Make targeted improvements based on the user's instructions
-        3. Improve question clarity, organization, and flow
-        4. Return the complete refined survey JSON with the same structure:
+        3. Improve content clarity, organization, and flow
+        4. Return the complete refined content JSON with the same structure:
         {
-          "title": "Survey Title",
-          "description": "Survey description",
+          "title": "Content Title",
+          "description": "Content description",
           "pages": [
             {
               "title": "Page Title",
@@ -682,22 +689,28 @@ export const surveyRouter = createTRPCRouter({
                   "type": "text|radio|checkbox",
                   "text": "Question text",
                   "required": true|false,
-                  "options": ["Option 1", "Option 2"] // Only for radio/checkbox
+                  "options": ["Option 1", "Option 2"], // Only for radio/checkbox
+                  "contextElements": [
+                      {
+                        "type": "paragraph|image|video",
+                        "content": "Detailed text content for the paragraph, and valid URL for image or video"
+                      }
+                  ]
                 }
               ],
               "contextElements": [
                 {
                   "type": "paragraph|image|video",
-                  "content": "Text content or URL for media"
+                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
                 }
               ]
             }
           ]
         }
         
-        Apply the following refinement instructions to the survey: "${prompt}"`;
+        Apply the following refinement instructions to the content: "${prompt}"`;
 
-        // Call the AI to refine the survey
+        // Call the AI to refine the form
         const aiResponse = await generateChatCompletion(
           [
             { role: "system", content: systemPrompt },
@@ -711,7 +724,7 @@ export const surveyRouter = createTRPCRouter({
         );
 
         // Parse the AI response into a JSON structure
-        const refinedSurveyStructure = parseJsonResponse(aiResponse);
+        const refinedFormStructure = parseJsonResponse(aiResponse);
 
         // Record the AI refinement transaction
         await db.creditTransaction.create({
@@ -720,16 +733,16 @@ export const surveyRouter = createTRPCRouter({
             credits: -1,
             amount: 0,
             type: CreditTransactionType.AI,
-            description: "Survey refinement preview",
+            description: "Form refinement preview",
           },
         });
 
         return {
           success: true,
-          structure: refinedSurveyStructure,
+          structure: refinedFormStructure,
         };
       } catch (error) {
-        console.error("AI survey refinement preview error:", error);
+        console.error("AI form refinement preview error:", error);
 
         // If refinement preview failed, refund the AI credit
         try {
@@ -743,7 +756,7 @@ export const surveyRouter = createTRPCRouter({
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to preview survey refinement with AI",
+          message: "Failed to preview form refinement with AI",
           cause: error,
         });
       }
@@ -761,28 +774,27 @@ export const surveyRouter = createTRPCRouter({
         if (!structure || typeof structure !== "object") {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: "Invalid survey structure provided",
+            message: "Invalid form structure provided",
           });
         }
 
-        // Fetch the existing survey
-        const existingSurvey = await db.survey.findUnique({
+        // Fetch the existing form
+        const existingForm = await db.form.findUnique({
           where: {
             id,
             userId,
           },
         });
 
-        if (!existingSurvey) {
+        if (!existingForm) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message:
-              "Survey not found or you don't have permission to access it",
+            message: "Form not found or you don't have permission to access it",
           });
         }
 
-        // Update the survey with the refined data
-        const updatedSurvey = await db.survey.update({
+        // Update the form with the refined data
+        const updatedForm = await db.form.update({
           where: {
             id,
             userId,
@@ -794,14 +806,14 @@ export const surveyRouter = createTRPCRouter({
 
         return {
           success: true,
-          survey: updatedSurvey,
+          form: updatedForm,
         };
       } catch (error) {
-        console.error("Survey refinement application error:", error);
+        console.error("Form refinement application error:", error);
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to apply survey refinement",
+          message: "Failed to apply form refinement",
           cause: error,
         });
       }

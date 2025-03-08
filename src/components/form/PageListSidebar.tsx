@@ -1,6 +1,6 @@
 "use client";
 
-import { useSurveyContext } from "@/lib/context/SurveyContext";
+import { useFormContext } from "@/lib/context/Context";
 import {
   ArrowDown,
   ArrowUp,
@@ -22,7 +22,7 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
     selectPage,
     movePageUp,
     movePageDown,
-  } = useSurveyContext();
+  } = useFormContext();
 
   const handleAddPage = () => {
     selectPage(-1); // Reset currentPageIndex to -1 when adding a new page
@@ -36,7 +36,7 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
           <div className='mb-4 flex items-center justify-between'>
             <div>
               <h2 className='text-base font-semibold text-gray-900 dark:text-gray-100 sm:text-lg'>
-                Survey Pages
+                Form Pages
               </h2>
               <p className='mt-0.5 text-xs text-gray-500 dark:text-gray-400 sm:text-sm'>
                 {pages.length} page{pages.length !== 1 ? "s" : ""} in total

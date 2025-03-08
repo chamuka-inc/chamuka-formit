@@ -19,13 +19,13 @@ const updatePasswordSchema = z.object({
 // Schema for updating notification preferences
 const updateNotificationsSchema = z.object({
   emailNotifications: z.object({
-    surveyResponses: z.boolean(),
+    formResponses: z.boolean(),
     weeklySummary: z.boolean(),
     productUpdates: z.boolean(),
   }),
   pushNotifications: z.object({
     newResponses: z.boolean(),
-    surveyCompletion: z.boolean(),
+    formCompletion: z.boolean(),
   }),
 });
 

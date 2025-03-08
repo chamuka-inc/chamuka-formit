@@ -1,7 +1,7 @@
-import { SurveyState, SurveyAction } from "../types";
-import { validateAction, validateSurveyState } from "./SurveyValidation";
+import { FormState, FormAction } from "../types";
+import { validateAction, validateFormState } from "./Validation";
 
-export const initialState: SurveyState = {
+export const initialState: FormState = {
   pages: [],
   currentPageIndex: -1,
   previewPageIndex: 0,
@@ -10,15 +10,15 @@ export const initialState: SurveyState = {
   loadingStates: {
     savingPage: false,
     savingQuestion: false,
-    loadingSurvey: true,
+    loadingForm: true,
   },
 };
 
-export function surveyReducer(
-  state: SurveyState = initialState,
-  action: SurveyAction,
-): SurveyState {
-  console.log("SurveyReducer action:", action.type, action);
+export function formReducer(
+  state: FormState = initialState,
+  action: FormAction,
+): FormState {
+  console.log("FormReducer action:", action.type, action);
 
   // Validate action before processing
   const actionErrors = validateAction(state, action);
@@ -29,7 +29,7 @@ export function surveyReducer(
     };
   }
 
-  let newState: SurveyState;
+  let newState: FormState;
 
   switch (action.type) {
     case "SET_LOADING":
@@ -205,7 +205,7 @@ export function surveyReducer(
   }
 
   // Validate new state before returning
-  const { isValid, errors } = validateSurveyState(newState);
+  const { isValid, errors } = validateFormState(newState);
   if (!isValid) {
     return {
       ...state,
@@ -213,6 +213,6 @@ export function surveyReducer(
     };
   }
 
-  console.log("SurveyReducer returning newState:", newState);
+  console.log("FormReducer returning newState:", newState);
   return newState;
 }

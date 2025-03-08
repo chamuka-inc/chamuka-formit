@@ -16,7 +16,7 @@ import {
 import { api } from "@/lib/trpc/react";
 import Link from "next/link";
 
-export default function CreateSurveyPage() {
+export default function CreateFormPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -31,27 +31,27 @@ export default function CreateSurveyPage() {
   const utils = api.useUtils();
 
   // Create mutation
-  const createMutation = api.survey.create.useMutation({
+  const createMutation = api.form.create.useMutation({
     onSuccess: (data) => {
-      toast.success("Survey created successfully");
-      router.push(`/surveys/${data.id}/edit`);
+      toast.success("Form created successfully");
+      router.push(`/forms/${data.id}/edit`);
     },
     onError: (error) => {
-      toast.error(`Error creating survey: ${error.message}`);
+      toast.error(`Error creating form: ${error.message}`);
     },
   });
 
   // AI generation mutation
-  const generateMutation = api.survey.generateWithAI.useMutation({
+  const generateMutation = api.form.generateWithAI.useMutation({
     onSuccess: (data) => {
-      toast.success("Survey generated successfully with AI");
+      toast.success("Form generated successfully with AI");
       // Invalidate the credits query to refresh the credit count
       utils.credits.getAICredits.invalidate();
-      router.push(`/surveys/${data.survey.id}/edit`);
+      router.push(`/forms/${data.form.id}/edit`);
     },
     onError: (error) => {
       setAiGenerationError(error.message);
-      toast.error(`Error generating survey: ${error.message}`);
+      toast.error(`Error generating form: ${error.message}`);
       setIsGenerating(false);
       // Also invalidate on error to show the refunded credit
       utils.credits.getAICredits.invalidate();
@@ -104,11 +104,11 @@ export default function CreateSurveyPage() {
           Back to Dashboard
         </Link>
         <h1 className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-gray-900 text-transparent dark:from-blue-400 dark:to-purple-400 dark:text-white'>
-          Create New Survey
+          Create New Form
         </h1>
         <p className='mt-2 max-w-2xl text-gray-600 dark:text-gray-400'>
-          Choose how you want to create your survey. You can build it manually
-          or let our AI generate one for you based on your description.
+          Choose how you want to create your form. You can build it manually or
+          let our AI generate one for you based on your description.
         </p>
       </div>
 
@@ -151,7 +151,7 @@ export default function CreateSurveyPage() {
                   : "text-gray-600 dark:text-gray-400"
               }`}
             >
-              Let AI generate a complete survey based on your description.
+              Let AI generate a complete form based on your description.
             </p>
 
             {creationMode === "ai" && (
@@ -197,8 +197,8 @@ export default function CreateSurveyPage() {
                   : "text-gray-600 dark:text-gray-400"
               }`}
             >
-              Design your survey from scratch with full control over questions
-              and layout.
+              Design your form from scratch with full control over questions and
+              layout.
             </p>
 
             {creationMode === "manual" && (
@@ -216,7 +216,7 @@ export default function CreateSurveyPage() {
           <div className='p-6 sm:p-8'>
             <h2 className='mb-6 flex items-center text-xl font-semibold text-gray-900 dark:text-white'>
               <LayoutTemplate className='mr-2 h-5 w-5 text-purple-500 dark:text-purple-400' />
-              Create Survey Manually
+              Create Form Manually
             </h2>
 
             <form onSubmit={handleManualSubmit}>
@@ -225,7 +225,7 @@ export default function CreateSurveyPage() {
                   htmlFor='title'
                   className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'
                 >
-                  Survey Title <span className='text-red-500'>*</span>
+                  Form Title <span className='text-red-500'>*</span>
                 </label>
                 <input
                   type='text'
@@ -233,7 +233,7 @@ export default function CreateSurveyPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Enter survey title'
+                  placeholder='Enter form title'
                   required
                 />
               </div>
@@ -251,10 +251,10 @@ export default function CreateSurveyPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
                   className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Enter survey description'
+                  placeholder='Enter form description'
                 ></textarea>
                 <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                  Add context about your survey's purpose to guide respondents.
+                  Add context about your form's purpose to guide respondents.
                 </p>
               </div>
 
@@ -291,23 +291,23 @@ export default function CreateSurveyPage() {
           <div className='p-6 sm:p-8'>
             <h2 className='mb-6 flex items-center text-xl font-semibold text-gray-900 dark:text-white'>
               <Sparkles className='mr-2 h-5 w-5 text-purple-500 dark:text-purple-400' />
-              Generate Survey with AI
+              Generate Form with AI
             </h2>
 
             <div className='mb-6 flex items-start rounded-lg border border-purple-100 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20'>
               <Lightbulb className='mr-3 mt-0.5 h-5 w-5 flex-shrink-0 text-purple-500 dark:text-purple-400' />
               <div>
                 <h3 className='mb-1 text-sm font-medium text-purple-800 dark:text-purple-300'>
-                  Let AI Design Your Survey
+                  Let AI Design Your Form
                 </h3>
                 <p className='text-sm text-purple-700 dark:text-purple-200'>
-                  Describe the survey you want to create in detail, and our AI
-                  will generate a complete multi-page survey with relevant
-                  questions. You can edit the generated survey afterward.
+                  Describe the form you want to create in detail, and our AI
+                  will generate a complete multi-page form with relevant
+                  questions. You can edit the generated form afterward.
                 </p>
                 <p className='mt-1 text-sm text-purple-700 dark:text-purple-200'>
-                  <strong>Example:</strong> "Create a customer feedback survey
-                  for a coffee shop that asks about service quality, product
+                  <strong>Example:</strong> "Create a customer feedback form for
+                  a coffee shop that asks about service quality, product
                   satisfaction, and suggestions for improvement."
                 </p>
               </div>
@@ -319,7 +319,7 @@ export default function CreateSurveyPage() {
                   htmlFor='title'
                   className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'
                 >
-                  Survey Title (optional)
+                  Form Title (optional)
                 </label>
                 <input
                   type='text'
@@ -327,7 +327,7 @@ export default function CreateSurveyPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Enter survey title (or let AI generate one)'
+                  placeholder='Enter form title (or let AI generate one)'
                 />
                 <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
                   Leave blank to use AI-generated title
@@ -347,7 +347,7 @@ export default function CreateSurveyPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                   className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Enter survey description (or let AI generate one)'
+                  placeholder='Enter form description (or let AI generate one)'
                 ></textarea>
                 <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
                   Leave blank to use AI-generated description
@@ -359,7 +359,7 @@ export default function CreateSurveyPage() {
                   htmlFor='aiPrompt'
                   className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'
                 >
-                  Describe Your Survey <span className='text-red-500'>*</span>
+                  Describe Your Form <span className='text-red-500'>*</span>
                 </label>
                 <textarea
                   id='aiPrompt'
@@ -367,12 +367,12 @@ export default function CreateSurveyPage() {
                   onChange={(e) => setAiPrompt(e.target.value)}
                   rows={6}
                   className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Describe the survey you want to create in detail...'
+                  placeholder='Describe the form you want to create in detail...'
                   required
                 ></textarea>
                 <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                  The more details you provide, the better the AI-generated
-                  survey will be.
+                  The more details you provide, the better the AI-generated form
+                  will be.
                 </p>
               </div>
 

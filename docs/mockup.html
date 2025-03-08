@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Survey Builder</title>
+    <title>Form Builder</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"
@@ -41,7 +41,7 @@
         <h1
           class="transform text-center text-4xl font-extrabold text-white drop-shadow-sm transition-transform hover:scale-105 sm:text-5xl"
         >
-          Survey Builder
+          Form Builder
         </h1>
       </div>
     </header>
@@ -58,17 +58,17 @@
       const ReactDOM = window.ReactDOM;
       const { useState, useEffect, createContext, useContext } = React;
 
-      // Survey Context
-      const SurveyContext = createContext();
+      // Form Context
+      const FormContext = createContext();
 
-      const SurveyContextProvider = ({ children }) => {
+      const FormContextProvider = ({ children }) => {
         const [pages, setPages] = useState([]);
         const [currentPageIndex, setCurrentPageIndex] = useState(-1);
         const [previewPageIndex, setPreviewPageIndex] = useState(0);
 
         useEffect(() => {
           loadFromLocalStorage();
-          setupSampleSurvey();
+          setupSampleForm();
         }, []);
 
         useEffect(() => {
@@ -76,7 +76,7 @@
         }, [pages]);
 
         const loadFromLocalStorage = () => {
-          const storedData = localStorage.getItem("surveyData");
+          const storedData = localStorage.getItem("formData");
           if (storedData) {
             const parsedData = JSON.parse(storedData);
             setPages(parsedData);
@@ -87,7 +87,7 @@
         };
 
         const saveToLocalStorage = () => {
-          localStorage.setItem("surveyData", JSON.stringify(pages));
+          localStorage.setItem("formData", JSON.stringify(pages));
         };
 
         const addPage = (newPage) => {
@@ -187,7 +187,7 @@
           }
         };
 
-        const setupSampleSurvey = () => {
+        const setupSampleForm = () => {
           if (pages.length === 0) {
             addSamplePages();
           }
@@ -196,8 +196,8 @@
         const addSamplePages = () => {
           const samplePages = [
             {
-              title: "Customer Satisfaction Survey - Page 1",
-              pageType: "survey",
+              title: "Customer Satisfaction Form - Page 1",
+              pageType: "form",
               questions: [
                 {
                   contextElements: [
@@ -239,8 +239,8 @@
               ],
             },
             {
-              title: "Customer Satisfaction Survey - Page 2",
-              pageType: "survey",
+              title: "Customer Satisfaction Form - Page 2",
+              pageType: "form",
               questions: [
                 {
                   contextElements: [
@@ -298,9 +298,7 @@
         };
 
         return (
-          <SurveyContext.Provider value={value}>
-            {children}
-          </SurveyContext.Provider>
+          <FormContext.Provider value={value}>{children}</FormContext.Provider>
         );
       };
 
@@ -356,7 +354,7 @@
         openQuestionModal,
         deleteQuestion,
       }) => {
-        const { currentPageIndex } = useContext(SurveyContext);
+        const { currentPageIndex } = useContext(FormContext);
         const handleDeleteQuestion = () => {
           deleteQuestion(currentPageIndex, index);
         };
@@ -438,7 +436,7 @@
           pages,
           currentPageIndex,
           deletePage: contextDeletePage,
-        } = useContext(SurveyContext);
+        } = useContext(FormContext);
         const currentPage = pages[currentPageIndex];
 
         const handleDeletePage = () => {
@@ -483,13 +481,13 @@
                     question={question}
                     index={index}
                     openQuestionModal={openQuestionModal}
-                    deleteQuestion={useContext(SurveyContext).deleteQuestion} // Access deleteQuestion from context here
+                    deleteQuestion={useContext(FormContext).deleteQuestion} // Access deleteQuestion from context here
                   />
                 ))}
               </div>
             )}
             <div className='mt-6 flex flex-col gap-4 sm:flex-row'>
-              {currentPage.pageType === "survey" && (
+              {currentPage.pageType === "form" && (
                 <button
                   id='add-question-btn'
                   onClick={openQuestionModal}
@@ -512,7 +510,7 @@
 
       // Page Preview Component
       const PagePreview = () => {
-        const { pages, previewPageIndex } = useContext(SurveyContext);
+        const { pages, previewPageIndex } = useContext(FormContext);
         if (pages.length === 0) {
           return <div className='p-6'>No pages to preview.</div>;
         }
@@ -548,12 +546,12 @@
           selectPage,
           movePageUp,
           movePageDown,
-        } = useContext(SurveyContext);
+        } = useContext(FormContext);
         return (
           <div className='p-4 md:w-1/4'>
             <div className='mb-10'>
               <h2 className='mb-6 text-2xl font-bold sm:text-3xl'>
-                Survey Pages
+                Form Pages
               </h2>
               <ul className='space-y-4'>
                 {pages.map((page, index) => (
@@ -727,7 +725,7 @@
           currentPageIndex,
           updateQuestion: contextUpdateQuestion,
           addQuestion: contextAddQuestion,
-        } = useContext(SurveyContext);
+        } = useContext(FormContext);
         const currentPage = pages[currentPageIndex];
 
         useEffect(() => {
@@ -902,7 +900,7 @@
         savePage: contextSavePage,
       }) => {
         const [pageTitleInput, setPageTitleInput] = useState("");
-        const [pageTypeInput, setPageTypeInput] = useState("survey");
+        const [pageTypeInput, setPageTypeInput] = useState("form");
         const [pageContextElements, setPageContextElements] = useState([]);
 
         const {
@@ -910,17 +908,17 @@
           currentPageIndex,
           addPage: contextAddPage,
           updatePage: contextUpdatePage,
-        } = useContext(SurveyContext);
+        } = useContext(FormContext);
         const currentPage = pages[currentPageIndex];
 
         useEffect(() => {
           if (isOpen && isEditingPage && currentPage) {
             setPageTitleInput(currentPage.title);
-            setPageTypeInput(currentPage.pageType || "survey");
+            setPageTypeInput(currentPage.pageType || "form");
             setPageContextElements(currentPage.contextElements || []);
           } else {
             setPageTitleInput("");
-            setPageTypeInput("survey");
+            setPageTypeInput("form");
             setPageContextElements([]);
           }
         }, [isOpen, isEditingPage, currentPage]);
@@ -929,7 +927,7 @@
           const newPage = {
             title: pageTitleInput,
             pageType: pageTypeInput,
-            questions: pageTypeInput === "survey" ? [] : [],
+            questions: pageTypeInput === "form" ? [] : [],
             contextElements:
               pageTypeInput === "info" ? pageContextElements : [],
           };
@@ -984,7 +982,7 @@
                   onChange={(e) => setPageTypeInput(e.target.value)}
                   className='w-full rounded border p-3 focus:outline-none focus:ring dark:bg-gray-700 dark:text-gray-200'
                 >
-                  <option value='survey'>Survey Page</option>
+                  <option value='form'>Form Page</option>
                   <option value='info'>Information Page</option>
                 </select>
               </div>
@@ -1042,7 +1040,7 @@
         };
 
         const { showPreviousPreviewPage, showNextPreviewPage } =
-          useContext(SurveyContext);
+          useContext(FormContext);
 
         return (
           <div className='mb-12'>
@@ -1068,7 +1066,7 @@
             <div className={`mt-10 ${activeTab !== "preview" ? "hidden" : ""}`}>
               <div className='rounded-xl bg-white p-4 shadow dark:bg-gray-800 sm:p-8'>
                 <h2 className='mb-6 text-2xl font-bold dark:text-gray-100 sm:text-3xl'>
-                  Survey Preview
+                  Form Preview
                 </h2>
                 <div id='preview-container' className='space-y-6'>
                   <PagePreview />
@@ -1077,14 +1075,14 @@
                   <button
                     id='prev-page-btn'
                     onClick={showPreviousPreviewPage}
-                    className={`transform rounded-xl bg-gray-400 px-4 py-3 font-bold text-white transition-transform hover:scale-105 hover:bg-gray-500 sm:px-8 sm:py-4 ${useContext(SurveyContext).previewPageIndex === 0 ? "hidden" : ""}`}
+                    className={`transform rounded-xl bg-gray-400 px-4 py-3 font-bold text-white transition-transform hover:scale-105 hover:bg-gray-500 sm:px-8 sm:py-4 ${useContext(FormContext).previewPageIndex === 0 ? "hidden" : ""}`}
                   >
                     Previous
                   </button>
                   <button
                     id='next-page-btn'
                     onClick={showNextPreviewPage}
-                    className={`transform rounded-xl bg-blue-500 px-4 py-3 font-bold text-white transition-transform hover:scale-105 hover:bg-blue-600 sm:px-8 sm:py-4 ${useContext(SurveyContext).previewPageIndex === useContext(SurveyContext).pages.length - 1 ? "hidden" : ""}`}
+                    className={`transform rounded-xl bg-blue-500 px-4 py-3 font-bold text-white transition-transform hover:scale-105 hover:bg-blue-600 sm:px-8 sm:py-4 ${useContext(FormContext).previewPageIndex === useContext(FormContext).pages.length - 1 ? "hidden" : ""}`}
                   >
                     Next
                   </button>
@@ -1097,9 +1095,9 @@
               isOpen={isQuestionModalOpen}
               onClose={closeQuestionModal}
               currentQuestionIndex={
-                useContext(SurveyContext).currentQuestionIndex
+                useContext(FormContext).currentQuestionIndex
               }
-              saveQuestion={useContext(SurveyContext).updateQuestion}
+              saveQuestion={useContext(FormContext).updateQuestion}
             />
 
             {/* Page Modal */}
@@ -1107,16 +1105,16 @@
               isOpen={isPageModalOpen}
               onClose={closePageModal}
               isEditingPage={isEditingPage}
-              savePage={useContext(SurveyContext).updatePage}
+              savePage={useContext(FormContext).updatePage}
             />
           </div>
         );
       };
 
       const RootApp = () => (
-        <SurveyContextProvider>
+        <FormContextProvider>
           <App />
-        </SurveyContextProvider>
+        </FormContextProvider>
       );
 
       const root = ReactDOM.createRoot(document.getElementById("root"));
