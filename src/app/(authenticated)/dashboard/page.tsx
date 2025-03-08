@@ -94,7 +94,7 @@ export default function DashboardPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div>
+      <div className='p-4'>
         <div className='mb-8 flex items-center justify-between'>
           <h1 className='text-2xl font-bold'>My Surveys</h1>
           <div className='h-10 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700'></div>
