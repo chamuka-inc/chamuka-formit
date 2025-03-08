@@ -9,40 +9,38 @@ import {
   useMemo,
 } from "react";
 import {
-  SurveyContextType,
-  SurveyPage,
+  FormContextType,
+  FormPage,
   Question,
-  SurveyState,
-  SurveyAction,
+  FormState,
+  FormAction,
 } from "../types";
-import { surveyReducer, initialState } from "./SurveyReducer";
-import { createHistoryReducer, HistoryState } from "./SurveyHistory";
-import { createStorageManager } from "./SurveyStorage";
-import { surveySelectors } from "./SurveySelectors";
+import { formReducer, initialState } from "./Reducer";
+import { createHistoryReducer, HistoryState } from "./History";
+import { createStorageManager } from "./Storage";
+import { formSelectors } from "./Selectors";
 
-const SurveyContext = createContext<SurveyContextType | null>(null);
-const storageManager = createStorageManager("surveyData");
+const FormContext = createContext<FormContextType | null>(null);
+const storageManager = createStorageManager("formData");
 
-export const useSurveyContext = () => {
-  const context = useContext(SurveyContext);
+export const useFormContext = () => {
+  const context = useContext(FormContext);
   if (!context) {
-    throw new Error(
-      "useSurveyContext must be used within a SurveyContextProvider",
-    );
+    throw new Error("useFormContext must be used within a FormContextProvider");
   }
   return context;
 };
 
-export const SurveyContextProvider = ({
+export const FormContextProvider = ({
   children,
   initialPages = [],
 }: {
   children: React.ReactNode;
-  initialPages?: SurveyPage[];
+  initialPages?: FormPage[];
 }) => {
-  console.log("SurveyContextProvider initialPages:", initialPages);
+  console.log("FormContextProvider initialPages:", initialPages);
 
-  const [history, dispatch] = useReducer(createHistoryReducer(surveyReducer), {
+  const [history, dispatch] = useReducer(createHistoryReducer(formReducer), {
     past: [],
     present: {
       ...initialState,
@@ -52,23 +50,23 @@ export const SurveyContextProvider = ({
       loadingStates: {
         savingPage: false,
         savingQuestion: false,
-        loadingSurvey: false,
+        loadingForm: false,
       },
     },
     future: [],
   });
 
   const state = history.present;
-  console.log("SurveyContext state:", state);
+  console.log("FormContext state:", state);
 
   useEffect(() => {
     console.log(
-      "SurveyContext useEffect initialPages.length:",
+      "FormContext useEffect initialPages.length:",
       initialPages.length,
     );
     if (initialPages.length > 0) {
       // If we have initialPages, load them directly
-      loadSurvey(initialPages);
+      loadForm(initialPages);
       // Clear local storage to prevent conflicts with database data
       storageManager.clear();
     } else if (initialPages.length === 0) {
@@ -88,24 +86,24 @@ export const SurveyContextProvider = ({
       if (loadedState) {
         dispatch({ type: "LOAD_SURVEY", payload: loadedState.pages });
       } else if (initialPages.length === 0) {
-        setupSampleSurvey();
+        setupSampleForm();
       }
     } catch (error) {
-      dispatch({ type: "SET_ERROR", payload: "Failed to load survey data" });
+      dispatch({ type: "SET_ERROR", payload: "Failed to load form data" });
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
-  const loadSurvey = useCallback((pages: SurveyPage[]) => {
+  const loadForm = useCallback((pages: FormPage[]) => {
     dispatch({ type: "LOAD_SURVEY", payload: pages });
   }, []);
 
-  const addPage = useCallback((page: SurveyPage) => {
+  const addPage = useCallback((page: FormPage) => {
     dispatch({ type: "ADD_PAGE", payload: page });
   }, []);
 
-  const updatePage = useCallback((index: number, page: SurveyPage) => {
+  const updatePage = useCallback((index: number, page: FormPage) => {
     dispatch({ type: "UPDATE_PAGE", payload: { index, page } });
   }, []);
 
@@ -189,17 +187,17 @@ export const SurveyContextProvider = ({
     dispatch({ type: "CLEAR_HISTORY" });
   }, []);
 
-  const setupSampleSurvey = () => {
-    console.log("Setting up sample survey");
-    const samplePages: SurveyPage[] = [
+  const setupSampleForm = () => {
+    console.log("Setting up sample form");
+    const samplePages: FormPage[] = [
       {
-        title: "Customer Feedback Survey - Introduction",
+        title: "Customer Feedback Form - Introduction",
         questions: [],
         contextElements: [
           {
             type: "paragraph",
             content:
-              "# Welcome to our Customer Feedback Survey!\n\nWe value your input and would like to hear about your experience with our products and services.\n\n**Your feedback matters** and will help us improve our offerings.",
+              "# Welcome to our Customer Feedback Form!\n\nWe value your input and would like to hear about your experience with our products and services.\n\n**Your feedback matters** and will help us improve our offerings.",
           },
           {
             type: "image",
@@ -209,7 +207,7 @@ export const SurveyContextProvider = ({
           {
             type: "paragraph",
             content:
-              "## Important Information\n\n- This survey will take approximately 5 minutes to complete\n- All responses are confidential\n- Your honest feedback is appreciated",
+              "## Important Information\n\n- This form will take approximately 5 minutes to complete\n- All responses are confidential\n- Your honest feedback is appreciated",
           },
         ],
       },
@@ -309,7 +307,7 @@ export const SurveyContextProvider = ({
     () => ({
       state,
       dispatch,
-      loadSurvey,
+      loadForm,
       addPage,
       updatePage,
       deletePage,
@@ -323,9 +321,9 @@ export const SurveyContextProvider = ({
       showNextPreviewPage,
       setPreviewPageIndex,
       // Memoized selectors
-      currentPage: surveySelectors.getCurrentPage(state),
-      pageStats: surveySelectors.getPageStats(state),
-      questionCount: surveySelectors.getQuestionCount(state),
+      currentPage: formSelectors.getCurrentPage(state),
+      pageStats: formSelectors.getPageStats(state),
+      questionCount: formSelectors.getQuestionCount(state),
       // History actions
       canUndo: history.past.length > 0,
       canRedo: history.future.length > 0,
@@ -338,7 +336,7 @@ export const SurveyContextProvider = ({
       history.past.length,
       history.future.length,
       // Include all callback functions in dependencies
-      loadSurvey,
+      loadForm,
       addPage,
       updatePage,
       deletePage,
@@ -358,8 +356,8 @@ export const SurveyContextProvider = ({
   );
 
   return (
-    <SurveyContext.Provider value={memoizedValue}>
+    <FormContext.Provider value={memoizedValue}>
       {children}
-    </SurveyContext.Provider>
+    </FormContext.Provider>
   );
 };

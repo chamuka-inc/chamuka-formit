@@ -100,7 +100,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <footer className='relative mt-auto border-t border-gray-200 bg-white py-4 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'>
         <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700'></div>
         <div className='container mx-auto'>
-          © {new Date().getFullYear()} Chamuka Fundi. All rights reserved.
+          © {new Date().getFullYear()} Chamuka FormIt. All rights reserved.
         </div>
       </footer>
     </div>

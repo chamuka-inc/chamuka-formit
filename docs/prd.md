@@ -13,7 +13,7 @@ This **AI-assisted multi-page form builder** will enable users to:
 
 - **AI First**: Leverage AI to handle the tedious aspects of form creation (e.g., question text, ordering, grouping into pages).
 - **Minimal Manual Effort**: Allow users to refine or override the AI’s suggestions in a builder, rather than building from scratch.
-- **Multi-Page Support**: Support complex workflows or multi-step surveys out of the box.
+- **Multi-Page Support**: Support complex workflows or multi-step forms out of the box.
 - **Easy Distribution**: Provide a simple client interface that renders the final form, collects submissions, and optionally routes them to a user-defined endpoint.
 
 ---
@@ -211,7 +211,7 @@ This **AI-assisted multi-page form builder** will enable users to:
 
 This **MVP PRD** focuses on delivering an **AI-driven multi-page form generator** with minimal friction: 
 - The AI creates a structured form object based on user prompts.  
-- A visual builder refines that form into a polished, multi-step survey or data-collection tool.  
+- A visual builder refines that form into a polished, multi-step form or data-collection tool.  
 - The client renderer ensures seamless distribution and submission handling.  
 
 By releasing these **core features**—AI generation, builder editing, and multi-page rendering—alongside a simple **Freemium/Pro** model, you can rapidly validate the product’s commercial potential and gather user feedback for subsequent expansions (e.g., advanced conditional logic, deeper analytics, enterprise security).

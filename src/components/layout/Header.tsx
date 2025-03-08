@@ -44,7 +44,7 @@ export default function Header({ toggleSidebar, sidebarOpen }: HeaderProps) {
             <Link href='/' className='flex items-center gap-2'>
               <FileText className='h-8 w-8 text-blue-600 dark:text-blue-400' />
               <span className='text-xl font-semibold text-gray-900 dark:text-white'>
-                Chamuka Fundi
+                Chamuka FormIt
               </span>
             </Link>
           </div>

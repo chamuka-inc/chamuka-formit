@@ -14,7 +14,7 @@ import {
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { isPathActive } from "@/lib/utils/shared";
 
-interface SurveyInfo {
+interface FormInfo {
   id: string;
   type: string;
 }
@@ -34,7 +34,7 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
           <Link href='/' className='flex items-center gap-2' onClick={onClose}>
             <FileText className='h-8 w-8 text-blue-600 dark:text-blue-400' />
             <span className='text-xl font-semibold text-gray-900 dark:text-white'>
-              Chamuka Fundi
+              Chamuka FormIt
             </span>
           </Link>
           <button
@@ -65,9 +65,9 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
 
               {/* Create link */}
               <Link
-                href='/surveys/create'
+                href='/forms/create'
                 className={`flex items-center rounded-lg ${
-                  isPathActive(pathname, "/surveys/create")
+                  isPathActive(pathname, "/forms/create")
                     ? "bg-gray-50 text-blue-600 dark:bg-gray-700 dark:text-blue-400"
                     : "text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-700"
                 } px-3 py-2 text-base font-semibold leading-7`}

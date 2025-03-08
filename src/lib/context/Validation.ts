@@ -1,4 +1,4 @@
-import { SurveyState, SurveyPage, Question } from "../types";
+import { FormState, FormPage, Question } from "../types";
 
 export interface ValidationError {
   type: string;
@@ -67,7 +67,7 @@ function validateQuestion(
   return errors;
 }
 
-function validatePage(page: SurveyPage, index: number): ValidationError[] {
+function validatePage(page: FormPage, index: number): ValidationError[] {
   const errors: ValidationError[] = [];
   const path = ["pages", index.toString()];
 
@@ -125,7 +125,7 @@ function validatePage(page: SurveyPage, index: number): ValidationError[] {
   return errors;
 }
 
-export function validateSurveyState(state: SurveyState): ValidationResult {
+export function validateFormState(state: FormState): ValidationResult {
   const errors: ValidationError[] = [];
 
   // Validate indices
@@ -158,7 +158,7 @@ export function validateSurveyState(state: SurveyState): ValidationResult {
 }
 
 export function validateAction(
-  state: SurveyState,
+  state: FormState,
   action: any,
 ): ValidationError[] {
   const errors: ValidationError[] = [];

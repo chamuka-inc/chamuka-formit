@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useSurveyContext } from "@/lib/context/SurveyContext";
+import { useFormContext } from "@/lib/context/Context";
 import { Question } from "./Question";
 import { ContextElements } from "./ContextElements";
 import { ChevronLeft, ChevronRight, FileText, Menu, X } from "lucide-react";
-import { SurveyPageNavigation } from "./SurveyPageNavigation";
+import { FormPageNavigation } from "./PageNavigation";
 
 // Add description as optional property to the currentPage type
 type PageWithOptionalDescription = {
@@ -22,7 +22,7 @@ export const PagePreview = () => {
     showPreviousPreviewPage,
     showNextPreviewPage,
     setPreviewPageIndex,
-  } = useSurveyContext();
+  } = useFormContext();
 
   if (pages.length === 0) {
     return (
@@ -34,7 +34,7 @@ export const PagePreview = () => {
           No Pages to Preview
         </h2>
         <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
-          Add some pages to your survey using the builder tab to see them in
+          Add some pages to your form using the builder tab to see them in
           preview mode.
         </p>
       </div>
@@ -64,7 +64,7 @@ export const PagePreview = () => {
     <div className='w-full'>
       {/* Preview Banner */}
       <div className='mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 p-3 text-center text-sm text-gray-600 shadow-sm dark:from-gray-800/50 dark:to-blue-900/20 dark:text-gray-300 sm:text-base'>
-        <span className='font-medium'>Preview Mode</span> — See how your survey
+        <span className='font-medium'>Preview Mode</span> — See how your form
         will appear to respondents
       </div>
 
@@ -95,7 +95,7 @@ export const PagePreview = () => {
             sidebarVisible ? "block" : "hidden lg:block"
           } w-full lg:w-1/4 xl:w-1/5`}
         >
-          <SurveyPageNavigation
+          <FormPageNavigation
             pages={pages}
             currentPageIndex={previewPageIndex}
             onPageSelect={(index) => {

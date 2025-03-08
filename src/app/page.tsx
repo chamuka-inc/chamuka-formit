@@ -23,11 +23,11 @@ export default async function Home() {
           <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
             <div className='mx-auto max-w-3xl text-center'>
               <h1 className='text-4xl font-bold text-gray-900 dark:text-white sm:text-6xl'>
-                Create Beautiful Surveys with Ease
+                Create Beautiful Forms with Ease
               </h1>
               <p className='mt-6 text-lg text-gray-600 dark:text-gray-300 sm:text-xl'>
-                Build engaging surveys, collect valuable feedback, and make
-                data-driven decisions with our modern survey platform.
+                Build engaging forms, collect valuable feedback, and make
+                data-driven decisions with our modern form platform.
               </p>
               <div className='mt-10 flex flex-col justify-center gap-4 sm:flex-row'>
                 <Link
@@ -55,12 +55,12 @@ export default async function Home() {
                   {
                     title: "Modern Design",
                     description:
-                      "Create beautiful surveys with our modern, responsive design system.",
+                      "Create beautiful forms with our modern, responsive design system.",
                   },
                   {
                     title: "AI-Powered",
                     description:
-                      "Generate survey questions automatically with our AI assistant.",
+                      "Generate form questions automatically with our AI assistant.",
                   },
                   {
                     title: "Real-time Analytics",

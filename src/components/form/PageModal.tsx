@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SurveyPage, ContextElement } from "@/lib/types";
+import { FormPage, ContextElement } from "@/lib/types";
 import { ContextElementEditor } from "./ContextElementEditor";
 import { X } from "lucide-react";
 
 interface PageModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentPage?: SurveyPage;
-  onSave: (page: SurveyPage) => void;
+  currentPage?: FormPage;
+  onSave: (page: FormPage) => void;
 }
 
 export const PageModal = ({
@@ -32,7 +32,7 @@ export const PageModal = ({
   }, [isOpen, currentPage]);
 
   const handleSave = () => {
-    const newPage: SurveyPage = {
+    const newPage: FormPage = {
       title: pageTitle,
       questions: currentPage?.questions || [],
       contextElements: contextElements.length > 0 ? contextElements : undefined,

@@ -3,7 +3,7 @@ import { CreditPurchaseForm } from "./CreditPurchaseForm";
 import { TransactionHistory } from "./TransactionHistory";
 
 export const metadata: Metadata = {
-  title: "Credits | Survey Builder",
+  title: "Credits | Form Builder",
   description: "Purchase credits to use premium features",
 };
 
@@ -41,13 +41,12 @@ export default function CreditsPage() {
           <div className='rounded-lg bg-muted p-6'>
             <h2 className='mb-4 text-xl font-semibold'>Premium Features</h2>
             <ul className='list-disc space-y-2 pl-5'>
-              <li>AI-generated surveys - save hours of design time</li>
+              <li>AI-generated forms - save hours of design time</li>
               <li>
-                Data exports - export your survey results in various formats
+                Data exports - export your form results in various formats
               </li>
               <li>
-                Advanced analytics - get deeper insights into your survey
-                results
+                Advanced analytics - get deeper insights into your form results
               </li>
               <li>
                 Coming soon: Custom branding, advanced question types, and more

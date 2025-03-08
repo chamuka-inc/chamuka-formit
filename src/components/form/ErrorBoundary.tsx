@@ -11,7 +11,7 @@ interface State {
   error?: Error;
 }
 
-export class SurveyErrorBoundary extends Component<Props, State> {
+export class FormErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false };

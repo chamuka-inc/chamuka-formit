@@ -4,31 +4,31 @@ import React, { useState } from "react";
 import { notFound } from "next/navigation";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import SurveyRenderer from "@/components/survey/SurveyRenderer";
-import { SurveyThankYouPage } from "@/components/survey/SurveyThankYouPage";
+import FormRenderer from "@/components/form/Renderer";
+import { FormThankYouPage } from "@/components/form/ThankYouPage";
 import { Loader2, AlertCircle } from "lucide-react";
 import PublicLayout from "@/components/layout/PublicLayout";
 
-export default function PublicSurveyPage() {
+export default function PublicFormPage() {
   const params = useParams();
   const token = params?.token as string;
-  const [surveyLoaded, setSurveyLoaded] = useState(false);
-  const [surveyError, setSurveyError] = useState<string | null>(null);
-  const [surveyCompleted, setSurveyCompleted] = useState(false);
+  const [formLoaded, setFormLoaded] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formCompleted, setFormCompleted] = useState(false);
 
   // Show 404 if no token is provided
   if (!token) {
     notFound();
   }
 
-  // When survey is completed
-  const handleSurveyComplete = () => {
-    setSurveyCompleted(true);
+  // When form is completed
+  const handleFormComplete = () => {
+    setFormCompleted(true);
   };
 
-  // When survey has an error
-  const handleSurveyError = (errorMessage: string) => {
-    setSurveyError(errorMessage);
+  // When form has an error
+  const handleFormError = (errorMessage: string) => {
+    setFormError(errorMessage);
   };
 
   return (
@@ -36,26 +36,26 @@ export default function PublicSurveyPage() {
       <div className='flex flex-1 items-start justify-center px-4 py-12'>
         <div className='w-full'>
           {/* Loading state */}
-          {!surveyLoaded && !surveyError && (
+          {!formLoaded && !formError && (
             <div className='flex h-64 items-center justify-center'>
               <Loader2 className='h-8 w-8 animate-spin text-blue-600 dark:text-blue-400' />
               <span className='ml-2 text-gray-600 dark:text-gray-300'>
-                Loading survey...
+                Loading form...
               </span>
             </div>
           )}
 
           {/* Error state */}
-          {surveyError && (
+          {formError && (
             <div className='rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800'>
               <div className='mb-4 flex justify-center'>
                 <AlertCircle className='h-12 w-12 text-red-600 dark:text-red-500' />
               </div>
               <h2 className='mb-2 text-xl font-semibold text-gray-900 dark:text-white'>
-                Unable to Load Survey
+                Unable to Load Form
               </h2>
               <p className='mb-6 text-gray-600 dark:text-gray-300'>
-                {surveyError}
+                {formError}
               </p>
               <Link
                 href='/'
@@ -67,15 +67,15 @@ export default function PublicSurveyPage() {
           )}
 
           {/* Completion state */}
-          {surveyCompleted && <SurveyThankYouPage />}
+          {formCompleted && <FormThankYouPage />}
 
-          {/* Survey renderer */}
-          {!surveyError && !surveyCompleted && (
-            <SurveyRenderer
-              surveyToken={token}
-              onLoad={() => setSurveyLoaded(true)}
-              onError={handleSurveyError}
-              onComplete={handleSurveyComplete}
+          {/* Form renderer */}
+          {!formError && !formCompleted && (
+            <FormRenderer
+              formToken={token}
+              onLoad={() => setFormLoaded(true)}
+              onError={handleFormError}
+              onComplete={handleFormComplete}
               showImprovedNavigation={true}
             />
           )}
