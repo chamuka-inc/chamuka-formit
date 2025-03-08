@@ -78,7 +78,11 @@ export interface SurveyContextType {
   deleteQuestion: (pageIndex: number, questionIndex: number) => void;
   showPreviousPreviewPage: () => void;
   showNextPreviewPage: () => void;
-  // Selectors
+  setPreviewPageIndex: (index: number) => void;
+  undo: () => void;
+  redo: () => void;
+  clearHistory: () => void;
+  // Memoized selectors
   currentPage: SurveyPage | null;
   pageStats: {
     totalPages: number;
@@ -89,9 +93,6 @@ export interface SurveyContextType {
   // History actions
   canUndo: boolean;
   canRedo: boolean;
-  undo: () => void;
-  redo: () => void;
-  clearHistory: () => void;
 }
 
 export enum CreditTransactionType {

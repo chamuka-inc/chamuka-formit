@@ -34,7 +34,7 @@ export default function PublicSurveyPage() {
   return (
     <PublicLayout>
       <div className='flex flex-1 items-start justify-center px-4 py-12'>
-        <div className='w-full max-w-4xl'>
+        <div className='w-full'>
           {/* Loading state */}
           {!surveyLoaded && !surveyError && (
             <div className='flex h-64 items-center justify-center'>
@@ -76,6 +76,7 @@ export default function PublicSurveyPage() {
               onLoad={() => setSurveyLoaded(true)}
               onError={handleSurveyError}
               onComplete={handleSurveyComplete}
+              showImprovedNavigation={true}
             />
           )}
         </div>
