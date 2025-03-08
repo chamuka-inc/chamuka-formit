@@ -264,7 +264,7 @@ export default function EditSurveyPage() {
       <div className='relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-500 dark:via-indigo-500 dark:to-purple-500'>
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         <div className='relative z-10 w-full px-3 py-4 sm:px-6 sm:py-5 lg:px-8'>
-          <div className='mx-auto flex max-w-[1600px] flex-col justify-between gap-3 md:flex-row md:items-center md:gap-4'>
+          <div className='flex w-full flex-col justify-between gap-3 md:flex-row md:items-center md:gap-4'>
             <div className='flex items-center gap-2'>
               <Link
                 href='/dashboard'
