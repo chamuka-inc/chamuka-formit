@@ -1,11 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  FileText,
-  CircleCheck,
-  ArrowRight,
-} from "lucide-react";
+import { FileText, CircleCheck, ArrowRight } from "lucide-react";
 
 interface SurveyPageNavigationProps {
   pages: Array<{

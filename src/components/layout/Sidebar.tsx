@@ -132,7 +132,7 @@ export default function Sidebar({ className = "" }: { className?: string }) {
 
   return (
     <aside
-      className={`h-full w-64 border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 ${className}`}
+      className={`h-full border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 ${className}`}
     >
       <div className='flex h-full flex-col p-4'>
         <div className='mb-2 px-2'>
