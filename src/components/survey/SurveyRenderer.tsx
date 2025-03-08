@@ -2,19 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { ChevronLeft, ChevronRight, Send, Menu, X } from "lucide-react";
 import { api } from "@/lib/trpc/react";
 import {
   type SurveyPage,
   type Question,
   type ContextElement,
 } from "@/lib/types";
+import { SurveyPageNavigation } from "./SurveyPageNavigation";
 
 interface SurveyRendererProps {
   surveyToken: string;
   onLoad?: () => void;
   onError?: (message: string) => void;
   onComplete?: () => void;
+  showImprovedNavigation?: boolean;
 }
 
 export default function SurveyRenderer({
@@ -22,12 +24,14 @@ export default function SurveyRenderer({
   onLoad,
   onError,
   onComplete,
+  showImprovedNavigation = false,
 }: SurveyRendererProps) {
   // State for survey data
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [surveyCompleted, setSurveyCompleted] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   // Fetch the survey data using the public share token
   const {
@@ -196,124 +200,291 @@ export default function SurveyRenderer({
     );
   }
 
+  // Render the survey
   return (
-    <div className='mx-auto w-full max-w-3xl'>
-      {/* Survey title */}
-      <div className='mb-8 text-center'>
+    <div className='mx-auto w-full p-4'>
+      {/* Survey title section with gradient background */}
+      <div className='dark:to-gray-850 mb-8 rounded-xl bg-gradient-to-b from-blue-50 to-white p-6 text-center shadow-sm dark:from-gray-800 sm:p-8'>
         <h1 className='text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl'>
           {surveyData.title}
         </h1>
         {surveyData.description && (
-          <p className='mt-2 text-gray-600 dark:text-gray-300'>
+          <p className='mx-auto mt-3 max-w-3xl text-gray-600 dark:text-gray-300'>
             {surveyData.description}
           </p>
         )}
       </div>
 
-      {/* Progress indicator */}
-      <div className='mb-6'>
-        <div className='mb-1 flex justify-between text-sm text-gray-500 dark:text-gray-400'>
-          <span>
-            Page {currentPageIndex + 1} of {totalPages}
-          </span>
-          <span>
-            {Math.round(((currentPageIndex + 1) / totalPages) * 100)}% completed
-          </span>
-        </div>
-        <div className='h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700'>
-          <div
-            className='h-2 rounded-full bg-blue-500'
-            style={{ width: `${((currentPageIndex + 1) / totalPages) * 100}%` }}
-          ></div>
-        </div>
-      </div>
-
-      {/* Current page */}
-      <div className='rounded-lg bg-white p-6 shadow dark:bg-gray-800'>
-        {/* Page title */}
-        {currentPage && (
-          <div className='mb-6'>
-            <h2 className='text-xl font-semibold text-gray-800 dark:text-white'>
-              {currentPage.title}
-            </h2>
-            {currentPage.description && (
-              <p className='mt-1 text-gray-600 dark:text-gray-300'>
-                {currentPage.description}
-              </p>
+      {/* Mobile: Toggle sidebar button (only for improved navigation) */}
+      {showImprovedNavigation && (
+        <div className='mb-4 flex lg:hidden'>
+          <button
+            onClick={() => setSidebarVisible(!sidebarVisible)}
+            className='inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
+          >
+            {sidebarVisible ? (
+              <>
+                <X className='h-4 w-4' />
+                <span>Hide Pages</span>
+              </>
+            ) : (
+              <>
+                <Menu className='h-4 w-4' />
+                <span>Show Pages</span>
+              </>
             )}
+          </button>
+        </div>
+      )}
+
+      <div className='flex flex-col gap-6 lg:flex-row'>
+        {/* Side Page Navigation (only for improved navigation) */}
+        {showImprovedNavigation && (
+          <div
+            className={`${
+              sidebarVisible ? "block" : "hidden lg:block"
+            } w-full lg:w-1/4 xl:w-1/5`}
+          >
+            <SurveyPageNavigation
+              pages={pages}
+              currentPageIndex={currentPageIndex}
+              onPageSelect={(pageIndex) => {
+                // Validation for required fields before allowing to go to a new page
+                if (pageIndex > currentPageIndex) {
+                  const requiredQuestions =
+                    currentPage?.questions?.filter(
+                      (q: Question) => q.required,
+                    ) || [];
+                  const missingResponses = requiredQuestions.filter(
+                    (q: Question) => !responses[q.id!],
+                  );
+
+                  if (missingResponses.length > 0) {
+                    toast.error(
+                      "Please answer all required questions before proceeding",
+                    );
+                    return;
+                  }
+                }
+
+                setCurrentPageIndex(pageIndex);
+                setSidebarVisible(false); // Hide sidebar on mobile after selection
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            />
           </div>
         )}
 
-        {/* Context elements at page level */}
-        {currentPage?.contextElements?.map(
-          (element: ContextElement, idx: number) => (
-            <RenderContextElement
-              key={`page-context-${idx}`}
-              element={element}
-            />
-          ),
-        )}
-
-        {/* Questions */}
-        <div className='space-y-8'>
-          {currentPage?.questions?.map((question: Question) => (
-            <div
-              key={question.id}
-              className='border-b border-gray-200 pb-6 last:border-b-0 dark:border-gray-700'
-            >
-              <RenderQuestion
-                question={question}
-                value={responses[question.id!] || ""}
-                onChange={(value) => handleResponseChange(question.id!, value)}
-              />
+        <div
+          className={`w-full ${showImprovedNavigation ? "lg:w-3/4 xl:w-4/5" : ""}`}
+        >
+          {/* Progress indicator */}
+          <div className='mb-6'>
+            <div className='mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between'>
+              <div className='mb-1 text-sm font-medium text-gray-700 dark:text-gray-300 sm:mb-0'>
+                Page {currentPageIndex + 1} of {totalPages}
+              </div>
+              <div className='text-sm text-gray-500 dark:text-gray-400'>
+                {Math.round(((currentPageIndex + 1) / totalPages) * 100)}%
+                completed
+              </div>
             </div>
-          ))}
-        </div>
+            <div className='h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700'>
+              <div
+                className='h-2 rounded-full bg-blue-500 transition-all duration-300'
+                style={{
+                  width: `${((currentPageIndex + 1) / totalPages) * 100}%`,
+                }}
+              ></div>
+            </div>
+          </div>
 
-        {/* Navigation buttons */}
-        <div className='mt-8 flex justify-between'>
-          <button
-            type='button'
-            onClick={goToPrevPage}
-            disabled={currentPageIndex === 0}
-            className={`flex items-center rounded-md px-4 py-2 ${
-              currentPageIndex === 0
-                ? "cursor-not-allowed text-gray-400"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-            }`}
-          >
-            <ChevronLeft className='mr-1 h-5 w-5' />
-            Previous
-          </button>
-
-          {currentPageIndex < totalPages - 1 ? (
-            <button
-              type='button'
-              onClick={goToNextPage}
-              className='flex items-center rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
-            >
-              Next
-              <ChevronRight className='ml-1 h-5 w-5' />
-            </button>
-          ) : (
-            <button
-              type='button'
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className='flex items-center rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600'
-            >
-              {isSubmitting ? (
-                <>
-                  <div className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent'></div>
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  Submit
-                  <Send className='ml-2 h-4 w-4' />
-                </>
+          {/* Current page */}
+          <div className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800'>
+            <div className='p-5 sm:p-8'>
+              {/* Page title */}
+              {currentPage && (
+                <div className='mb-8 border-b border-gray-100 pb-4 dark:border-gray-700'>
+                  <h2 className='text-xl font-semibold text-gray-800 dark:text-white'>
+                    {currentPage.title}
+                  </h2>
+                  {currentPage.description && (
+                    <p className='mt-2 text-gray-600 dark:text-gray-300'>
+                      {currentPage.description}
+                    </p>
+                  )}
+                </div>
               )}
-            </button>
+
+              {/* Context elements at page level */}
+              {currentPage?.contextElements?.length > 0 && (
+                <div className='mb-8'>
+                  {currentPage.contextElements.map(
+                    (element: ContextElement, idx: number) => (
+                      <RenderContextElement
+                        key={`ctx-${idx}`}
+                        element={element}
+                      />
+                    ),
+                  )}
+                </div>
+              )}
+
+              {/* Questions */}
+              {currentPage?.questions?.length > 0 && (
+                <div className='space-y-8'>
+                  {currentPage.questions.map(
+                    (question: Question, idx: number) => (
+                      <div
+                        key={`q-${idx}`}
+                        className='rounded-lg border border-gray-100 bg-gray-50 p-6 last:mb-0 dark:border-gray-700 dark:bg-gray-800/50'
+                      >
+                        <RenderQuestion
+                          question={question}
+                          value={responses[question.id!] || ""}
+                          onChange={(value) =>
+                            handleResponseChange(question.id!, value)
+                          }
+                        />
+                      </div>
+                    ),
+                  )}
+                </div>
+              )}
+
+              {/* Navigation buttons (old style navigation) */}
+              {!showImprovedNavigation && (
+                <div className='mt-8 flex justify-between'>
+                  <button
+                    onClick={goToPrevPage}
+                    className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      currentPageIndex === 0
+                        ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
+                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    }`}
+                    disabled={currentPageIndex === 0}
+                  >
+                    <ChevronLeft className='h-4 w-4' />
+                    Previous
+                  </button>
+
+                  {currentPageIndex < totalPages - 1 ? (
+                    <button
+                      onClick={goToNextPage}
+                      className='flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                    >
+                      Next
+                      <ChevronRight className='h-4 w-4' />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      className='flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white'></div>
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          Submit
+                          <Send className='h-4 w-4' />
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Improved Navigation Footer (similar to builder preview) */}
+          {showImprovedNavigation && (
+            <div className='mt-6 flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 sm:px-8 sm:py-4'>
+              <button
+                onClick={goToPrevPage}
+                disabled={currentPageIndex === 0}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:gap-2 sm:px-4 sm:py-2.5 ${
+                  currentPageIndex === 0
+                    ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                }`}
+              >
+                <ChevronLeft className='h-4 w-4 sm:h-5 sm:w-5' />
+                <span className='hidden sm:inline'>Previous</span>
+              </button>
+
+              <div className='hidden items-center gap-1.5 md:flex'>
+                {pages.map((_: SurveyPage, idx: number) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      if (idx <= currentPageIndex) {
+                        setCurrentPageIndex(idx);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      } else {
+                        // Validate required fields before navigation
+                        const requiredQuestions =
+                          currentPage?.questions?.filter(
+                            (q: Question) => q.required,
+                          ) || [];
+                        const missingResponses = requiredQuestions.filter(
+                          (q: Question) => !responses[q.id!],
+                        );
+
+                        if (missingResponses.length > 0) {
+                          toast.error(
+                            "Please answer all required questions before proceeding",
+                          );
+                          return;
+                        }
+                        setCurrentPageIndex(idx);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }
+                    }}
+                    className={`h-2.5 w-2.5 rounded-full transition-all ${
+                      idx === currentPageIndex
+                        ? "scale-125 bg-blue-500"
+                        : idx < currentPageIndex
+                          ? "bg-green-500"
+                          : "bg-gray-300 dark:bg-gray-600"
+                    }`}
+                    disabled={idx > currentPageIndex + 1}
+                    aria-label={`Go to page ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              {currentPageIndex < totalPages - 1 ? (
+                <button
+                  onClick={goToNextPage}
+                  className='inline-flex items-center gap-1.5 rounded-lg bg-blue-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 sm:gap-2 sm:px-6 sm:py-2.5'
+                >
+                  <span>Next</span>
+                  <ChevronRight className='h-4 w-4 sm:h-5 sm:w-5' />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className='inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 sm:gap-2 sm:px-6 sm:py-2.5'
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white'></div>
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit</span>
+                      <Send className='h-4 w-4 sm:h-5 sm:w-5' />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>

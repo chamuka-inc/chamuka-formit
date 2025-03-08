@@ -173,6 +173,10 @@ export const SurveyContextProvider = ({
     dispatch({ type: "SET_PREVIEW_PAGE", payload: state.previewPageIndex + 1 });
   }, [state.previewPageIndex]);
 
+  const setPreviewPageIndex = useCallback((index: number) => {
+    dispatch({ type: "SET_PREVIEW_PAGE", payload: index });
+  }, []);
+
   const undo = useCallback(() => {
     dispatch({ type: "UNDO" });
   }, []);
@@ -317,6 +321,7 @@ export const SurveyContextProvider = ({
       deleteQuestion,
       showPreviousPreviewPage,
       showNextPreviewPage,
+      setPreviewPageIndex,
       // Memoized selectors
       currentPage: surveySelectors.getCurrentPage(state),
       pageStats: surveySelectors.getPageStats(state),
@@ -345,6 +350,7 @@ export const SurveyContextProvider = ({
       deleteQuestion,
       showPreviousPreviewPage,
       showNextPreviewPage,
+      setPreviewPageIndex,
       undo,
       redo,
       clearHistory,
