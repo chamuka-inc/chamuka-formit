@@ -15,6 +15,7 @@ import {
   ExternalLink,
   FileText,
   Sparkles,
+  Edit,
 } from "lucide-react";
 import { api } from "@/lib/trpc/react";
 import { SurveyBuilder } from "@/components/survey/SurveyBuilder";
@@ -190,10 +191,25 @@ export default function EditSurveyPage() {
   };
 
   // Handle successful refinement
-  const handleRefinementSuccess = () => {
+  const handleRefinementSuccess = (updatedData?: any) => {
+    // If we received updated data, use it to update the UI
+    if (updatedData && typeof updatedData === "object") {
+      // Update survey data override for the builder
+      setSurveyDataOverride(updatedData);
+
+      // Trigger re-render of the builder
+      setSurveyKey((prev) => prev + 1);
+    }
+
+    // Refetch the latest data from the server
     refetch();
-    toast.success("Survey has been refined with AI!");
+
+    toast.success("Survey updated successfully!");
   };
+
+  // For forcing re-render of the SurveyBuilder
+  const [surveyKey, setSurveyKey] = useState(0);
+  const [surveyDataOverride, setSurveyDataOverride] = useState<any>(null);
 
   // Loading state
   if (isLoading) {
@@ -206,11 +222,13 @@ export default function EditSurveyPage() {
   }
 
   // Map survey data to the format expected by SurveyBuilder
-  const surveyData = survey?.data
-    ? typeof survey.data === "object"
-      ? (survey.data as any)
-      : { pages: [] }
-    : { pages: [] };
+  const surveyData =
+    surveyDataOverride ||
+    (survey?.data
+      ? typeof survey.data === "object"
+        ? (survey.data as any)
+        : { pages: [] }
+      : { pages: [] });
   const surveyPages = Array.isArray(surveyData.pages) ? surveyData.pages : [];
 
   // If we have no pages but have a survey, create a default page
@@ -334,10 +352,10 @@ export default function EditSurveyPage() {
                 <button
                   onClick={handleOpenRefineModal}
                   className='flex flex-grow items-center justify-center rounded-md bg-white/20 px-2 py-1.5 text-sm font-medium text-white hover:bg-white/30 sm:flex-grow-0 sm:px-3'
-                  title='Refine survey with AI'
+                  title='Edit survey JSON'
                 >
-                  <Sparkles className='mr-1 h-4 w-4 text-yellow-300 sm:mr-1.5' />
-                  AI Refine
+                  <Edit className='mr-1 h-4 w-4 text-blue-300 sm:mr-1.5' />
+                  Edit JSON
                 </button>
 
                 <button
@@ -391,16 +409,20 @@ export default function EditSurveyPage() {
 
       {/* Main Content */}
       <div className='flex-1'>
-        <SurveyBuilder initialPages={pagesForBuilder} hideHeader={true} />
+        <SurveyBuilder
+          key={surveyKey}
+          initialPages={pagesForBuilder}
+          hideHeader={true}
+        />
       </div>
 
       {/* Publish Success Modal */}
       {publishModalOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <div className='relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50 p-4 sm:p-6 md:p-8'>
+          <div className='relative w-full max-w-md rounded-lg bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-6'>
             <button
               onClick={handleClosePublishModal}
-              className='absolute right-4 top-4 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300'
+              className='absolute right-3 top-3 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 sm:right-4 sm:top-4'
             >
               <X className='h-5 w-5' />
             </button>
@@ -417,44 +439,19 @@ export default function EditSurveyPage() {
               </p>
             </div>
 
-            <div className='mb-6 rounded-md bg-gray-50 p-4 dark:bg-gray-700'>
-              <p className='mb-2 text-xs text-gray-500 dark:text-gray-400'>
-                Share link:
-              </p>
-              <div className='flex items-center'>
-                <input
-                  type='text'
-                  readOnly
-                  value={`${window.location.origin}/surveys/${id}`}
-                  className='flex-1 rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300'
-                />
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      `${window.location.origin}/surveys/${id}`,
-                    );
-                    toast.success("Link copied to clipboard");
-                  }}
-                  className='rounded-r-md border border-l-0 border-gray-300 bg-gray-100 px-3 py-2 text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
-
-            <div className='mt-6 flex flex-col gap-3 sm:flex-row'>
+            <div className='flex flex-col justify-center space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0'>
+              <button
+                onClick={handleClosePublishModal}
+                className='w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:w-auto'
+              >
+                Close
+              </button>
               <button
                 onClick={handleViewPublishedSurvey}
-                className='flex flex-1 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
+                className='flex w-full items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 sm:w-auto'
               >
                 <ExternalLink className='mr-2 h-4 w-4' />
                 View Survey
-              </button>
-              <button
-                onClick={handleBackToDashboard}
-                className='flex-1 rounded-md bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-              >
-                Back to Dashboard
               </button>
             </div>
           </div>
@@ -476,7 +473,9 @@ export default function EditSurveyPage() {
         <RefineSurveyModal
           surveyId={id}
           isOpen={refineModalOpen}
-          onClose={() => setRefineModalOpen(false)}
+          onClose={() => {
+            setRefineModalOpen(false);
+          }}
           onSuccess={handleRefinementSuccess}
         />
       )}

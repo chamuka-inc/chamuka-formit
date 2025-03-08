@@ -45,6 +45,17 @@ const refineSurveySchema = z.object({
   prompt: z.string().min(1, "Refinement instructions are required"),
 });
 
+// Add these schema definitions near your other schemas
+const previewRefinementSchema = z.object({
+  id: z.string(),
+  prompt: z.string().min(1),
+});
+
+const applyRefinementSchema = z.object({
+  id: z.string(),
+  structure: z.any(), // We'll validate this structure in the procedure
+});
+
 // Export the survey router
 export const surveyRouter = createTRPCRouter({
   // Create a new survey
@@ -614,6 +625,183 @@ export const surveyRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to refine survey with AI",
+          cause: error,
+        });
+      }
+    }),
+
+  // Preview refinement with AI (without applying changes)
+  previewRefinement: protectedProcedure
+    .input(previewRefinementSchema)
+    .use(aiCreditCheck)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const userId = ctx.session.user.id;
+        const { id, prompt } = input;
+
+        // Fetch the existing survey
+        const existingSurvey = await db.survey.findUnique({
+          where: {
+            id,
+            userId,
+          },
+        });
+
+        if (!existingSurvey) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message:
+              "Survey not found or you don't have permission to access it",
+          });
+        }
+
+        const existingData = existingSurvey.data as any;
+
+        // System prompt for the AI - same as refineWithAI
+        const systemPrompt = `You are an expert survey designer. Refine an existing survey based on the user's instructions.
+        
+        Your task is to analyze the existing survey structure and refine it according to the provided instructions.
+        
+        Here's the existing survey structure:
+        ${JSON.stringify(existingData, null, 2)}
+        
+        Follow these guidelines:
+        1. Preserve the overall structure of the survey
+        2. Make targeted improvements based on the user's instructions
+        3. Improve question clarity, organization, and flow
+        4. Return the complete refined survey JSON with the same structure:
+        {
+          "title": "Survey Title",
+          "description": "Survey description",
+          "pages": [
+            {
+              "title": "Page Title",
+              "description": "Optional page description",
+              "questions": [
+                {
+                  "type": "text|radio|checkbox",
+                  "text": "Question text",
+                  "required": true|false,
+                  "options": ["Option 1", "Option 2"] // Only for radio/checkbox
+                }
+              ],
+              "contextElements": [
+                {
+                  "type": "paragraph|image|video",
+                  "content": "Text content or URL for media"
+                }
+              ]
+            }
+          ]
+        }
+        
+        Apply the following refinement instructions to the survey: "${prompt}"`;
+
+        // Call the AI to refine the survey
+        const aiResponse = await generateChatCompletion(
+          [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: prompt },
+          ],
+          "GEMINI_FLASH_WEB",
+          {
+            temperature: 0.7,
+            max_tokens: 8192,
+          },
+        );
+
+        // Parse the AI response into a JSON structure
+        const refinedSurveyStructure = parseJsonResponse(aiResponse);
+
+        // Record the AI refinement transaction
+        await db.creditTransaction.create({
+          data: {
+            userId: ctx.session.user.id,
+            credits: -1,
+            amount: 0,
+            type: CreditTransactionType.AI,
+            description: "Survey refinement preview",
+          },
+        });
+
+        return {
+          success: true,
+          structure: refinedSurveyStructure,
+        };
+      } catch (error) {
+        console.error("AI survey refinement preview error:", error);
+
+        // If refinement preview failed, refund the AI credit
+        try {
+          await db.user.update({
+            where: { id: ctx.session.user.id },
+            data: { credits: { increment: 1 } },
+          });
+        } catch (refundError) {
+          console.error("Failed to refund AI credit:", refundError);
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to preview survey refinement with AI",
+          cause: error,
+        });
+      }
+    }),
+
+  // Apply a previously previewed refinement
+  applyRefinement: protectedProcedure
+    .input(applyRefinementSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const userId = ctx.session.user.id;
+        const { id, structure } = input;
+
+        // Validate the structure (basic check)
+        if (!structure || typeof structure !== "object") {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid survey structure provided",
+          });
+        }
+
+        // Fetch the existing survey
+        const existingSurvey = await db.survey.findUnique({
+          where: {
+            id,
+            userId,
+          },
+        });
+
+        if (!existingSurvey) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message:
+              "Survey not found or you don't have permission to access it",
+          });
+        }
+
+        // Update the survey with the refined data
+        const updatedSurvey = await db.survey.update({
+          where: {
+            id,
+            userId,
+          },
+          data: {
+            data: structure,
+          },
+        });
+
+        return {
+          success: true,
+          survey: updatedSurvey,
+        };
+      } catch (error) {
+        console.error("Survey refinement application error:", error);
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to apply survey refinement",
           cause: error,
         });
       }

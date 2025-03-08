@@ -43,8 +43,8 @@ export function SurveyShareModal({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-      <div className='w-full max-w-md overflow-hidden rounded-lg bg-white shadow-lg dark:bg-gray-800'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-8'>
+      <div className='relative max-h-[90vh] w-full max-w-md overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-800'>
         {/* Header */}
         <div className='flex items-center justify-between bg-gray-100 px-4 py-3 dark:bg-gray-700'>
           <div className='flex items-center'>
@@ -64,26 +64,28 @@ export function SurveyShareModal({
         {/* Tabs */}
         <div className='flex border-b border-gray-200 dark:border-gray-700'>
           <button
-            className={`flex-1 py-3 text-center text-sm font-medium ${
+            className={`flex flex-1 items-center justify-center gap-1 py-3 text-sm font-medium ${
               activeTab === "link"
                 ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
                 : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
             }`}
             onClick={() => setActiveTab("link")}
           >
-            <Link className='mr-1 inline h-4 w-4' />
-            Share Link
+            <Link className='h-4 w-4' />
+            <span className='hidden sm:inline'>Share Link</span>
+            <span className='sm:hidden'>Link</span>
           </button>
           <button
-            className={`flex-1 py-3 text-center text-sm font-medium ${
+            className={`flex flex-1 items-center justify-center gap-1 py-3 text-sm font-medium ${
               activeTab === "embed"
                 ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
                 : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
             }`}
             onClick={() => setActiveTab("embed")}
           >
-            <Code className='mr-1 inline h-4 w-4' />
-            Embed Code
+            <Code className='h-4 w-4' />
+            <span className='hidden sm:inline'>Embed Code</span>
+            <span className='sm:hidden'>Embed</span>
           </button>
         </div>
 
@@ -91,21 +93,22 @@ export function SurveyShareModal({
         <div className='p-4'>
           {activeTab === "link" && (
             <div>
-              <label className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
                 Share this link with others:
               </label>
-              <div className='flex'>
+              <div className='flex flex-col gap-2 sm:flex-row sm:gap-0'>
                 <input
                   type='text'
                   readOnly
                   value={surveyUrl}
-                  className='flex-1 rounded-l-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                  className='w-full flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:w-auto sm:rounded-r-none'
                 />
                 <button
                   onClick={() => handleCopy(surveyUrl, "Link")}
-                  className='flex items-center rounded-r-md border border-l-0 border-gray-300 bg-gray-100 px-3 py-2 text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'
+                  className='flex w-full items-center justify-center rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 sm:w-auto sm:rounded-l-none sm:border-l-0'
                 >
-                  <Copy className='h-4 w-4' />
+                  <Copy className='mr-2 h-4 w-4' />
+                  <span>Copy Link</span>
                 </button>
               </div>
               <p className='mt-2 text-xs text-gray-500 dark:text-gray-400'>
@@ -117,21 +120,22 @@ export function SurveyShareModal({
 
           {activeTab === "embed" && (
             <div>
-              <label className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
                 Embed in your website:
               </label>
-              <div className='flex'>
+              <div className='flex flex-col gap-2 sm:flex-row sm:gap-0'>
                 <textarea
                   readOnly
                   value={embedCode}
-                  className='flex-1 rounded-l-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                  className='w-full flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:w-auto sm:rounded-r-none'
                   rows={3}
                 />
                 <button
                   onClick={() => handleCopy(embedCode, "Embed code")}
-                  className='flex items-center rounded-r-md border border-l-0 border-gray-300 bg-gray-100 px-3 text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'
+                  className='flex w-full items-center justify-center rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 sm:w-auto sm:rounded-l-none sm:border-l-0'
                 >
-                  <Copy className='h-4 w-4' />
+                  <Copy className='mr-2 h-4 w-4' />
+                  <span>Copy Code</span>
                 </button>
               </div>
               <p className='mt-2 text-xs text-gray-500 dark:text-gray-400'>
@@ -146,7 +150,7 @@ export function SurveyShareModal({
         <div className='flex justify-end bg-gray-50 px-4 py-3 dark:bg-gray-700'>
           <button
             onClick={onClose}
-            className='rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700'
+            className='flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:w-auto'
           >
             Close
           </button>
