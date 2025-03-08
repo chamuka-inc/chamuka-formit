@@ -63,7 +63,7 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
                 Dashboard
               </Link>
 
-              {/* Create Survey link */}
+              {/* Create link */}
               <Link
                 href='/surveys/create'
                 className={`flex items-center rounded-lg ${
@@ -74,7 +74,7 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
                 onClick={onClose}
               >
                 <PlusCircle className='mr-2 h-5 w-5' />
-                Create Survey
+                Create
               </Link>
             </div>
             <div className='py-6'>
