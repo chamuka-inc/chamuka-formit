@@ -115,3 +115,6 @@
 # 2024-03-07
 - Created a responsive submission details modal component to view detailed information about survey submissions.
 - Fixed 404 error by adding missing grid.svg file for background patterns used throughout the application.
+
+# 2024-03-08
+- Successfully deployed the project to a new database by running Prisma migrations, fixing migration conflicts, and regenerating the Prisma client.

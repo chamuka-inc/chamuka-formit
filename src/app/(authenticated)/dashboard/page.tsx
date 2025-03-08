@@ -159,10 +159,10 @@ export default function DashboardPage() {
       <div className='mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
         <div>
           <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
-            My Surveys
+            My Collection
           </h1>
           <p className='mt-1 text-sm text-gray-600 dark:text-gray-400'>
-            Manage and analyze your surveys
+            Manage and analyze your collection
           </p>
         </div>
         <div className='flex space-x-3'>
@@ -171,7 +171,7 @@ export default function DashboardPage() {
             className='inline-flex items-center rounded-md bg-blue-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-blue-700'
           >
             <Plus className='mr-1.5 h-5 w-5' />
-            Create Survey
+            Create
           </Link>
         </div>
       </div>

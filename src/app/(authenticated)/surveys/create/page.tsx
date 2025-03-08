@@ -30,7 +30,7 @@ export default function CreateSurveyPage() {
   // Get trpc utils for cache invalidation
   const utils = api.useUtils();
 
-  // Create survey mutation
+  // Create mutation
   const createMutation = api.survey.create.useMutation({
     onSuccess: (data) => {
       toast.success("Survey created successfully");
@@ -276,7 +276,7 @@ export default function CreateSurveyPage() {
                       Creating...
                     </>
                   ) : (
-                    "Create Survey"
+                    "Create"
                   )}
                 </button>
               </div>
