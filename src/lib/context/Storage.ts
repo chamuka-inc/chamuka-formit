@@ -1,4 +1,4 @@
-import { SurveyState } from "../types";
+import { FormState } from "../types";
 
 function debounce<T extends (...args: any[]) => void>(
   func: T,
@@ -13,8 +13,8 @@ function debounce<T extends (...args: any[]) => void>(
 }
 
 export interface StorageManager {
-  save: (state: SurveyState) => void;
-  load: () => SurveyState | null;
+  save: (state: FormState) => void;
+  load: () => FormState | null;
   clear: () => void;
 }
 
@@ -22,7 +22,7 @@ export function createStorageManager(
   key: string,
   debounceMs = 1000,
 ): StorageManager {
-  const debouncedSave = debounce((state: SurveyState) => {
+  const debouncedSave = debounce((state: FormState) => {
     try {
       const serializedState = JSON.stringify({
         pages: state.pages,
@@ -34,7 +34,7 @@ export function createStorageManager(
     }
   }, debounceMs);
 
-  const load = (): SurveyState | null => {
+  const load = (): FormState | null => {
     try {
       const serializedState = localStorage.getItem(key);
       if (!serializedState) return null;
@@ -49,7 +49,7 @@ export function createStorageManager(
         loadingStates: {
           savingPage: false,
           savingQuestion: false,
-          loadingSurvey: false,
+          loadingForm: false,
         },
       };
     } catch (error) {

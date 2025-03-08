@@ -11,7 +11,7 @@
 
 ### 1.2 Target Users & Personas
 - **Small Business Owners:** Need to quickly generate and deploy customer feedback or lead capture forms.
-- **HR & Educational Professionals:** Require tools to create surveys and quizzes with minimal technical overhead.
+- **HR & Educational Professionals:** Require tools to create forms and quizzes with minimal technical overhead.
 - **Marketers & Event Coordinators:** Want to rapidly deploy registration forms with a branded look and feel.
 
 ---
@@ -24,7 +24,7 @@
 2. **Dashboard:**  
    - Landing page listing existing forms with options to create a new one.
 3. **New Form Creation:**
-   - **Prompt Input:** User enters a description (e.g., “Employee feedback survey on remote work”).
+   - **Prompt Input:** User enters a description (e.g., “Employee feedback form on remote work”).
    - **AI Generation:** System returns a structured JSON form preview.
 4. **Form Builder Interface:**
    - User edits and customizes the generated form using a  builder.

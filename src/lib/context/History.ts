@@ -1,4 +1,4 @@
-import { SurveyState, SurveyAction } from "../types";
+import { FormState, FormAction } from "../types";
 
 export interface HistoryState<T> {
   past: T[];
@@ -65,11 +65,11 @@ export function historyReducer<T>(
 }
 
 export function createHistoryReducer(
-  reducer: (state: SurveyState, action: SurveyAction) => SurveyState,
+  reducer: (state: FormState, action: FormAction) => FormState,
 ) {
   return (
-    state: HistoryState<SurveyState>,
-    action: SurveyAction | HistoryAction<SurveyState>,
+    state: HistoryState<FormState>,
+    action: FormAction | HistoryAction<FormState>,
   ) => {
     if (
       action.type === "UNDO" ||
@@ -79,7 +79,7 @@ export function createHistoryReducer(
       return historyReducer(state, action);
     }
 
-    const newPresent = reducer(state.present, action as SurveyAction);
+    const newPresent = reducer(state.present, action as FormAction);
     if (newPresent === state.present) {
       return state;
     }

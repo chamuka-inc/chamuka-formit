@@ -6,9 +6,9 @@ import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { ArrowLeft, BarChart, Download, FileText } from "lucide-react";
 import { api } from "@/lib/trpc/react";
-import SubmissionDetailsModal from "@/components/survey/SubmissionDetailsModal";
+import SubmissionDetailsModal from "@/components/form/SubmissionDetailsModal";
 
-export default function SurveyAnalyticsPage() {
+export default function FormAnalyticsPage() {
   const params = useParams();
   const id = params?.id as string;
   const [activeTab, setActiveTab] = useState<"overview" | "submissions">(
@@ -17,38 +17,38 @@ export default function SurveyAnalyticsPage() {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch survey data
+  // Fetch form data
   const {
-    data: survey,
-    isLoading: surveyLoading,
-    error: surveyError,
-  } = api.survey.getById.useQuery({ id });
+    data: form,
+    isLoading: formLoading,
+    error: formError,
+  } = api.form.getById.useQuery({ id });
 
   // Fetch submissions
   const {
     data: submissions,
     isLoading: submissionsLoading,
     error: submissionsError,
-  } = api.survey.getSubmissions.useQuery({ surveyId: id }, { enabled: !!id });
+  } = api.form.getSubmissions.useQuery({ formId: id }, { enabled: !!id });
 
   // Download responses as CSV
   const downloadCSV = () => {
-    if (!survey || !submissions) return;
+    if (!form || !submissions) return;
 
-    // Parse survey data
-    const surveyData = survey.data
-      ? typeof survey.data === "object"
-        ? (survey.data as any)
+    // Parse form data
+    const formData = form.data
+      ? typeof form.data === "object"
+        ? (form.data as any)
         : { pages: [] }
       : { pages: [] };
-    const surveyPages = Array.isArray(surveyData.pages) ? surveyData.pages : [];
+    const formPages = Array.isArray(formData.pages) ? formData.pages : [];
 
     // Prepare headers
     let headers = ["Submission ID", "Submission Date"];
     const questionMap = new Map();
 
     // Collect all questions from all pages
-    surveyPages.forEach((page: any) => {
+    formPages.forEach((page: any) => {
       if (page.questions) {
         page.questions.forEach((question: any) => {
           questionMap.set(question.id, question.text);
@@ -100,7 +100,7 @@ export default function SurveyAnalyticsPage() {
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `${survey.title.replace(/\s+/g, "_")}_responses.csv`,
+      `${form.title.replace(/\s+/g, "_")}_responses.csv`,
     );
     link.style.visibility = "hidden";
     document.body.appendChild(link);
@@ -120,7 +120,7 @@ export default function SurveyAnalyticsPage() {
   };
 
   // Loading state
-  if (surveyLoading || submissionsLoading) {
+  if (formLoading || submissionsLoading) {
     return (
       <div className='container mx-auto px-4 py-8'>
         <div className='flex min-h-[60vh] items-center justify-center'>
@@ -131,7 +131,7 @@ export default function SurveyAnalyticsPage() {
   }
 
   // Error state
-  if (surveyError || submissionsError) {
+  if (formError || submissionsError) {
     return (
       <div className='container mx-auto px-4 py-8'>
         <div className='rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20'>
@@ -139,25 +139,25 @@ export default function SurveyAnalyticsPage() {
             Error Loading Data
           </h2>
           <p className='text-red-600 dark:text-red-300'>
-            {surveyError?.message ||
+            {formError?.message ||
               submissionsError?.message ||
-              "Failed to load survey data"}
+              "Failed to load form data"}
           </p>
         </div>
       </div>
     );
   }
 
-  // No survey found
-  if (!survey) {
+  // No form found
+  if (!form) {
     return (
       <div className='container mx-auto px-4 py-8'>
         <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-6 dark:border-yellow-800 dark:bg-yellow-900/20'>
           <h2 className='text-lg font-semibold text-yellow-700 dark:text-yellow-400'>
-            Survey Not Found
+            Form Not Found
           </h2>
           <p className='text-yellow-600 dark:text-yellow-300'>
-            The requested survey does not exist or you don't have access to it.
+            The requested form does not exist or you don't have access to it.
           </p>
         </div>
       </div>
@@ -176,11 +176,11 @@ export default function SurveyAnalyticsPage() {
             <ArrowLeft className='h-5 w-5' />
           </Link>
           <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
-            {survey.title} - Analytics
+            {form.title} - Analytics
           </h1>
         </div>
         <p className='text-gray-600 dark:text-gray-300'>
-          {survey.description || "No description provided"}
+          {form.description || "No description provided"}
         </p>
       </div>
 
@@ -265,7 +265,7 @@ export default function SurveyAnalyticsPage() {
                   No Submissions Yet
                 </h4>
                 <p className='text-gray-600 dark:text-gray-400'>
-                  You haven't received any submissions for this survey yet.
+                  You haven't received any submissions for this form yet.
                 </p>
               </div>
             )}
@@ -355,7 +355,7 @@ export default function SurveyAnalyticsPage() {
                 No Submissions
               </h4>
               <p className='text-gray-600 dark:text-gray-400'>
-                You haven't received any submissions for this survey yet.
+                You haven't received any submissions for this form yet.
               </p>
             </div>
           )}
@@ -367,7 +367,7 @@ export default function SurveyAnalyticsPage() {
         isOpen={isModalOpen}
         onClose={closeSubmissionDetails}
         submission={selectedSubmission}
-        surveyData={survey?.data}
+        formData={form?.data}
       />
     </div>
   );

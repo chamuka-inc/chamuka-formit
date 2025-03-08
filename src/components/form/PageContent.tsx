@@ -1,6 +1,6 @@
 "use client";
 
-import { useSurveyContext } from "@/lib/context/SurveyContext";
+import { useFormContext } from "@/lib/context/Context";
 import { Question } from "./Question";
 import { ContextElements } from "./ContextElements";
 import { Pencil, Plus, Trash2, FileText } from "lucide-react";
@@ -18,7 +18,7 @@ export const PageContent = ({
     state: { pages, currentPageIndex },
     deleteQuestion,
     deletePage,
-  } = useSurveyContext();
+  } = useFormContext();
 
   const currentPage = pages[currentPageIndex];
 
@@ -37,7 +37,7 @@ export const PageContent = ({
         </h2>
         <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
           Select a page from the sidebar or create a new one to start building
-          your survey.
+          your form.
         </p>
       </div>
     );

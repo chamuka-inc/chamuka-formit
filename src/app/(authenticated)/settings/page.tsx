@@ -35,13 +35,13 @@ export default function SettingsPage() {
 
   // Notification states
   const [emailNotifications, setEmailNotifications] = useState({
-    surveyResponses: true,
+    formResponses: true,
     weeklySummary: true,
     productUpdates: false,
   });
   const [pushNotifications, setPushNotifications] = useState({
     newResponses: true,
-    surveyCompletion: false,
+    formCompletion: false,
   });
 
   // tRPC mutations
@@ -444,24 +444,24 @@ export default function SettingsPage() {
                     <div className='space-y-3'>
                       <div className='flex items-center justify-between'>
                         <label className='text-sm text-gray-700 dark:text-gray-300'>
-                          Survey Responses
+                          Form Responses
                         </label>
                         <div className='relative mr-2 inline-block w-10 select-none align-middle'>
                           <input
                             type='checkbox'
-                            name='survey_responses'
-                            id='survey-responses'
-                            checked={emailNotifications.surveyResponses}
+                            name='form_responses'
+                            id='form-responses'
+                            checked={emailNotifications.formResponses}
                             onChange={(e) =>
                               setEmailNotifications({
                                 ...emailNotifications,
-                                surveyResponses: e.target.checked,
+                                formResponses: e.target.checked,
                               })
                             }
                             className='absolute right-4 block h-6 w-6 cursor-pointer appearance-none rounded-full border-4 bg-white outline-none duration-200 ease-in checked:right-0 checked:bg-blue-500 focus:outline-none'
                           />
                           <label
-                            htmlFor='survey-responses'
+                            htmlFor='form-responses'
                             className='block h-6 cursor-pointer overflow-hidden rounded-full bg-gray-300 dark:bg-gray-600'
                           ></label>
                         </div>
@@ -551,24 +551,24 @@ export default function SettingsPage() {
 
                       <div className='flex items-center justify-between'>
                         <label className='text-sm text-gray-700 dark:text-gray-300'>
-                          Survey Completion
+                          Form Completion
                         </label>
                         <div className='relative mr-2 inline-block w-10 select-none align-middle'>
                           <input
                             type='checkbox'
-                            name='survey_completion'
-                            id='survey-completion'
-                            checked={pushNotifications.surveyCompletion}
+                            name='form_completion'
+                            id='form-completion'
+                            checked={pushNotifications.formCompletion}
                             onChange={(e) =>
                               setPushNotifications({
                                 ...pushNotifications,
-                                surveyCompletion: e.target.checked,
+                                formCompletion: e.target.checked,
                               })
                             }
                             className='absolute right-4 block h-6 w-6 cursor-pointer appearance-none rounded-full border-4 bg-white outline-none duration-200 ease-in checked:right-0 checked:bg-blue-500 focus:outline-none'
                           />
                           <label
-                            htmlFor='survey-completion'
+                            htmlFor='form-completion'
                             className='block h-6 cursor-pointer overflow-hidden rounded-full bg-gray-300 dark:bg-gray-600'
                           ></label>
                         </div>

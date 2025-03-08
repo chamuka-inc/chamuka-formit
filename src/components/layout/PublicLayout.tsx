@@ -26,7 +26,7 @@ export default function PublicLayout({
               className='flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white'
             >
               <FileText className='h-8 w-8 text-blue-600 dark:text-blue-400' />
-              Survey4
+              Chamuka FormIt
             </Link>
           </div>
           {showBackButton && (
@@ -49,7 +49,8 @@ export default function PublicLayout({
         <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <div className='text-center text-sm text-gray-600 dark:text-gray-400'>
             <p>
-              &copy; {new Date().getFullYear()} Survey4. All rights reserved.
+              &copy; {new Date().getFullYear()} Chamuka FormIt. All rights
+              reserved.
             </p>
           </div>
         </div>
