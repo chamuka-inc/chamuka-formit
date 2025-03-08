@@ -19,34 +19,34 @@ type FAQ = {
 
 const faqs: FAQ[] = [
   {
-    question: "How do I create a new survey?",
+    question: "How do I create a new form?",
     answer:
-      "To create a new survey, navigate to the 'Surveys' section and click the 'Create Survey' button. You'll be guided through our survey builder where you can add questions, customize your survey, and set up distribution options.",
+      "To create a new form, navigate to the 'Forms' section and click the 'Create Form' button. You'll be guided through our form builder where you can add questions, customize your form, and set up distribution options.",
   },
   {
-    question: "Can I customize the look of my surveys?",
+    question: "Can I customize the look of my forms?",
     answer:
-      "Yes! You can customize the appearance of your surveys including colors, fonts, and adding your logo. Go to the 'Appearance' tab when editing a survey to access these customization options.",
+      "Yes! You can customize the appearance of your forms including colors, fonts, and adding your logo. Go to the 'Appearance' tab when editing a form to access these customization options.",
   },
   {
-    question: "How do I share my survey with respondents?",
+    question: "How do I share my form with respondents?",
     answer:
-      "After creating your survey, you can share it via a direct link, email invitation, or embed it on your website. All sharing options are available in the 'Share' tab after publishing your survey.",
+      "After creating your form, you can share it via a direct link, email invitation, or embed it on your website. All sharing options are available in the 'Share' tab after publishing your form.",
   },
   {
-    question: "Can I export survey responses to Excel or CSV?",
+    question: "Can I export form responses to Excel or CSV?",
     answer:
-      "Yes, you can export all your survey data to CSV or Excel format. Go to your survey's analytics page and click the 'Export' button to download your data in your preferred format.",
+      "Yes, you can export all your form data to CSV or Excel format. Go to your form's analytics page and click the 'Export' button to download your data in your preferred format.",
   },
   {
-    question: "How do I create a branching logic in my survey?",
+    question: "How do I create a branching logic in my form?",
     answer:
       "Branching logic allows you to show different questions based on previous answers. To set this up, edit a question and select the 'Logic' tab to create rules for which questions appear next based on the respondent's answer.",
   },
   {
-    question: "Is there a limit to how many surveys I can create?",
+    question: "Is there a limit to how many forms I can create?",
     answer:
-      "The number of surveys you can create depends on your subscription plan. Free accounts can create up to 3 surveys, while premium plans have unlimited survey creation.",
+      "The number of forms you can create depends on your subscription plan. Free accounts can create up to 3 forms, while premium plans have unlimited form creation.",
   },
 ];
 
@@ -168,7 +168,7 @@ export default function HelpPage() {
                     Getting Started Guide
                   </h3>
                   <p className='text-sm text-gray-600 dark:text-gray-300'>
-                    Learn the basics of creating and distributing surveys
+                    Learn the basics of creating and distributing forms
                   </p>
                 </div>
               </a>
@@ -198,7 +198,7 @@ export default function HelpPage() {
                     Analytics & Reporting
                   </h3>
                   <p className='text-sm text-gray-600 dark:text-gray-300'>
-                    How to analyze and visualize survey results
+                    How to analyze and visualize form results
                   </p>
                 </div>
               </a>
@@ -276,11 +276,11 @@ export default function HelpPage() {
 
                 <div className='space-y-3'>
                   <a
-                    href='mailto:support@surveybuilder.com'
+                    href='mailto:support@formbuilder.com'
                     className='flex items-center text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
                   >
                     <Mail className='mr-2 h-5 w-5 text-gray-500 dark:text-gray-400' />
-                    <span>support@surveybuilder.com</span>
+                    <span>support@formbuilder.com</span>
                   </a>
 
                   <a

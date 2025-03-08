@@ -7,19 +7,19 @@ import { DiffEditor } from "@monaco-editor/react";
 import { api } from "@/lib/trpc/react";
 import type { JsonValue } from "@prisma/client/runtime/library";
 
-interface RefineSurveyModalProps {
-  surveyId: string;
+interface RefineFormModalProps {
+  formId: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (updatedData?: JsonValue) => void;
 }
 
-export function RefineSurveyModal({
-  surveyId,
+export function RefineFormModal({
+  formId,
   isOpen,
   onClose,
   onSuccess,
-}: RefineSurveyModalProps) {
+}: RefineFormModalProps) {
   const [prompt, setPrompt] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [originalStructure, setOriginalStructure] = useState<JsonValue | null>(
@@ -34,26 +34,26 @@ export function RefineSurveyModal({
   const { data: userData } = api.user.getCredits.useQuery();
   const hasCredits = userData?.credits && userData.credits > 0;
 
-  // Get current survey data
-  const { data: surveyData } = api.survey.getById.useQuery(
-    { id: surveyId },
+  // Get current form data
+  const { data: formData } = api.form.getById.useQuery(
+    { id: formId },
     {
-      enabled: !!surveyId,
+      enabled: !!formId,
     },
   );
 
-  // Set the original structure when survey data is loaded
+  // Set the original structure when form data is loaded
   useEffect(() => {
-    if (surveyData && !originalStructure) {
-      setOriginalStructure(surveyData.data);
-      if (surveyData.data) {
-        setEditorValue(JSON.stringify(surveyData.data, null, 2));
+    if (formData && !originalStructure) {
+      setOriginalStructure(formData.data);
+      if (formData.data) {
+        setEditorValue(JSON.stringify(formData.data, null, 2));
       }
     }
-  }, [surveyData, originalStructure]);
+  }, [formData, originalStructure]);
 
-  // Mutation for getting survey refinement preview
-  const previewRefinementMutation = api.survey.previewRefinement.useMutation({
+  // Mutation for getting form refinement preview
+  const previewRefinementMutation = api.form.previewRefinement.useMutation({
     onSuccess: (data) => {
       setIsSubmitting(false);
       setEditorValue(JSON.stringify(data.structure, null, 2));
@@ -65,15 +65,15 @@ export function RefineSurveyModal({
     },
   });
 
-  // Mutation for applying survey refinement
-  const applyRefinementMutation = api.survey.applyRefinement.useMutation({
+  // Mutation for applying form refinement
+  const applyRefinementMutation = api.form.applyRefinement.useMutation({
     onSuccess: () => {
       try {
         // Parse the editor value
         const parsedValue = JSON.parse(editorValue);
 
         setIsSubmitting(false);
-        toast.success("Survey changes saved successfully!");
+        toast.success("Form changes saved successfully!");
         onSuccess(parsedValue);
         onClose();
       } catch (error) {
@@ -104,7 +104,7 @@ export function RefineSurveyModal({
     setIsSubmitting(true);
 
     previewRefinementMutation.mutate({
-      id: surveyId,
+      id: formId,
       prompt: prompt.trim(),
     });
   };
@@ -125,7 +125,7 @@ export function RefineSurveyModal({
       setIsSubmitting(true);
 
       applyRefinementMutation.mutate({
-        id: surveyId,
+        id: formId,
         structure: parsedValue,
       });
     } catch (error) {
@@ -172,7 +172,7 @@ export function RefineSurveyModal({
           <div className='flex items-center'>
             <Edit className='mr-2 h-5 w-5 text-blue-500' />
             <h3 className='font-medium text-gray-900 dark:text-white'>
-              Edit Survey JSON
+              Edit Form JSON
             </h3>
           </div>
           <button
@@ -253,7 +253,7 @@ export function RefineSurveyModal({
                         htmlFor='prompt'
                         className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'
                       >
-                        How would you like to improve your survey?
+                        How would you like to improve your form?
                       </label>
                       <textarea
                         id='prompt'

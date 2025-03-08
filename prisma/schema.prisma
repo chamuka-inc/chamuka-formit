@@ -8,23 +8,23 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  name           String?
-  email          String?   @unique
-  emailVerified  DateTime?
-  image          String?
-  hashedPassword String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  login          String?
-  role           UserRole  @default(user)
-  isAdmin        Boolean   @default(false)
-  credits        Int       @default(5)
-  lastCreditReset DateTime @default(now())
-  accounts       Account[]
-  sessions       Session[]
-  surveys        Survey[]
+  id                 String              @id @default(cuid())
+  name               String?
+  email              String?             @unique
+  emailVerified      DateTime?
+  image              String?
+  hashedPassword     String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  login              String?
+  role               UserRole            @default(user)
+  isAdmin            Boolean             @default(false)
+  credits            Int                 @default(5)
+  lastCreditReset    DateTime            @default(now())
+  accounts           Account[]
   creditTransactions CreditTransaction[]
+  forms              Form[]
+  sessions           Session[]
 }
 
 model Account {
@@ -67,41 +67,41 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Survey {
+model Form {
   id               String       @id @default(cuid())
   title            String
   description      String?
-  status           SurveyStatus @default(draft)
+  status           FormStatus   @default(draft)
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
   userId           String
   isProFeature     Boolean      @default(false)
   customEndpoint   String?
   publicShareToken String       @unique @default(cuid())
-  data             Json?        // Complete survey JSON data
-  submissions      Submission[]
+  data             Json?
   user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  submissions      Submission[]
 }
 
 model Submission {
   id          String   @id @default(cuid())
   submittedAt DateTime @default(now())
-  surveyId    String
+  formId      String
   submitterIp String?
   userAgent   String?
-  data        Json?    // Complete submission JSON data
-  survey      Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  data        Json?
+  form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
 }
 
 model CreditTransaction {
-  id        String   @id @default(cuid())
-  userId    String
-  credits   Int
-  amount    Int
-  type      String   @default("ai")
+  id          String   @id @default(cuid())
+  userId      String
+  credits     Int
+  amount      Int
+  type        String   @default("ai")
   description String?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum UserRole {
@@ -109,7 +109,7 @@ enum UserRole {
   admin
 }
 
-enum SurveyStatus {
+enum FormStatus {
   draft
   published
   archived

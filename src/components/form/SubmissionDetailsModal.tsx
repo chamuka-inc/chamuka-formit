@@ -12,14 +12,14 @@ interface SubmissionDetailsModalProps {
     userAgent?: string | null;
     data?: any;
   } | null;
-  surveyData?: any;
+  formData?: any;
 }
 
 const SubmissionDetailsModal: React.FC<SubmissionDetailsModalProps> = ({
   isOpen,
   onClose,
   submission,
-  surveyData,
+  formData,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -75,12 +75,12 @@ const SubmissionDetailsModal: React.FC<SubmissionDetailsModalProps> = ({
 
   const responses = submissionData.responses || {};
 
-  // Parse survey data to get questions
-  const surveyPages = surveyData?.pages || [];
+  // Parse form data to get questions
+  const formPages = formData?.pages || [];
   const questions: Record<string, { text: string; type: string }> = {};
 
   // Collect all questions from all pages
-  surveyPages.forEach((page: any) => {
+  formPages.forEach((page: any) => {
     if (page.questions) {
       page.questions.forEach((question: any) => {
         questions[question.id] = {

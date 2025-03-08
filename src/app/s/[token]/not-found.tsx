@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 
-export default function SurveyNotFound() {
+export default function FormNotFound() {
   return (
     <div className='flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-900 sm:px-6 lg:px-8'>
       <div className='w-full max-w-md text-center'>
@@ -9,10 +9,10 @@ export default function SurveyNotFound() {
           <AlertCircle className='h-16 w-16 text-red-500' />
         </div>
         <h1 className='mb-2 text-3xl font-bold text-gray-900 dark:text-white'>
-          Survey Not Found
+          Form Not Found
         </h1>
         <p className='mb-8 text-gray-600 dark:text-gray-300'>
-          The survey you're looking for doesn't exist or has been removed.
+          The form you're looking for doesn't exist or has been removed.
         </p>
         <Link
           href='/'

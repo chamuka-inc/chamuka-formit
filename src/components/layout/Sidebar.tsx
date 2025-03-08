@@ -147,10 +147,10 @@ export default function Sidebar({ className = "" }: { className?: string }) {
               active={isActive("/dashboard") || pathname === "/"}
             />
             <SidebarItem
-              href='/surveys/create'
+              href='/forms/create'
               icon={<PlusCircle className='h-5 w-5' />}
               title='Create'
-              active={pathname === "/surveys/create"}
+              active={pathname === "/forms/create"}
               isNew={false}
             />
             <SidebarItem
