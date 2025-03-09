@@ -2,7 +2,11 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { db } from "@/lib/db";
 import { TRPCError } from "@trpc/server";
-import { parseJsonResponse, generateChatCompletion } from "@/lib/aiClient";
+import {
+  parseJsonResponse,
+  generateChatCompletion,
+  generateGeminiWebResponse,
+} from "@/lib/aiClient";
 import { aiCreditCheck } from "../middleware/creditCheck";
 import { CreditTransactionType } from "@/lib/types";
 import { randomUUID } from "crypto";
@@ -421,21 +425,17 @@ export const formRouter = createTRPCRouter({
         const systemPrompt = getFormGenerationPrompt(prompt);
 
         // Call the AI to generate the form
-        const aiResponse = await generateChatCompletion(
+        const aiResponse = await generateGeminiWebResponse(
           [
             { role: "system", content: systemPrompt },
             { role: "user", content: prompt },
           ],
           "GEMINI_FLASH_WEB",
-          {
-            temperature: 0.7,
-            max_tokens: 8192,
-          },
         );
-
+        console.log("aiResponse: ", aiResponse);
         // Parse the AI response into a JSON structure
         const formStructure = parseJsonResponse(
-          aiResponse,
+          aiResponse.text,
         ) as unknown as FormData;
 
         // Create the form with the AI-generated structure
@@ -478,7 +478,7 @@ export const formRouter = createTRPCRouter({
       }
     }),
 
-  // Refine form with AI
+  // Refine form with AI (This is not used at the moment)
   refineWithAI: protectedProcedure
     .input(refineFormSchema)
     .use(aiCreditCheck)
@@ -495,21 +495,17 @@ export const formRouter = createTRPCRouter({
         const systemPrompt = getFormRefinementPrompt(existingData, prompt);
 
         // Call the AI to refine the form
-        const aiResponse = await generateChatCompletion(
+        const aiResponse = await generateGeminiWebResponse(
           [
             { role: "system", content: systemPrompt },
             { role: "user", content: prompt },
           ],
           "GEMINI_FLASH_WEB",
-          {
-            temperature: 0.7,
-            max_tokens: 8192,
-          },
         );
 
         // Parse the AI response into a JSON structure
         const refinedFormStructure = parseJsonResponse(
-          aiResponse,
+          aiResponse.text,
         ) as unknown as FormData;
 
         // Update the form with the refined data
@@ -577,21 +573,17 @@ export const formRouter = createTRPCRouter({
         const systemPrompt = getFormRefinementPrompt(existingData, prompt);
 
         // Call the AI to refine the form
-        const aiResponse = await generateChatCompletion(
+        const aiResponse = await generateGeminiWebResponse(
           [
             { role: "system", content: systemPrompt },
             { role: "user", content: prompt },
           ],
           "GEMINI_FLASH_WEB",
-          {
-            temperature: 0.7,
-            max_tokens: 8192,
-          },
         );
 
         // Parse the AI response into a JSON structure
         const refinedFormStructure = parseJsonResponse(
-          aiResponse,
+          aiResponse.text,
         ) as unknown as FormData;
 
         // Record the AI refinement transaction
