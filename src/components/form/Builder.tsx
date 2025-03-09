@@ -149,6 +149,8 @@ const FormBuilderContent = ({ hideHeader = false }) => {
 
     // Prepare the complete form data payload
     const formData = {
+      title: currentForm?.title || "Untitled Form",
+      description: currentForm?.description || "",
       pages: pages.map((page) => ({
         title: page.title || "Untitled Page",
         questions: (page.questions || []).map((q) => ({
@@ -184,6 +186,8 @@ const FormBuilderContent = ({ hideHeader = false }) => {
       // Create a function reference to avoid dependency issues
       const saveData = () => {
         const formData = {
+          title: currentForm?.title || "Untitled Form",
+          description: currentForm?.description || "",
           pages: pages.map((page) => ({
             title: page.title || "Untitled Page",
             questions: (page.questions || []).map((q) => ({

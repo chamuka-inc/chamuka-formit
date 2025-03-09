@@ -5,7 +5,7 @@ import FormRenderer from "./Renderer";
 
 export const PagePreview = () => {
   const {
-    state: { pages, previewPageIndex },
+    state: { pages, previewPageIndex, title, description },
   } = useFormContext();
 
   return (
@@ -14,6 +14,8 @@ export const PagePreview = () => {
       previewData={{
         pages,
         pageIndex: previewPageIndex,
+        title,
+        description,
       }}
     />
   );
