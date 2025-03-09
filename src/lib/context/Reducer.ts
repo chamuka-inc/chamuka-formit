@@ -7,6 +7,8 @@ export const initialState: FormState = {
   previewPageIndex: 0,
   isLoading: true,
   error: null,
+  title: "",
+  description: "",
   loadingStates: {
     savingPage: false,
     savingQuestion: false,

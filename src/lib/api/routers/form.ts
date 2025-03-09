@@ -5,6 +5,36 @@ import { TRPCError } from "@trpc/server";
 import { parseJsonResponse, generateChatCompletion } from "@/lib/aiClient";
 import { aiCreditCheck } from "../middleware/creditCheck";
 import { CreditTransactionType } from "@/lib/types";
+import { randomUUID } from "crypto";
+import { Prisma, FormStatus } from "@prisma/client";
+
+// Define types for form data structure
+interface ContextElement {
+  type: "paragraph" | "image" | "video";
+  content: string;
+}
+
+interface FormQuestion {
+  type: "text" | "radio" | "checkbox";
+  text: string;
+  required: boolean;
+  options?: string[];
+  contextElements?: ContextElement[];
+}
+
+interface FormPage {
+  title: string;
+  description?: string;
+  questions: FormQuestion[];
+  contextElements?: ContextElement[];
+}
+
+interface FormData {
+  title: string;
+  description?: string;
+  pages: FormPage[];
+  [key: string]: unknown; // Add index signature for compatibility with Prisma JSON type
+}
 
 // Input schema for creating a form
 const createFormSchema = z.object({
@@ -23,13 +53,13 @@ const updateFormSchema = z.object({
 // Input schema for saving form data
 const saveFormDataSchema = z.object({
   id: z.string(),
-  data: z.any(),
+  data: z.custom<FormData>((val) => val !== null && typeof val === "object"),
 });
 
 // Input schema for submissions
 const createSubmissionSchema = z.object({
   formId: z.string(),
-  data: z.any(),
+  data: z.record(z.unknown()),
 });
 
 // Input schema for AI form generation
@@ -53,8 +83,141 @@ const previewRefinementSchema = z.object({
 
 const applyRefinementSchema = z.object({
   id: z.string(),
-  structure: z.any(), // We'll validate this structure in the procedure
+  structure: z.custom<FormData>(
+    (val) => val !== null && typeof val === "object",
+  ),
 });
+
+// Helper functions
+const verifyFormOwnership = async (formId: string, userId: string) => {
+  const form = await db.form.findUnique({
+    where: { id: formId },
+  });
+
+  if (!form) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Form not found",
+    });
+  }
+
+  if (form.userId !== userId) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "You are not authorized to access this form",
+    });
+  }
+
+  return form;
+};
+
+const getFormRefinementPrompt = (
+  existingData: FormData,
+  userPrompt: string,
+) => {
+  return `You are an expert content designer. Refine an existing content based on the user's instructions.
+        
+  Your task is to analyze the existing content structure and refine it according to the provided instructions.
+  
+  Here's the existing content structure:
+  ${JSON.stringify(existingData, null, 2)}
+  
+  Follow these guidelines:
+  1. Preserve the overall structure of the content
+  2. Make targeted improvements based on the user's instructions
+  3. Improve content clarity, organization, and flow
+  4. Return the complete refined content JSON with the same structure:
+  {
+    "title": "Content Title",
+    "description": "Content description",
+    "pages": [
+      {
+        "title": "Page Title",
+        "description": "Optional page description",
+        "questions": [
+          {
+            "type": "text|radio|checkbox",
+            "text": "Question text",
+            "required": true|false,
+            "options": ["Option 1", "Option 2"], // Only for radio/checkbox
+            "contextElements": [
+                {
+                  "type": "paragraph|image|video",
+                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
+                }
+            ]
+          }
+        ],
+        "contextElements": [
+          {
+            "type": "paragraph|image|video",
+            "content": "Detailed text content for the paragraph, and valid URL for image or video"
+          }
+        ]
+      }
+    ]
+  }
+  
+  Apply the following refinement instructions to the content: "${userPrompt}"`;
+};
+
+const getFormGenerationPrompt = () => {
+  return `You are an expert content creator. Create a comprehensive content based on the user's needs.
+        
+  Your task is to generate a well-structured JSON content format following these specifications:
+  {
+    "title": "Form Title",
+    "description": "Form description",
+    "pages": [
+      {
+        "title": "Page Title",
+        "description": "Optional page description",
+        "questions": [
+          {
+            "type": "text|radio|checkbox",
+            "text": "Question text",
+            "required": true|false,
+            "options": ["Option 1", "Option 2"], // Only for radio/checkbox
+            "contextElements": [
+                {
+                  "type": "paragraph|image|video",
+                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
+                }
+            ]
+          }
+        ],
+        "contextElements": [
+          {
+            "type": "paragraph|image|video",
+            "content": "Detailed text content for the paragraph, and valid URL for image or video"
+          }
+        ]
+      }
+    ]
+  }
+  
+  Create a comprehensive form with multiple pages and relevant questions based on the user's requirements.
+  Use a mix of question types (text, radio, checkbox) as appropriate.
+  Ensure the form flows logically and captures all necessary information.
+  Add appropriate context elements (paragraphs, images) to guide the user.
+  `;
+};
+
+const handleAiCreditRefund = async (userId: string, errorMessage: string) => {
+  try {
+    await db.user.update({
+      where: { id: userId },
+      data: { credits: { increment: 1 } },
+    });
+  } catch (refundError) {
+    console.error(`Failed to refund AI credit: ${errorMessage}`, refundError);
+  }
+};
+
+// Helper to convert data to Prisma-compatible JSON
+const toPrismaJson = <T>(data: T): Prisma.InputJsonValue => {
+  return data as unknown as Prisma.InputJsonValue;
+};
 
 // Export the form router
 export const formRouter = createTRPCRouter({
@@ -62,10 +225,9 @@ export const formRouter = createTRPCRouter({
   create: protectedProcedure
     .input(createFormSchema)
     .mutation(async ({ ctx, input }) => {
-      // Create the form
       const userId = ctx.session.user.id;
 
-      const form = await db.form.create({
+      return db.form.create({
         data: {
           title: input.title,
           description: input.description,
@@ -73,22 +235,15 @@ export const formRouter = createTRPCRouter({
           status: "draft",
         },
       });
-
-      return form;
     }),
 
   // Get all forms for the current user
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
 
-    // Get all forms for the user
-    let forms = await db.form.findMany({
-      where: {
-        userId,
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
+    return db.form.findMany({
+      where: { userId },
+      orderBy: { updatedAt: "desc" },
       select: {
         id: true,
         title: true,
@@ -99,91 +254,31 @@ export const formRouter = createTRPCRouter({
         publicShareToken: true,
       },
     });
-
-    return forms;
   }),
 
   // Get a form by ID (protected - only owner can access)
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-
-      const form = await db.form.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!form) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Form not found",
-        });
-      }
-
-      // Check if the user is the owner
-      if (form.userId !== userId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not authorized to access this form",
-        });
-      }
-
-      return form;
+      return verifyFormOwnership(input.id, ctx.session.user.id);
     }),
 
   // Get submissions for a form
   getSubmissions: protectedProcedure
     .input(z.object({ formId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
+      await verifyFormOwnership(input.formId, ctx.session.user.id);
 
-      // Check if the user is the owner of the form
-      const form = await db.form.findUnique({
-        where: {
-          id: input.formId,
-        },
+      return db.submission.findMany({
+        where: { formId: input.formId },
+        orderBy: { submittedAt: "desc" },
       });
-
-      if (!form) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Form not found",
-        });
-      }
-
-      if (form.userId !== userId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not authorized to view submissions for this form",
-        });
-      }
-
-      // Get the submissions
-      const submissions = await db.submission.findMany({
-        where: {
-          formId: input.formId,
-        },
-        orderBy: {
-          submittedAt: "desc",
-        },
-      });
-
-      return submissions;
     }),
 
   // Get a published form by public share token (public)
   getByShareToken: publicProcedure
-    .input(z.object({ token: z.string() }))
+    .input(z.object({ token: z.string().min(1, "Token is required") }))
     .query(async ({ input }) => {
-      if (!input.token || input.token.trim() === "") {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid share token provided",
-        });
-      }
-
       try {
         const form = await db.form.findUnique({
           where: {
@@ -193,7 +288,6 @@ export const formRouter = createTRPCRouter({
         });
 
         if (!form) {
-          console.error(`Form not found for token: ${input.token}`);
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Form not found or not published",
@@ -214,133 +308,60 @@ export const formRouter = createTRPCRouter({
   update: protectedProcedure
     .input(updateFormSchema)
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
+      const existingForm = await verifyFormOwnership(
+        input.id,
+        ctx.session.user.id,
+      );
 
-      // Check if the user is the owner
-      const existingForm = await db.form.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!existingForm) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Form not found",
-        });
-      }
-
-      if (existingForm.userId !== userId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not authorized to update this form",
-        });
-      }
-
-      // Update data object
-      const updateData: any = {
+      const updateData: {
+        title: string;
+        description?: string;
+        status?: FormStatus;
+        publicShareToken?: string;
+      } = {
         title: input.title,
         description: input.description,
       };
 
-      // If status is being updated to 'published' and the current status is not 'published',
-      // ensure a public share token is generated
+      // Handle publishing logic
       if (input.status === "published" && existingForm.status !== "published") {
-        updateData.status = input.status;
-        // Only regenerate the token if it's not already set
+        updateData.status = input.status as FormStatus;
+
         if (!existingForm.publicShareToken) {
-          // Generate a new CUID for the public share token if one doesn't exist
-          const { randomUUID } = require("crypto");
           updateData.publicShareToken = randomUUID();
         }
       } else if (input.status) {
-        // Just update the status if provided
-        updateData.status = input.status;
+        updateData.status = input.status as FormStatus;
       }
 
-      // Update the form
-      const updatedForm = await db.form.update({
-        where: {
-          id: input.id,
-        },
+      return db.form.update({
+        where: { id: input.id },
         data: updateData,
       });
-
-      return updatedForm;
     }),
 
   // Save form data (pages, questions, etc.)
   saveFormData: protectedProcedure
     .input(saveFormDataSchema)
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
+      await verifyFormOwnership(input.id, ctx.session.user.id);
 
-      // Check if the user is the owner
-      const existingForm = await db.form.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!existingForm) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Form not found",
-        });
-      }
-
-      if (existingForm.userId !== userId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not authorized to update this form",
-        });
-      }
-
-      // Update the form data
-      const updatedForm = await db.form.update({
-        where: {
-          id: input.id,
-        },
+      return db.form.update({
+        where: { id: input.id },
         data: {
-          data: input.data,
+          data: toPrismaJson(input.data),
         },
       });
-
-      return updatedForm;
     }),
 
   // Delete a form
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
+      await verifyFormOwnership(input.id, ctx.session.user.id);
 
-      // Check if the user is the owner
-      const existingForm = await db.form.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!existingForm) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Form not found",
-        });
-      }
-
-      if (existingForm.userId !== userId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not authorized to delete this form",
-        });
-      }
-
-      // Delete the form
       await db.form.delete({
-        where: {
-          id: input.id,
-        },
+        where: { id: input.id },
       });
 
       return { success: true };
@@ -351,7 +372,6 @@ export const formRouter = createTRPCRouter({
     .input(createSubmissionSchema)
     .mutation(async ({ input }) => {
       try {
-        // Check if the form exists and is published
         const form = await db.form.findUnique({
           where: {
             id: input.formId,
@@ -366,11 +386,10 @@ export const formRouter = createTRPCRouter({
           });
         }
 
-        // Create the submission with the response data
         const submission = await db.submission.create({
           data: {
             formId: input.formId,
-            data: input.data,
+            data: toPrismaJson(input.data),
           },
         });
 
@@ -394,52 +413,10 @@ export const formRouter = createTRPCRouter({
         const userId = ctx.session.user.id;
         const { prompt, title, description } = input;
 
-        // System prompt for the AI
-        const systemPrompt = `You are an expert content creator. Create a comprehensive content based on the user's needs.
-        
-        Your task is to generate a well-structured JSON content format following these specifications:
-        
-        1. Return a JSON object with this structure:
-        {
-          "title": "Content Title",
-          "description": "Content description",
-          "pages": [
-            {
-              "title": "Page Title",
-              "description": "Optional page description",
-              "questions": [
-                {
-                  "type": "text|radio|checkbox",
-                  "text": "Question text",
-                  "required": true|false,
-                  "options": ["Option 1", "Option 2"] // Only for radio/checkbox,
-                  "contextElements": [
-                    {
-                      "type": "paragraph|image|video",
-                      "content": "Detailed text content for the paragraph, and valid URL for image or video"
-                    }
-              ]
-                }
-              ],
-              "contextElements": [
-                {
-                  "type": "paragraph|image|video",
-                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
-                }
-              ]
-            }
-          ]
-        }
-        
-        2. Make sure to create a logical flow of content across multiple pages (2-4 pages recommended)
-        3. Use appropriate question types (text, radio, checkbox) for different question scenarios
-        4. Add context elements (detailed paragraphs, images/videos) to provide context where needed
-        5. For each page, include a clear title and description
-        6. Design the content that satisfies the user's prompt
-        
-        Generate a complete content structure based on this prompt: "${prompt}"`;
+        // Get system prompt for AI
+        const systemPrompt = getFormGenerationPrompt();
 
-        // Call the AI to generate the form structure
+        // Call the AI to generate the form
         const aiResponse = await generateChatCompletion(
           [
             { role: "system", content: systemPrompt },
@@ -453,46 +430,41 @@ export const formRouter = createTRPCRouter({
         );
 
         // Parse the AI response into a JSON structure
-        const formStructure = parseJsonResponse(aiResponse);
+        const formStructure = parseJsonResponse(
+          aiResponse,
+        ) as unknown as FormData;
 
-        // Create the form with the generated data
+        // Create the form with the AI-generated structure
         const form = await db.form.create({
           data: {
-            title: title || formStructure.title || "AI Generated Form",
+            title: title || formStructure.title || "Generated Form",
             description: description || formStructure.description || "",
             userId,
             status: "draft",
-            data: formStructure,
+            data: toPrismaJson(formStructure),
           },
         });
 
         // Record the AI generation transaction
         await db.creditTransaction.create({
           data: {
-            userId: ctx.session.user.id,
+            userId,
             credits: -1,
             amount: 0,
             type: CreditTransactionType.AI,
+            description: "Form generation",
           },
         });
 
-        return {
-          success: true,
-          form,
-          structure: formStructure,
-        };
+        return { success: true, formId: form.id, form };
       } catch (error) {
         console.error("AI form generation error:", error);
 
-        // If generation failed, refund the AI credit since it wasn't actually used
-        try {
-          await db.user.update({
-            where: { id: ctx.session.user.id },
-            data: { credits: { increment: 1 } },
-          });
-        } catch (refundError) {
-          console.error("Failed to refund AI credit:", refundError);
-        }
+        // Refund the AI credit if generation failed
+        await handleAiCreditRefund(
+          ctx.session.user.id,
+          "Failed to generate form with AI",
+        );
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -508,71 +480,15 @@ export const formRouter = createTRPCRouter({
     .use(aiCreditCheck)
     .mutation(async ({ ctx, input }) => {
       try {
-        const userId = ctx.session.user.id;
         const { id, prompt } = input;
+        const userId = ctx.session.user.id;
 
-        // Fetch the existing form
-        const existingForm = await db.form.findUnique({
-          where: {
-            id,
-            userId,
-          },
-        });
+        // Get the existing form
+        const existingForm = await verifyFormOwnership(id, userId);
+        const existingData = existingForm.data as unknown as FormData;
 
-        if (!existingForm) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Form not found or you don't have permission to access it",
-          });
-        }
-
-        const existingData = existingForm.data as any;
-
-        // System prompt for the AI
-        const systemPrompt = `You are an expert content designer. Refine an existing content based on the user's instructions.
-        
-        Your task is to analyze the existing content structure and refine it according to the provided instructions.
-        
-        Here's the existing content structure:
-        ${JSON.stringify(existingData, null, 2)}
-        
-        Follow these guidelines:
-        1. Preserve the overall structure of the content
-        2. Make targeted improvements based on the user's instructions
-        3. Improve content clarity, organization, and flow
-        4. Return the complete refined content JSON with the same structure:
-        {
-          "title": "Content Title",
-          "description": "Content description",
-          "pages": [
-            {
-              "title": "Page Title",
-              "description": "Optional page description",
-              "questions": [
-                {
-                  "type": "text|radio|checkbox",
-                  "text": "Question text",
-                  "required": true|false,
-                  "options": ["Option 1", "Option 2"], // Only for radio/checkbox
-                  "contextElements": [
-                      {
-                        "type": "paragraph|image|video",
-                        "content": "Detailed text content for the paragraph, and valid URL for image or video"
-                      }
-                  ]
-                }
-              ],
-              "contextElements": [
-                {
-                  "type": "paragraph|image|video",
-                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
-                }
-              ]
-            }
-          ]
-        }
-        
-        Apply the following refinement instructions to the content: "${prompt}"`;
+        // Generate system prompt for refinement
+        const systemPrompt = getFormRefinementPrompt(existingData, prompt);
 
         // Call the AI to refine the form
         const aiResponse = await generateChatCompletion(
@@ -588,23 +504,29 @@ export const formRouter = createTRPCRouter({
         );
 
         // Parse the AI response into a JSON structure
-        const refinedFormStructure = parseJsonResponse(aiResponse);
+        const refinedFormStructure = parseJsonResponse(
+          aiResponse,
+        ) as unknown as FormData;
 
         // Update the form with the refined data
         const updatedForm = await db.form.update({
-          where: {
-            id,
-            userId,
-          },
+          where: { id, userId },
           data: {
-            data: refinedFormStructure,
+            data: toPrismaJson(refinedFormStructure),
+            // Also update the form title and description from the structure if they exist
+            ...(refinedFormStructure.title && {
+              title: refinedFormStructure.title,
+            }),
+            ...(refinedFormStructure.description !== undefined && {
+              description: refinedFormStructure.description,
+            }),
           },
         });
 
         // Record the AI refinement transaction
         await db.creditTransaction.create({
           data: {
-            userId: ctx.session.user.id,
+            userId,
             credits: -1,
             amount: 0,
             type: CreditTransactionType.AI,
@@ -620,15 +542,11 @@ export const formRouter = createTRPCRouter({
       } catch (error) {
         console.error("AI form refinement error:", error);
 
-        // If refinement failed, refund the AI credit
-        try {
-          await db.user.update({
-            where: { id: ctx.session.user.id },
-            data: { credits: { increment: 1 } },
-          });
-        } catch (refundError) {
-          console.error("Failed to refund AI credit:", refundError);
-        }
+        // Refund the AI credit if refinement failed
+        await handleAiCreditRefund(
+          ctx.session.user.id,
+          "Failed to refine form with AI",
+        );
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -644,71 +562,15 @@ export const formRouter = createTRPCRouter({
     .use(aiCreditCheck)
     .mutation(async ({ ctx, input }) => {
       try {
-        const userId = ctx.session.user.id;
         const { id, prompt } = input;
+        const userId = ctx.session.user.id;
 
-        // Fetch the existing form
-        const existingForm = await db.form.findUnique({
-          where: {
-            id,
-            userId,
-          },
-        });
+        // Get the existing form
+        const existingForm = await verifyFormOwnership(id, userId);
+        const existingData = existingForm.data as unknown as FormData;
 
-        if (!existingForm) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Form not found or you don't have permission to access it",
-          });
-        }
-
-        const existingData = existingForm.data as any;
-
-        // System prompt for the AI - same as refineWithAI
-        const systemPrompt = `You are an expert content designer. Refine an existing content based on the user's instructions.
-        
-        Your task is to analyze the existing content structure and refine it according to the provided instructions.
-        
-        Here's the existing content structure:
-        ${JSON.stringify(existingData, null, 2)}
-        
-        Follow these guidelines:
-        1. Preserve the overall structure of the content
-        2. Make targeted improvements based on the user's instructions
-        3. Improve content clarity, organization, and flow
-        4. Return the complete refined content JSON with the same structure:
-        {
-          "title": "Content Title",
-          "description": "Content description",
-          "pages": [
-            {
-              "title": "Page Title",
-              "description": "Optional page description",
-              "questions": [
-                {
-                  "type": "text|radio|checkbox",
-                  "text": "Question text",
-                  "required": true|false,
-                  "options": ["Option 1", "Option 2"], // Only for radio/checkbox
-                  "contextElements": [
-                      {
-                        "type": "paragraph|image|video",
-                        "content": "Detailed text content for the paragraph, and valid URL for image or video"
-                      }
-                  ]
-                }
-              ],
-              "contextElements": [
-                {
-                  "type": "paragraph|image|video",
-                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
-                }
-              ]
-            }
-          ]
-        }
-        
-        Apply the following refinement instructions to the content: "${prompt}"`;
+        // Generate system prompt for refinement preview
+        const systemPrompt = getFormRefinementPrompt(existingData, prompt);
 
         // Call the AI to refine the form
         const aiResponse = await generateChatCompletion(
@@ -724,12 +586,14 @@ export const formRouter = createTRPCRouter({
         );
 
         // Parse the AI response into a JSON structure
-        const refinedFormStructure = parseJsonResponse(aiResponse);
+        const refinedFormStructure = parseJsonResponse(
+          aiResponse,
+        ) as unknown as FormData;
 
         // Record the AI refinement transaction
         await db.creditTransaction.create({
           data: {
-            userId: ctx.session.user.id,
+            userId,
             credits: -1,
             amount: 0,
             type: CreditTransactionType.AI,
@@ -744,15 +608,11 @@ export const formRouter = createTRPCRouter({
       } catch (error) {
         console.error("AI form refinement preview error:", error);
 
-        // If refinement preview failed, refund the AI credit
-        try {
-          await db.user.update({
-            where: { id: ctx.session.user.id },
-            data: { credits: { increment: 1 } },
-          });
-        } catch (refundError) {
-          console.error("Failed to refund AI credit:", refundError);
-        }
+        // Refund the AI credit if refinement preview failed
+        await handleAiCreditRefund(
+          ctx.session.user.id,
+          "Failed to preview form refinement with AI",
+        );
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -767,40 +627,21 @@ export const formRouter = createTRPCRouter({
     .input(applyRefinementSchema)
     .mutation(async ({ ctx, input }) => {
       try {
-        const userId = ctx.session.user.id;
         const { id, structure } = input;
+        const userId = ctx.session.user.id;
 
-        // Validate the structure (basic check)
-        if (!structure || typeof structure !== "object") {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid form structure provided",
-          });
-        }
-
-        // Fetch the existing form
-        const existingForm = await db.form.findUnique({
-          where: {
-            id,
-            userId,
-          },
-        });
-
-        if (!existingForm) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Form not found or you don't have permission to access it",
-          });
-        }
+        await verifyFormOwnership(id, userId);
 
         // Update the form with the refined data
         const updatedForm = await db.form.update({
-          where: {
-            id,
-            userId,
-          },
+          where: { id, userId },
           data: {
-            data: structure,
+            data: toPrismaJson(structure),
+            // Also update the form title and description from the structure if they exist
+            ...(structure.title && { title: structure.title }),
+            ...(structure.description !== undefined && {
+              description: structure.description,
+            }),
           },
         });
 

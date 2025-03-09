@@ -22,8 +22,32 @@ interface FormRendererProps {
   previewData?: {
     pages: FormPage[];
     pageIndex: number;
+    title?: string;
+    description?: string;
   };
 }
+
+// Form header component to display the form title and description
+const FormHeader = ({
+  title,
+  description,
+}: {
+  title?: string;
+  description?: string;
+}) => {
+  if (!title) return null;
+
+  return (
+    <div className='mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800 sm:p-8'>
+      <h1 className='text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl'>
+        {title}
+      </h1>
+      {description && (
+        <p className='mt-3 text-gray-600 dark:text-gray-300'>{description}</p>
+      )}
+    </div>
+  );
+};
 
 // Progress indicator component
 const ProgressIndicator = ({
@@ -420,6 +444,25 @@ export default function FormRenderer({
   const totalPages = pages.length;
   const currentPage = pages[currentPageIndex];
 
+  // Get form title and description from either preview or form data
+  const formTitle =
+    isPreview && previewData?.title
+      ? previewData.title
+      : formData?.data &&
+          typeof formData.data === "object" &&
+          "title" in formData.data
+        ? (formData.data as any).title
+        : formData?.title;
+
+  const formDescription =
+    isPreview && previewData?.description
+      ? previewData.description
+      : formData?.data &&
+          typeof formData.data === "object" &&
+          "description" in formData.data
+        ? (formData.data as any).description
+        : formData?.description;
+
   // Effects
   useEffect(() => {
     if (!isPreview && formData && onLoad) {
@@ -552,6 +595,9 @@ export default function FormRenderer({
           will appear to respondents
         </div>
       )}
+
+      {/* Form Title and Description */}
+      <FormHeader title={formTitle} description={formDescription} />
 
       {/* Mobile: Toggle sidebar button */}
       <div className='mb-4 flex lg:hidden'>

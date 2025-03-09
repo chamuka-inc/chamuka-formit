@@ -119,3 +119,16 @@
 # 2024-03-08
 - Successfully deployed the project to a new database by running Prisma migrations, fixing migration conflicts, and regenerating the Prisma client.
 - Performed a complete fresh database deployment by resetting the database, applying all migrations from scratch, and verifying the schema.
+
+# 2024-06-18
+- Refactored form router with clean code principles and TypeScript best practices:
+  - Added proper typed interfaces for form data structure
+  - Extracted reusable helper functions (verifyFormOwnership, getFormRefinementPrompt)
+  - Improved error handling with consistent patterns
+  - Removed any types in favor of strongly typed parameters
+  - Added Prisma-compatible type conversion utilities
+  - Fixed Builder component to correctly handle form data typing requirements
+
+# 2024-06-19
+- Fixed form title and description persistence in RefineModal by ensuring changes made to the JSON structure are also synchronized to the main form fields in the database.
+- Enhanced form display by adding form title and description at the top of both preview and public form views, with proper styling and dark mode support.
