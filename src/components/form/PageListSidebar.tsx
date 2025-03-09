@@ -29,6 +29,11 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
     onAddPage();
   };
 
+  // Improve page selection handling
+  const handlePageClick = (index: number) => {
+    selectPage(index);
+  };
+
   return (
     <div className='flex-shrink-0 lg:w-80'>
       <div className='rounded-lg border border-gray-200 bg-white/95 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/95'>
@@ -83,12 +88,20 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
               pages.map((page, index) => (
                 <div
                   key={index}
-                  onClick={() => selectPage(index)}
+                  onClick={() => handlePageClick(index)}
                   className={`group relative cursor-pointer rounded-lg border transition-colors duration-200 ${
                     index === currentPageIndex
                       ? "border-blue-500 bg-blue-50/50 dark:border-blue-400 dark:bg-blue-500/5"
                       : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-700/30"
                   } `}
+                  role='button'
+                  aria-current={index === currentPageIndex ? "page" : undefined}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      handlePageClick(index);
+                    }
+                  }}
                 >
                   <div className='p-3'>
                     <div className='flex items-start gap-3'>
