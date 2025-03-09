@@ -244,7 +244,7 @@ export default function SettingsPage() {
                         name='email'
                         value={email}
                         disabled
-                        className='w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:bg-gray-700 dark:text-white'
+                        className='w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
                       />
                       <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
                         Email cannot be changed

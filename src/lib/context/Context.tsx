@@ -34,9 +34,13 @@ export const useFormContext = () => {
 export const FormContextProvider = ({
   children,
   initialPages = [],
+  initialTitle = "",
+  initialDescription = "",
 }: {
   children: React.ReactNode;
   initialPages?: FormPage[];
+  initialTitle?: string;
+  initialDescription?: string;
 }) => {
   console.log("FormContextProvider initialPages:", initialPages);
 
@@ -46,6 +50,8 @@ export const FormContextProvider = ({
       ...initialState,
       pages: initialPages.length > 0 ? initialPages : initialState.pages,
       currentPageIndex: initialPages.length > 0 ? 0 : -1,
+      title: initialTitle,
+      description: initialDescription,
       isLoading: false,
       loadingStates: {
         savingPage: false,
