@@ -290,7 +290,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
           type='text'
           value={value}
           onChange={(e) => onChange(questionId, e.target.value)}
-          className='w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30'
+          className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30 sm:text-base'
           placeholder='Your answer'
           required={question.required}
         />
@@ -301,7 +301,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
         <textarea
           value={value}
           onChange={(e) => onChange(questionId, e.target.value)}
-          className='h-24 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30'
+          className='h-20 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30 sm:h-24 sm:text-base'
           placeholder='Your answer'
           required={question.required}
         />
@@ -309,19 +309,24 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
 
     case "radio":
       return (
-        <div className='space-y-2'>
+        <div className='space-y-1.5 sm:space-y-2'>
           {question.options?.map((option, idx) => (
-            <label key={idx} className='flex items-center space-x-3'>
+            <label
+              key={idx}
+              className='flex items-center space-x-2 sm:space-x-3'
+            >
               <input
                 type='radio'
                 name={`question-${questionId}`}
                 value={option}
                 checked={value === option}
                 onChange={() => onChange(questionId, option)}
-                className='h-4 w-4 text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400'
+                className='h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400 sm:h-4 sm:w-4'
                 required={question.required}
               />
-              <span className='text-gray-700 dark:text-gray-300'>{option}</span>
+              <span className='text-sm text-gray-700 dark:text-gray-300 sm:text-base'>
+                {option}
+              </span>
             </label>
           ))}
         </div>
@@ -329,7 +334,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
 
     case "checkbox":
       return (
-        <div className='space-y-2'>
+        <div className='space-y-1.5 sm:space-y-2'>
           {question.options?.map((option, idx) => {
             const currentSelections = (value || "")
               .split(",")
@@ -337,7 +342,10 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
               .filter(Boolean);
 
             return (
-              <label key={idx} className='flex items-center space-x-3'>
+              <label
+                key={idx}
+                className='flex items-center space-x-2 sm:space-x-3'
+              >
                 <input
                   type='checkbox'
                   name={`question-${questionId}-${idx}`}
@@ -354,9 +362,9 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
 
                     onChange(questionId, newSelections.join(", "));
                   }}
-                  className='h-4 w-4 rounded text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400'
+                  className='h-3.5 w-3.5 rounded text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400 sm:h-4 sm:w-4'
                 />
-                <span className='text-gray-700 dark:text-gray-300'>
+                <span className='text-sm text-gray-700 dark:text-gray-300 sm:text-base'>
                   {option}
                 </span>
               </label>
@@ -370,7 +378,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
         <select
           value={value}
           onChange={(e) => onChange(questionId, e.target.value)}
-          className='w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30'
+          className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30 sm:text-base'
           required={question.required}
         >
           <option value=''>Select an option</option>
@@ -678,59 +686,60 @@ export default function FormRenderer({
               <div className='space-y-8'>
                 {currentPage.contextElements &&
                   currentPage.contextElements.length > 0 && (
-                    <div className='mb-8'>
+                    <div className='mb-6 md:mb-8'>
                       <ContextElements elements={currentPage.contextElements} />
                     </div>
                   )}
 
                 {currentPage.questions && currentPage.questions.length > 0 ? (
-                  <div className='space-y-6'>
+                  <div className='space-y-4 sm:space-y-6'>
                     {currentPage.questions.map(
-                      (question: Question, index: number) => (
-                        <div
-                          key={question.id || index}
-                          className='rounded-lg border border-gray-100 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800/50'
-                        >
-                          {isPreview ? (
-                            <QuestionComponent
-                              key={index}
-                              question={question}
-                              mode='preview'
-                            />
-                          ) : (
-                            <div className='space-y-3'>
-                              <div className='flex items-start'>
-                                <label className='block font-medium text-gray-700 dark:text-gray-200'>
-                                  {question.text}
-                                  {question.required && (
-                                    <span className='ml-1 text-red-500'>*</span>
-                                  )}
-                                </label>
-                              </div>
+                      (question: Question, index: number) =>
+                        isPreview ? (
+                          <QuestionComponent
+                            key={question.id || index}
+                            question={question}
+                            mode='preview'
+                          />
+                        ) : (
+                          <div
+                            key={question.id || index}
+                            className='rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50 sm:p-5 md:p-6'
+                          >
+                            <div className='flex items-start'>
+                              <label className='block text-sm font-medium text-gray-700 dark:text-gray-200 sm:text-base'>
+                                {question.text}
+                                {question.required && (
+                                  <span className='ml-1 text-red-500'>*</span>
+                                )}
+                              </label>
+                            </div>
 
-                              {/* Context elements */}
-                              {question.contextElements &&
-                                question.contextElements.length > 0 && (
+                            {/* Context elements */}
+                            {question.contextElements &&
+                              question.contextElements.length > 0 && (
+                                <div className='mt-2 sm:mt-3'>
                                   <ContextElements
                                     elements={question.contextElements}
                                   />
-                                )}
+                                </div>
+                              )}
 
-                              {/* Render the appropriate input type */}
+                            {/* Render the appropriate input type */}
+                            <div className='mt-2 sm:mt-3'>
                               <QuestionInput
                                 question={question}
                                 value={responses[question.id!] || ""}
                                 onChange={handleResponseChange}
                               />
                             </div>
-                          )}
-                        </div>
-                      ),
+                          </div>
+                        ),
                     )}
                   </div>
                 ) : (
                   !currentPage.contextElements?.length && (
-                    <div className='rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center dark:border-gray-600 dark:bg-gray-800/30'>
+                    <div className='rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-center dark:border-gray-600 dark:bg-gray-800/30 sm:p-6 md:p-8'>
                       <p className='text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
                         No content added to this page.
                       </p>

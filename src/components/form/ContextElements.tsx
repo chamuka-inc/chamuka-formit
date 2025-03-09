@@ -14,30 +14,36 @@ export const ContextElements = ({ elements }: ContextElementsProps) => {
   }
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-2 sm:space-y-3 md:space-y-4'>
       {elements.map((element, index) => {
         if (element.type === "paragraph") {
           return (
-            <div key={index} className='prose max-w-none dark:prose-invert'>
+            <div
+              key={index}
+              className='prose prose-sm max-w-none text-xs dark:prose-invert sm:prose-base sm:text-sm md:text-base'
+            >
               <ReactMarkdown>{element.content}</ReactMarkdown>
             </div>
           );
         } else if (element.type === "image") {
           return (
-            <img
-              key={index}
-              src={element.content}
-              alt='Context'
-              className='w-full rounded-lg shadow-sm'
-            />
+            <div key={index} className='overflow-hidden'>
+              <img
+                src={element.content}
+                alt='Context'
+                className='w-full rounded-lg object-cover shadow-sm'
+                loading='lazy'
+              />
+            </div>
           );
         } else if (element.type === "video") {
           return (
-            <VideoEmbed
+            <div
               key={index}
-              url={element.content}
-              className='rounded-lg shadow-sm'
-            />
+              className='aspect-video w-full overflow-hidden rounded-lg shadow-sm'
+            >
+              <VideoEmbed url={element.content} className='h-full w-full' />
+            </div>
           );
         }
         return null;
