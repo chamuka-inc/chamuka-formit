@@ -83,7 +83,7 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-      }
+      },
     },
     callbackUrl: {
       name: `next-auth.callback-url`,
@@ -91,8 +91,8 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-      }
-    }
+      },
+    },
   },
   callbacks: {
     async signIn({ user }) {

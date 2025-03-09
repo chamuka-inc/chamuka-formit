@@ -1,112 +1,454 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import { ChevronLeft, ChevronRight, Send, Menu, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Menu, X, FileText } from "lucide-react";
 import { api } from "@/lib/trpc/react";
-import { type FormPage, type Question, type ContextElement } from "@/lib/types";
+import { type FormPage, type Question, type QuestionType } from "@/lib/types";
 import { FormPageNavigation } from "./PageNavigation";
+import { Question as QuestionComponent } from "./Question";
+import { ContextElements } from "./ContextElements";
+
+// Extended question type for the renderer
+type ExtendedQuestionType = QuestionType | "textarea" | "select";
 
 interface FormRendererProps {
-  formToken: string;
+  formToken?: string;
   onLoad?: () => void;
   onError?: (message: string) => void;
   onComplete?: () => void;
   showImprovedNavigation?: boolean;
+  isPreview?: boolean;
+  previewData?: {
+    pages: FormPage[];
+    pageIndex: number;
+  };
 }
+
+// Progress indicator component
+const ProgressIndicator = ({
+  current,
+  total,
+}: {
+  current: number;
+  total: number;
+}) => {
+  const percentage = Math.round(((current + 1) / total) * 100);
+
+  return (
+    <div className='mb-6'>
+      <div className='mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between'>
+        <div className='mb-1 text-sm font-medium text-gray-700 dark:text-gray-300 sm:mb-0'>
+          Page {current + 1} of {total}
+        </div>
+        <div className='text-sm text-gray-500 dark:text-gray-400'>
+          {percentage}% Complete
+        </div>
+      </div>
+      <div className='h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700'>
+        <div
+          className='h-full bg-blue-500 transition-all duration-300 dark:bg-blue-400'
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// Loading state component
+const LoadingState = () => (
+  <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
+    <div className='mb-4 flex h-12 w-12 animate-spin items-center justify-center rounded-full border-2 border-gray-200 border-t-blue-500 dark:border-gray-700 dark:border-t-blue-400 sm:h-16 sm:w-16'></div>
+    <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+      Loading Form
+    </h2>
+    <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+      Please wait while we load the form content...
+    </p>
+  </div>
+);
+
+// Error state component
+const ErrorState = ({ message }: { message: string }) => (
+  <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
+    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900 sm:h-16 sm:w-16'>
+      <svg
+        className='h-6 w-6 text-red-500 dark:text-red-400 sm:h-8 sm:w-8'
+        fill='none'
+        stroke='currentColor'
+        viewBox='0 0 24 24'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        <path
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          strokeWidth={2}
+          d='M6 18L18 6M6 6l12 12'
+        />
+      </svg>
+    </div>
+    <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+      Error Loading Form
+    </h2>
+    <p className='max-w-sm text-sm text-red-500 dark:text-red-400 sm:text-base'>
+      {message || "An unexpected error occurred"}
+    </p>
+  </div>
+);
+
+// Success state component
+const SuccessState = () => (
+  <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
+    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 sm:h-16 sm:w-16'>
+      <svg
+        className='h-6 w-6 text-green-500 dark:text-green-400 sm:h-8 sm:w-8'
+        fill='none'
+        stroke='currentColor'
+        viewBox='0 0 24 24'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        <path
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          strokeWidth={2}
+          d='M5 13l4 4L19 7'
+        />
+      </svg>
+    </div>
+    <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+      Response Submitted
+    </h2>
+    <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+      Thank you for completing this form. Your response has been recorded.
+    </p>
+  </div>
+);
+
+// Empty state component
+const EmptyState = ({ isPreview }: { isPreview: boolean }) => (
+  <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
+    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 sm:h-16 sm:w-16'>
+      <FileText className='h-6 w-6 text-gray-400 dark:text-gray-500 sm:h-8 sm:w-8' />
+    </div>
+    <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+      {isPreview ? "No Pages to Preview" : "No Form Content"}
+    </h2>
+    <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+      {isPreview
+        ? "Add some pages to your form using the builder tab to see them in preview mode."
+        : "This form has no content yet. Check back later."}
+    </p>
+  </div>
+);
+
+// Navigation buttons component
+interface NavigationProps {
+  currentPageIndex: number;
+  totalPages: number;
+  isSubmitting: boolean;
+  isPreview: boolean;
+  onPrevious: () => void;
+  onNext: () => void;
+  onSubmit: () => void;
+  pages: FormPage[];
+  setPageIndex: (index: number) => void;
+}
+
+const FormNavigation = ({
+  currentPageIndex,
+  totalPages,
+  isSubmitting,
+  isPreview,
+  onPrevious,
+  onNext,
+  onSubmit,
+  pages,
+  setPageIndex,
+}: NavigationProps) => {
+  const isLastPage = currentPageIndex === totalPages - 1;
+
+  const handlePageDotClick = (idx: number) => {
+    // Only allow skipping ahead in preview mode
+    if (isPreview || idx <= currentPageIndex) {
+      setPageIndex(idx);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      toast.error("Please complete the current page before skipping ahead");
+    }
+  };
+
+  return (
+    <div className='flex items-center justify-between gap-4 border-t border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50 sm:px-8 sm:py-4'>
+      <button
+        onClick={onPrevious}
+        disabled={currentPageIndex === 0}
+        className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:gap-2 sm:px-4 sm:py-2.5 ${
+          currentPageIndex === 0
+            ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
+            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+        }`}
+      >
+        <ChevronLeft className='h-4 w-4 sm:h-5 sm:w-5' />
+        <span className='hidden sm:inline'>Previous</span>
+      </button>
+
+      <div className='hidden items-center gap-1.5 md:flex'>
+        {pages.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => handlePageDotClick(idx)}
+            className={`h-2.5 w-2.5 rounded-full transition-all ${
+              idx === currentPageIndex
+                ? "scale-125 bg-blue-500"
+                : idx < currentPageIndex
+                  ? "bg-green-500"
+                  : "bg-gray-300 dark:bg-gray-600"
+            }`}
+            aria-label={`Go to page ${idx + 1}`}
+          />
+        ))}
+      </div>
+
+      <button
+        onClick={isLastPage ? onSubmit : onNext}
+        disabled={isSubmitting && !isPreview}
+        className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:gap-2 sm:px-6 sm:py-2.5 ${
+          isLastPage
+            ? "bg-green-500 text-white hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
+            : "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+        } ${isSubmitting && !isPreview ? "cursor-not-allowed opacity-70" : ""}`}
+      >
+        {isSubmitting && !isPreview ? (
+          <span className='flex items-center gap-2'>
+            <svg className='h-4 w-4 animate-spin' viewBox='0 0 24 24'>
+              <circle
+                className='opacity-25'
+                cx='12'
+                cy='12'
+                r='10'
+                stroke='currentColor'
+                strokeWidth='4'
+                fill='none'
+              />
+              <path
+                className='opacity-75'
+                fill='currentColor'
+                d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+              />
+            </svg>
+            <span>Submitting...</span>
+          </span>
+        ) : (
+          <>
+            <span>{isLastPage ? "Submit" : "Next"}</span>
+            <ChevronRight className='h-4 w-4 sm:h-5 sm:w-5' />
+          </>
+        )}
+      </button>
+    </div>
+  );
+};
+
+// Input component for different question types
+interface QuestionInputProps {
+  question: Question;
+  value: string;
+  onChange: (id: string, value: string) => void;
+}
+
+const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
+  const questionId = question.id as string;
+
+  switch (question.type as ExtendedQuestionType) {
+    case "text":
+      return (
+        <input
+          type='text'
+          value={value}
+          onChange={(e) => onChange(questionId, e.target.value)}
+          className='w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30'
+          placeholder='Your answer'
+          required={question.required}
+        />
+      );
+
+    case "textarea":
+      return (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(questionId, e.target.value)}
+          className='h-24 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30'
+          placeholder='Your answer'
+          required={question.required}
+        />
+      );
+
+    case "radio":
+      return (
+        <div className='space-y-2'>
+          {question.options?.map((option, idx) => (
+            <label key={idx} className='flex items-center space-x-3'>
+              <input
+                type='radio'
+                name={`question-${questionId}`}
+                value={option}
+                checked={value === option}
+                onChange={() => onChange(questionId, option)}
+                className='h-4 w-4 text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400'
+                required={question.required}
+              />
+              <span className='text-gray-700 dark:text-gray-300'>{option}</span>
+            </label>
+          ))}
+        </div>
+      );
+
+    case "checkbox":
+      return (
+        <div className='space-y-2'>
+          {question.options?.map((option, idx) => {
+            const currentSelections = (value || "")
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean);
+
+            return (
+              <label key={idx} className='flex items-center space-x-3'>
+                <input
+                  type='checkbox'
+                  name={`question-${questionId}-${idx}`}
+                  value={option}
+                  checked={currentSelections.includes(option)}
+                  onChange={(e) => {
+                    let newSelections = [...currentSelections];
+
+                    if (e.target.checked) {
+                      newSelections.push(option);
+                    } else {
+                      newSelections = newSelections.filter((s) => s !== option);
+                    }
+
+                    onChange(questionId, newSelections.join(", "));
+                  }}
+                  className='h-4 w-4 rounded text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400'
+                />
+                <span className='text-gray-700 dark:text-gray-300'>
+                  {option}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      );
+
+    case "select":
+      return (
+        <select
+          value={value}
+          onChange={(e) => onChange(questionId, e.target.value)}
+          className='w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30'
+          required={question.required}
+        >
+          <option value=''>Select an option</option>
+          {question.options?.map((option, idx) => (
+            <option key={idx} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      );
+
+    default:
+      return null;
+  }
+};
 
 export default function FormRenderer({
   formToken,
   onLoad,
   onError,
   onComplete,
-  showImprovedNavigation = false,
+  showImprovedNavigation = true,
+  isPreview = false,
+  previewData,
 }: FormRendererProps) {
-  // State for form data
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  // State management
+  const [currentPageIndex, setCurrentPageIndex] = useState(
+    isPreview && previewData ? previewData.pageIndex : 0,
+  );
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formCompleted, setFormCompleted] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
-  // Fetch the form data using the public share token
+  // API queries and mutations
+  const submitResponsesMutation = api.form.submitResponses.useMutation({
+    onSuccess: () => {
+      setFormCompleted(true);
+      onComplete?.();
+    },
+    onError: (err) => {
+      const errorMessage = err.message || "Failed to submit form";
+      toast.error(errorMessage);
+      onError?.(errorMessage);
+      setIsSubmitting(false);
+    },
+  });
+
   const {
     data: formData,
     isLoading,
     error,
-  } = api.form.getByShareToken.useQuery(
-    {
-      token: formToken,
-    },
-    {
-      retry: 1, // Only retry once to avoid excessive error messages
-      retryDelay: 1000,
-    },
-  );
+  } = !isPreview && formToken
+    ? api.form.getByShareToken.useQuery(
+        { token: formToken },
+        {
+          retry: 1,
+          retryDelay: 1000,
+        },
+      )
+    : { data: undefined, isLoading: false, error: undefined };
 
-  // Call onLoad callback when form data is loaded
+  // Get pages data from either preview or form data
+  const formDataPages = formData?.data
+    ? typeof formData.data === "object" && "pages" in formData.data
+      ? (formData.data as any).pages
+      : []
+    : [];
+
+  const pages = isPreview && previewData ? previewData.pages : formDataPages;
+  const totalPages = pages.length;
+  const currentPage = pages[currentPageIndex];
+
+  // Effects
   useEffect(() => {
-    if (formData && !isLoading && onLoad) {
+    if (!isPreview && formData && onLoad) {
       onLoad();
     }
-  }, [formData, isLoading, onLoad]);
+  }, [formData, isPreview, onLoad]);
 
-  // Call onError callback when there's an error loading the form
   useEffect(() => {
-    if (error) {
-      console.error("Error fetching form by token:", error);
-      if (onError) {
-        onError(error.message || "Failed to load form");
-      }
+    if (!isPreview && error && onError) {
+      onError(error.message);
     }
-  }, [error, onError]);
+  }, [error, isPreview, onError]);
 
-  // Handle case when form is not found or not published
-  useEffect(() => {
-    if (!isLoading && !formData && !error && onError) {
-      onError("Form not found or not available for viewing");
-    }
-  }, [formData, isLoading, error, onError]);
+  // Handler functions
+  const handleResponseChange = useCallback(
+    (questionId: string, value: string) => {
+      if (isPreview) return;
 
-  // Submission mutation
-  const submitMutation = api.form.submitResponses.useMutation({
-    onSuccess: () => {
-      toast.success("Form submitted successfully!");
-      setFormCompleted(true);
-      if (onComplete) {
-        onComplete();
-      }
+      setResponses((prev) => ({
+        ...prev,
+        [questionId]: value,
+      }));
     },
-    onError: (error) => {
-      toast.error(`Error submitting form: ${error.message}`);
-      setIsSubmitting(false);
-      if (onError) {
-        onError(`Error submitting form: ${error.message}`);
-      }
-    },
-  });
+    [isPreview],
+  );
 
-  // Get the current page
-  const formData1 = formData?.data
-    ? typeof formData.data === "object"
-      ? (formData.data as any)
-      : { pages: [] }
-    : { pages: [] };
-  const pages = Array.isArray(formData1.pages) ? formData1.pages : [];
-  const currentPage = pages[currentPageIndex];
-  const totalPages = pages.length || 0;
+  const validateRequiredFields = useCallback(() => {
+    if (isPreview) return true;
 
-  // Handle response changes
-  const handleResponseChange = (questionId: string, value: string) => {
-    setResponses((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-  };
-
-  // Navigate to the next page
-  const goToNextPage = () => {
-    // Validate required fields
     const requiredQuestions =
       currentPage?.questions?.filter((q: Question) => q.required) || [];
     const missingResponses = requiredQuestions.filter(
@@ -115,517 +457,263 @@ export default function FormRenderer({
 
     if (missingResponses.length > 0) {
       toast.error("Please answer all required questions");
-      return;
+      return false;
     }
+
+    return true;
+  }, [currentPage, responses, isPreview]);
+
+  const goToNextPage = useCallback(() => {
+    if (!validateRequiredFields()) return;
 
     if (currentPageIndex < totalPages - 1) {
       setCurrentPageIndex((current) => current + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  };
+  }, [currentPageIndex, totalPages, validateRequiredFields]);
 
-  // Navigate to the previous page
-  const goToPrevPage = () => {
+  const goToPrevPage = useCallback(() => {
     if (currentPageIndex > 0) {
       setCurrentPageIndex((current) => current - 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  };
+  }, [currentPageIndex]);
 
-  // Handle form submission
-  const handleSubmit = async () => {
-    // Validate required fields on the final page
-    const requiredQuestions =
-      currentPage?.questions?.filter((q: Question) => q.required) || [];
-    const missingResponses = requiredQuestions.filter(
-      (q: Question) => !responses[q.id!],
-    );
-
-    if (missingResponses.length > 0) {
-      toast.error("Please answer all required questions");
+  const handleSubmit = useCallback(async () => {
+    if (isPreview) {
+      toast.info("Form submission is disabled in preview mode");
       return;
     }
 
-    // Prepare the submission data
+    if (!validateRequiredFields()) return;
+
     setIsSubmitting(true);
 
-    // Submit the responses with the full JSON data
-    submitMutation.mutate({
-      formId: formData?.id || "",
-      data: {
-        responses,
-        submittedAt: new Date().toISOString(),
-      },
-    });
-  };
+    if (formToken) {
+      submitResponsesMutation.mutate({
+        formId: formData?.id || "",
+        data: {
+          responses,
+          submittedAt: new Date().toISOString(),
+        },
+      });
+    } else {
+      setIsSubmitting(false);
+    }
+  }, [
+    isPreview,
+    validateRequiredFields,
+    formToken,
+    submitResponsesMutation,
+    formData,
+    responses,
+  ]);
 
-  // Render loading state
-  if (isLoading) {
-    return (
-      <div className='flex min-h-[60vh] items-center justify-center'>
-        <div className='h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-blue-500'></div>
-      </div>
-    );
+  // Render states
+  if (formCompleted && !isPreview) {
+    return <SuccessState />;
   }
 
-  // Render error state
-  if (error || !formData) {
+  if (!isPreview && isLoading) {
+    return <LoadingState />;
+  }
+
+  if (!isPreview && error) {
+    return <ErrorState message={error.message} />;
+  }
+
+  if (pages.length === 0) {
+    return <EmptyState isPreview={isPreview} />;
+  }
+
+  if (!currentPage) {
     return (
-      <div className='rounded-lg border border-red-200 bg-red-50 p-6 text-center dark:border-red-800 dark:bg-red-900/20'>
-        <h2 className='mb-2 text-lg font-semibold text-red-700 dark:text-red-400'>
-          Error Loading Form
+      <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
+        <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 sm:h-16 sm:w-16'>
+          <FileText className='h-6 w-6 text-gray-400 dark:text-gray-500 sm:h-8 sm:w-8' />
+        </div>
+        <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+          Page Not Found
         </h2>
-        <p className='text-red-600 dark:text-red-300'>
-          {error?.message || "Form not found or not available"}
+        <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+          The selected page could not be found. Please try selecting a different
+          page.
         </p>
       </div>
     );
   }
 
-  // Render completion state
-  if (formCompleted) {
-    return (
-      <div className='my-8 rounded-lg border border-green-200 bg-green-50 p-8 text-center dark:border-green-800 dark:bg-green-900/20'>
-        <h2 className='mb-3 text-2xl font-bold text-green-700 dark:text-green-400'>
-          Thank You!
-        </h2>
-        <p className='mb-6 text-green-600 dark:text-green-300'>
-          Your response has been submitted successfully.
-        </p>
-      </div>
-    );
-  }
-
-  // Render the form
   return (
-    <div className='mx-auto w-full p-4'>
-      {/* Form title section with gradient background */}
-      <div className='dark:to-gray-850 mb-8 rounded-xl bg-gradient-to-b from-blue-50 to-white p-6 text-center shadow-sm dark:from-gray-800 sm:p-8'>
-        <h1 className='text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl'>
-          {formData.title}
-        </h1>
-        {formData.description && (
-          <p className='mx-auto mt-3 max-w-3xl text-gray-600 dark:text-gray-300'>
-            {formData.description}
-          </p>
-        )}
-      </div>
-
-      {/* Mobile: Toggle sidebar button (only for improved navigation) */}
-      {showImprovedNavigation && (
-        <div className='mb-4 flex lg:hidden'>
-          <button
-            onClick={() => setSidebarVisible(!sidebarVisible)}
-            className='inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
-          >
-            {sidebarVisible ? (
-              <>
-                <X className='h-4 w-4' />
-                <span>Hide Pages</span>
-              </>
-            ) : (
-              <>
-                <Menu className='h-4 w-4' />
-                <span>Show Pages</span>
-              </>
-            )}
-          </button>
+    <div className='w-full'>
+      {/* Preview Banner - only show in preview mode */}
+      {isPreview && (
+        <div className='mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 p-3 text-center text-sm text-gray-600 shadow-sm dark:from-gray-800/50 dark:to-blue-900/20 dark:text-gray-300 sm:text-base'>
+          <span className='font-medium'>Preview Mode</span> — See how your form
+          will appear to respondents
         </div>
       )}
+
+      {/* Mobile: Toggle sidebar button */}
+      <div className='mb-4 flex lg:hidden'>
+        <button
+          onClick={() => setSidebarVisible(!sidebarVisible)}
+          className='inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
+        >
+          {sidebarVisible ? (
+            <>
+              <X className='h-4 w-4' />
+              <span>Hide Pages</span>
+            </>
+          ) : (
+            <>
+              <Menu className='h-4 w-4' />
+              <span>Show Pages</span>
+            </>
+          )}
+        </button>
+      </div>
 
       <div className='flex flex-col gap-6 lg:flex-row'>
-        {/* Side Page Navigation (only for improved navigation) */}
-        {showImprovedNavigation && (
-          <div
-            className={`${
-              sidebarVisible ? "block" : "hidden lg:block"
-            } w-full lg:w-1/4 xl:w-1/5`}
-          >
-            <FormPageNavigation
-              pages={pages}
-              currentPageIndex={currentPageIndex}
-              onPageSelect={(pageIndex) => {
-                // Validation for required fields before allowing to go to a new page
-                if (pageIndex > currentPageIndex) {
-                  const requiredQuestions =
-                    currentPage?.questions?.filter(
-                      (q: Question) => q.required,
-                    ) || [];
-                  const missingResponses = requiredQuestions.filter(
-                    (q: Question) => !responses[q.id!],
-                  );
-
-                  if (missingResponses.length > 0) {
-                    toast.error(
-                      "Please answer all required questions before proceeding",
-                    );
-                    return;
-                  }
-                }
-
-                setCurrentPageIndex(pageIndex);
-                setSidebarVisible(false); // Hide sidebar on mobile after selection
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            />
-          </div>
-        )}
-
+        {/* Side Page Navigation */}
         <div
-          className={`w-full ${showImprovedNavigation ? "lg:w-3/4 xl:w-4/5" : ""}`}
+          className={`${
+            sidebarVisible ? "block" : "hidden lg:block"
+          } w-full lg:w-1/4 xl:w-1/5`}
         >
-          {/* Progress indicator */}
-          <div className='mb-6'>
-            <div className='mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between'>
-              <div className='mb-1 text-sm font-medium text-gray-700 dark:text-gray-300 sm:mb-0'>
-                Page {currentPageIndex + 1} of {totalPages}
-              </div>
-              <div className='text-sm text-gray-500 dark:text-gray-400'>
-                {Math.round(((currentPageIndex + 1) / totalPages) * 100)}%
-                completed
-              </div>
-            </div>
-            <div className='h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700'>
-              <div
-                className='h-2 rounded-full bg-blue-500 transition-all duration-300'
-                style={{
-                  width: `${((currentPageIndex + 1) / totalPages) * 100}%`,
-                }}
-              ></div>
-            </div>
-          </div>
+          <FormPageNavigation
+            pages={pages}
+            currentPageIndex={currentPageIndex}
+            onPageSelect={(index) => {
+              // In non-preview mode, validate required fields before allowing navigation
+              if (!isPreview && currentPageIndex !== index) {
+                const requiredQuestions =
+                  currentPage?.questions?.filter((q: Question) => q.required) ||
+                  [];
+                const missingResponses = requiredQuestions.filter(
+                  (q: Question) => !responses[q.id!],
+                );
 
-          {/* Current page */}
+                if (missingResponses.length > 0 && index > currentPageIndex) {
+                  toast.error(
+                    "Please answer all required questions before proceeding",
+                  );
+                  return;
+                }
+              }
+
+              setCurrentPageIndex(index);
+              setSidebarVisible(false); // Hide sidebar on mobile after selection
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
+        </div>
+
+        <div className='w-full lg:w-3/4 xl:w-4/5'>
+          {/* Progress Bar */}
+          <ProgressIndicator current={currentPageIndex} total={pages.length} />
+
+          {/* Page Content */}
           <div className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800'>
             <div className='p-5 sm:p-8'>
-              {/* Page title */}
-              {currentPage && (
-                <div className='mb-8 border-b border-gray-100 pb-4 dark:border-gray-700'>
-                  <h2 className='text-xl font-semibold text-gray-800 dark:text-white'>
+              <div className='mb-8 border-b border-gray-100 pb-4 dark:border-gray-700'>
+                <div className='flex items-center gap-2 sm:gap-3'>
+                  <FileText className='h-5 w-5 text-gray-400 dark:text-gray-500 sm:h-6 sm:w-6' />
+                  <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
                     {currentPage.title}
                   </h2>
-                  {currentPage.description && (
-                    <p className='mt-2 text-gray-600 dark:text-gray-300'>
-                      {currentPage.description}
-                    </p>
-                  )}
                 </div>
-              )}
+                {currentPage.description && (
+                  <p className='mt-3 pl-8 text-gray-600 dark:text-gray-300'>
+                    {currentPage.description}
+                  </p>
+                )}
+              </div>
 
-              {/* Context elements at page level */}
-              {currentPage?.contextElements?.length > 0 && (
-                <div className='mb-8'>
-                  {currentPage.contextElements.map(
-                    (element: ContextElement, idx: number) => (
-                      <RenderContextElement
-                        key={`ctx-${idx}`}
-                        element={element}
-                      />
-                    ),
+              <div className='space-y-8'>
+                {currentPage.contextElements &&
+                  currentPage.contextElements.length > 0 && (
+                    <div className='mb-8'>
+                      <ContextElements elements={currentPage.contextElements} />
+                    </div>
                   )}
-                </div>
-              )}
 
-              {/* Questions */}
-              {currentPage?.questions?.length > 0 && (
-                <div className='space-y-8'>
-                  {currentPage.questions.map(
-                    (question: Question, idx: number) => (
-                      <div
-                        key={`q-${idx}`}
-                        className='rounded-lg border border-gray-100 bg-gray-50 p-6 last:mb-0 dark:border-gray-700 dark:bg-gray-800/50'
-                      >
-                        <RenderQuestion
-                          question={question}
-                          value={responses[question.id!] || ""}
-                          onChange={(value) =>
-                            handleResponseChange(question.id!, value)
-                          }
-                        />
-                      </div>
-                    ),
-                  )}
-                </div>
-              )}
+                {currentPage.questions && currentPage.questions.length > 0 ? (
+                  <div className='space-y-6'>
+                    {currentPage.questions.map(
+                      (question: Question, index: number) => (
+                        <div
+                          key={question.id || index}
+                          className='rounded-lg border border-gray-100 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800/50'
+                        >
+                          {isPreview ? (
+                            <QuestionComponent
+                              key={index}
+                              question={question}
+                              mode='preview'
+                            />
+                          ) : (
+                            <div className='space-y-3'>
+                              <div className='flex items-start'>
+                                <label className='block font-medium text-gray-700 dark:text-gray-200'>
+                                  {question.text}
+                                  {question.required && (
+                                    <span className='ml-1 text-red-500'>*</span>
+                                  )}
+                                </label>
+                              </div>
 
-              {/* Navigation buttons (old style navigation) */}
-              {!showImprovedNavigation && (
-                <div className='mt-8 flex justify-between'>
-                  <button
-                    onClick={goToPrevPage}
-                    className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                      currentPageIndex === 0
-                        ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
-                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                    }`}
-                    disabled={currentPageIndex === 0}
-                  >
-                    <ChevronLeft className='h-4 w-4' />
-                    Previous
-                  </button>
+                              {/* Context elements */}
+                              {question.contextElements &&
+                                question.contextElements.length > 0 && (
+                                  <ContextElements
+                                    elements={question.contextElements}
+                                  />
+                                )}
 
-                  {currentPageIndex < totalPages - 1 ? (
-                    <button
-                      onClick={goToNextPage}
-                      className='flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                    >
-                      Next
-                      <ChevronRight className='h-4 w-4' />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      className='flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white'></div>
-                          Submitting...
-                        </>
-                      ) : (
-                        <>
-                          Submit
-                          <Send className='h-4 w-4' />
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              )}
+                              {/* Render the appropriate input type */}
+                              <QuestionInput
+                                question={question}
+                                value={responses[question.id!] || ""}
+                                onChange={handleResponseChange}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ),
+                    )}
+                  </div>
+                ) : (
+                  !currentPage.contextElements?.length && (
+                    <div className='rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center dark:border-gray-600 dark:bg-gray-800/30'>
+                      <p className='text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+                        No content added to this page.
+                      </p>
+                      <p className='mt-1 text-xs text-gray-400 dark:text-gray-500'>
+                        {isPreview
+                          ? "Switch to builder mode to add questions or content elements"
+                          : "This page has no content yet."}
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
             </div>
+
+            {/* Navigation Footer */}
+            <FormNavigation
+              currentPageIndex={currentPageIndex}
+              totalPages={totalPages}
+              isSubmitting={isSubmitting}
+              isPreview={isPreview}
+              onPrevious={goToPrevPage}
+              onNext={goToNextPage}
+              onSubmit={handleSubmit}
+              pages={pages}
+              setPageIndex={setCurrentPageIndex}
+            />
           </div>
-
-          {/* Improved Navigation Footer (similar to builder preview) */}
-          {showImprovedNavigation && (
-            <div className='mt-6 flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 sm:px-8 sm:py-4'>
-              <button
-                onClick={goToPrevPage}
-                disabled={currentPageIndex === 0}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:gap-2 sm:px-4 sm:py-2.5 ${
-                  currentPageIndex === 0
-                    ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
-                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                }`}
-              >
-                <ChevronLeft className='h-4 w-4 sm:h-5 sm:w-5' />
-                <span className='hidden sm:inline'>Previous</span>
-              </button>
-
-              <div className='hidden items-center gap-1.5 md:flex'>
-                {pages.map((_: FormPage, idx: number) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      if (idx <= currentPageIndex) {
-                        setCurrentPageIndex(idx);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      } else {
-                        // Validate required fields before navigation
-                        const requiredQuestions =
-                          currentPage?.questions?.filter(
-                            (q: Question) => q.required,
-                          ) || [];
-                        const missingResponses = requiredQuestions.filter(
-                          (q: Question) => !responses[q.id!],
-                        );
-
-                        if (missingResponses.length > 0) {
-                          toast.error(
-                            "Please answer all required questions before proceeding",
-                          );
-                          return;
-                        }
-                        setCurrentPageIndex(idx);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }
-                    }}
-                    className={`h-2.5 w-2.5 rounded-full transition-all ${
-                      idx === currentPageIndex
-                        ? "scale-125 bg-blue-500"
-                        : idx < currentPageIndex
-                          ? "bg-green-500"
-                          : "bg-gray-300 dark:bg-gray-600"
-                    }`}
-                    disabled={idx > currentPageIndex + 1}
-                    aria-label={`Go to page ${idx + 1}`}
-                  />
-                ))}
-              </div>
-
-              {currentPageIndex < totalPages - 1 ? (
-                <button
-                  onClick={goToNextPage}
-                  className='inline-flex items-center gap-1.5 rounded-lg bg-blue-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 sm:gap-2 sm:px-6 sm:py-2.5'
-                >
-                  <span>Next</span>
-                  <ChevronRight className='h-4 w-4 sm:h-5 sm:w-5' />
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className='inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 sm:gap-2 sm:px-6 sm:py-2.5'
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white'></div>
-                      <span>Submitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Submit</span>
-                      <Send className='h-4 w-4 sm:h-5 sm:w-5' />
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>
   );
-}
-
-// Component to render a question based on its type
-function RenderQuestion({
-  question,
-  value,
-  onChange,
-}: {
-  question: Question;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className='space-y-3'>
-      <div className='flex items-start'>
-        <label className='block font-medium text-gray-700 dark:text-gray-200'>
-          {question.text}
-          {question.required && <span className='ml-1 text-red-500'>*</span>}
-        </label>
-      </div>
-
-      {/* Context elements */}
-      {question.contextElements?.map((element, idx) => (
-        <RenderContextElement
-          key={`question-context-${idx}`}
-          element={element}
-        />
-      ))}
-
-      {/* Render different input types based on question type */}
-      {question.type === "text" && (
-        <input
-          type='text'
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700'
-          placeholder='Your answer'
-          required={question.required}
-        />
-      )}
-
-      {question.type === "radio" && (
-        <div className='space-y-2'>
-          {question.options?.map((option, idx) => (
-            <div key={idx} className='flex items-center'>
-              <input
-                type='radio'
-                id={`question-${question.id}-option-${idx}`}
-                name={`question-${question.id}`}
-                value={option}
-                checked={value === option}
-                onChange={() => onChange(option)}
-                className='h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600'
-                required={question.required}
-              />
-              <label
-                htmlFor={`question-${question.id}-option-${idx}`}
-                className='ml-2 block text-gray-700 dark:text-gray-200'
-              >
-                {option}
-              </label>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {question.type === "checkbox" && (
-        <div className='space-y-2'>
-          {question.options?.map((option, idx) => {
-            const values = value ? value.split(",") : [];
-            const isChecked = values.includes(option);
-
-            return (
-              <div key={idx} className='flex items-center'>
-                <input
-                  type='checkbox'
-                  id={`question-${question.id}-option-${idx}`}
-                  name={`question-${question.id}`}
-                  value={option}
-                  checked={isChecked}
-                  onChange={() => {
-                    let newValues;
-                    if (isChecked) {
-                      newValues = values.filter((v) => v !== option);
-                    } else {
-                      newValues = [...values, option];
-                    }
-                    onChange(newValues.join(","));
-                  }}
-                  className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600'
-                />
-                <label
-                  htmlFor={`question-${question.id}-option-${idx}`}
-                  className='ml-2 block text-gray-700 dark:text-gray-200'
-                >
-                  {option}
-                </label>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Component to render a context element
-function RenderContextElement({ element }: { element: ContextElement }) {
-  if (element.type === "paragraph") {
-    return (
-      <div className='prose mb-4 max-w-none dark:prose-invert'>
-        <p>{element.content}</p>
-      </div>
-    );
-  }
-
-  if (element.type === "image") {
-    return (
-      <div className='mb-4'>
-        <img
-          src={element.content}
-          alt='Form context'
-          className='h-auto max-w-full rounded-lg'
-        />
-      </div>
-    );
-  }
-
-  if (element.type === "video") {
-    return (
-      <div className='mb-4'>
-        <iframe
-          src={element.content}
-          title='Form video'
-          className='aspect-video w-full rounded-lg'
-          allowFullScreen
-        ></iframe>
-      </div>
-    );
-  }
-
-  return null;
 }
