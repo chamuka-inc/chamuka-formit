@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "react-toastify";
 import { Loader2, Sparkles, X, Save, Edit } from "lucide-react";
 import { DiffEditor } from "@monaco-editor/react";
@@ -12,6 +12,28 @@ interface RefineFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (updatedData?: JsonValue) => void;
+}
+
+// Add custom hook for window size
+function useWindowSize() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    function checkMobile() {
+      setIsMobile(window.innerWidth < 768);
+    }
+
+    // Set initial value
+    checkMobile();
+
+    // Add event listener
+    window.addEventListener("resize", checkMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile;
 }
 
 export function RefineFormModal({
@@ -29,6 +51,33 @@ export function RefineFormModal({
   const [aiPromptOpen, setAiPromptOpen] = useState(false);
 
   const editorRef = useRef<any>(null);
+  const isMobileScreen = useWindowSize();
+
+  // Helper function to clean up the editor models
+  const cleanupEditor = () => {
+    if (!editorRef.current) return;
+
+    try {
+      // Simply clear our reference to the editor
+      // Let Monaco handle its own internal cleanup
+      const tempRef = editorRef.current;
+      editorRef.current = null;
+
+      // Set a small delay to ensure proper cleanup order in Monaco
+      setTimeout(() => {
+        try {
+          // Some versions of Monaco may require this for proper cleanup
+          if (tempRef && typeof tempRef.dispose === "function") {
+            tempRef.dispose();
+          }
+        } catch (err) {
+          // Ignore errors during delayed cleanup
+        }
+      }, 0);
+    } catch (error) {
+      console.error("Error cleaning up editor:", error);
+    }
+  };
 
   // Get current user credits
   const { data: userData } = api.user.getCredits.useQuery();
@@ -52,6 +101,62 @@ export function RefineFormModal({
     }
   }, [formData, originalStructure]);
 
+  // Clean up editor when component unmounts or modal is closed
+  useEffect(() => {
+    // Nothing to do when modal opens
+    if (isOpen) {
+      return;
+    }
+
+    // Modal is closing, clean up the editor
+    // No need to run cleanupEditor here as it will be called by handleClose
+    // This is a fallback in case the modal is closed programmatically without handleClose
+    if (editorRef.current) {
+      cleanupEditor();
+    }
+  }, [isOpen]);
+
+  // Separate useEffect for unmounting cleanup
+  useEffect(() => {
+    // Return cleanup function for component unmount
+    return () => {
+      if (editorRef.current) {
+        cleanupEditor();
+      }
+    };
+  }, []);
+
+  // Handle body scroll lock
+  useEffect(() => {
+    if (isOpen) {
+      // Save the current body overflow style
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      // Prevent body scroll
+      document.body.style.overflow = "hidden";
+
+      // Restore original style when modal closes
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [isOpen]);
+
+  // Prevent scroll propagation
+  const handleContentScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+    },
+    [],
+  );
+
+  // Prevent event propagation
+  const handleContentClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+    },
+    [],
+  );
+
   // Mutation for getting form refinement preview
   const previewRefinementMutation = api.form.previewRefinement.useMutation({
     onSuccess: (data) => {
@@ -74,8 +179,12 @@ export function RefineFormModal({
 
         setIsSubmitting(false);
         toast.success("Form changes saved successfully!");
+
+        // Call onSuccess with the parsed value
         onSuccess(parsedValue);
-        onClose();
+
+        // Use the safe handleClose instead of direct cleanup + onClose
+        handleClose();
       } catch (error) {
         console.error("Error parsing JSON:", error);
         toast.error("Error saving changes");
@@ -157,84 +266,136 @@ export function RefineFormModal({
     }
   };
 
-  if (!isOpen) return null;
+  // Create a custom close handler that cleans up before closing
+  const handleClose = () => {
+    // Prevent multiple calls to close
+    if (!editorRef.current) {
+      // Editor already cleaned up, just call onClose
+      onClose();
+      return;
+    }
+
+    // Clean up editor before closing the modal
+    cleanupEditor();
+
+    // Call the original onClose after a short delay
+    // This gives Monaco time to clean up properly
+    setTimeout(() => {
+      onClose();
+    }, 10);
+  };
 
   // Check for dark mode
   const isDarkMode =
     typeof document !== "undefined" &&
     document.documentElement.classList.contains("dark");
 
+  if (!isOpen) return null;
+
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-8'>
-      <div className='relative max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-800'>
+    <div
+      className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-2 sm:p-4 md:p-6 lg:p-8'
+      onScroll={handleContentScroll}
+      onClick={handleClose}
+    >
+      <div
+        className='relative max-h-[98vh] w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-800'
+        onClick={handleContentClick}
+      >
         {/* Header */}
-        <div className='flex items-center justify-between bg-gray-100 px-4 py-3 dark:bg-gray-700'>
+        <div className='sticky top-0 z-10 flex items-center justify-between bg-gray-100 px-3 py-2.5 dark:bg-gray-700 sm:px-4 sm:py-3'>
           <div className='flex items-center'>
-            <Edit className='mr-2 h-5 w-5 text-blue-500' />
-            <h3 className='font-medium text-gray-900 dark:text-white'>
+            <Edit className='mr-1.5 h-4 w-4 text-blue-500 sm:mr-2 sm:h-5 sm:w-5' />
+            <h3 className='text-sm font-medium text-gray-900 dark:text-white sm:text-base'>
               Edit Form JSON
             </h3>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             disabled={isSubmitting}
           >
-            <X className='h-5 w-5' />
+            <X className='h-4 w-4 sm:h-5 sm:w-5' />
           </button>
         </div>
 
         {/* Content */}
-        <div className='p-4'>
-          <div className='space-y-4'>
-            <div className='h-[50vh] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 sm:h-[60vh] md:h-[500px]'>
-              <DiffEditor
-                height='100%'
-                language='json'
-                original={
-                  originalStructure
-                    ? JSON.stringify(originalStructure, null, 2)
-                    : ""
-                }
-                modified={editorValue}
-                theme={isDarkMode ? "vs-dark" : "light"}
-                options={{
-                  readOnly: false,
-                  originalEditable: false,
-                  minimap: { enabled: false },
-                  renderSideBySide: true,
-                  renderOverviewRuler: false,
-                  scrollBeyondLastLine: false,
-                  automaticLayout: true,
-                  wordWrap: "on",
-                  scrollbar: {
-                    verticalScrollbarSize: 10,
-                    horizontalScrollbarSize: 10,
-                    alwaysConsumeMouseWheel: false,
-                  },
-                }}
-                onMount={handleEditorDidMount}
-                loading={
-                  <div className='p-4 text-center'>Loading editor...</div>
-                }
-              />
+        <div className='p-2 sm:p-4' onScroll={handleContentScroll}>
+          <div className='space-y-3 sm:space-y-4'>
+            <div
+              className={`h-[60vh] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 ${
+                isMobileScreen ? "sm:h-[65vh]" : "sm:h-[70vh]"
+              } md:h-[500px]`}
+            >
+              {isOpen && (
+                <DiffEditor
+                  key={`diff-editor-${formId}`}
+                  height='100%'
+                  language='json'
+                  original={
+                    originalStructure
+                      ? JSON.stringify(originalStructure, null, 2)
+                      : ""
+                  }
+                  modified={editorValue}
+                  theme={isDarkMode ? "vs-dark" : "light"}
+                  options={{
+                    readOnly: false,
+                    originalEditable: false,
+                    minimap: { enabled: false },
+                    renderSideBySide: !isMobileScreen, // Stack on mobile
+                    renderOverviewRuler: false,
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    wordWrap: "on",
+                    scrollbar: {
+                      verticalScrollbarSize: 10,
+                      horizontalScrollbarSize: 10,
+                      alwaysConsumeMouseWheel: false,
+                    },
+                    lineNumbers: !isMobileScreen ? "on" : "off", // Hide line numbers on mobile
+                    folding: !isMobileScreen, // Disable code folding on mobile
+                    fontSize: isMobileScreen ? 14 : 16, // Smaller font on mobile
+                  }}
+                  onMount={handleEditorDidMount}
+                  loading={
+                    <div className='p-4 text-center'>Loading editor...</div>
+                  }
+                />
+              )}
             </div>
 
-            <div className='text-sm text-gray-600 dark:text-gray-400'>
+            <div className='space-y-2 text-xs text-gray-600 dark:text-gray-400 sm:text-sm'>
               <p>
-                Edit the JSON on the right side. The left side shows the
-                original structure for reference.
+                Edit the JSON{" "}
+                {!isMobileScreen
+                  ? "on the right side. The left side shows the original structure for reference."
+                  : "below to modify your form structure."}
               </p>
+              {isMobileScreen && (
+                <p className='italic'>
+                  Tip: Rotate your device to landscape mode for a better editing
+                  experience.
+                </p>
+              )}
             </div>
           </div>
 
           {aiPromptOpen && (
-            <div className='fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50 p-4 sm:p-6 md:p-8'>
-              <div className='relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-gray-800'>
-                <div className='flex items-center justify-between bg-gray-100 px-4 py-3 dark:bg-gray-700'>
+            <div
+              className='fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50 p-2 sm:p-4 md:p-6'
+              onScroll={handleContentScroll}
+              onClick={() => setAiPromptOpen(false)}
+            >
+              <div
+                className='relative max-h-[95vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-gray-800'
+                onScroll={handleContentScroll}
+                onClick={handleContentClick}
+              >
+                <div className='sticky top-0 z-10 flex items-center justify-between bg-gray-100 px-3 py-2.5 dark:bg-gray-700 sm:px-4 sm:py-3'>
                   <div className='flex items-center'>
-                    <Sparkles className='mr-2 h-5 w-5 text-purple-500' />
-                    <h3 className='font-medium text-gray-900 dark:text-white'>
+                    <Sparkles className='mr-1.5 h-4 w-4 text-purple-500 sm:mr-2 sm:h-5 sm:w-5' />
+                    <h3 className='text-sm font-medium text-gray-900 dark:text-white sm:text-base'>
                       AI Refinement
                     </h3>
                   </div>
@@ -242,23 +403,23 @@ export function RefineFormModal({
                     onClick={() => setAiPromptOpen(false)}
                     className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                   >
-                    <X className='h-5 w-5' />
+                    <X className='h-4 w-4 sm:h-5 sm:w-5' />
                   </button>
                 </div>
 
-                <div className='p-4'>
+                <div className='p-3 sm:p-4'>
                   <form onSubmit={handleAIRefine}>
-                    <div className='mb-4'>
+                    <div className='mb-3 sm:mb-4'>
                       <label
                         htmlFor='prompt'
-                        className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'
+                        className='mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300 sm:text-sm'
                       >
                         How would you like to improve your form?
                       </label>
                       <textarea
                         id='prompt'
-                        rows={5}
-                        className='w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500'
+                        rows={isMobileScreen ? 4 : 5}
+                        className='w-full rounded-md border border-gray-300 px-2.5 py-2 text-xs text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500 sm:px-3 sm:text-sm'
                         placeholder='Example: Add more questions about demographic information, improve the wording of questions on page 2, add more options to multiple choice questions...'
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
@@ -266,24 +427,24 @@ export function RefineFormModal({
                       ></textarea>
                     </div>
 
-                    <div className='mb-4 rounded-md bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'>
+                    <div className='mb-3 rounded-md bg-blue-50 p-2.5 text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 sm:mb-4 sm:p-3 sm:text-sm'>
                       <p>
-                        <Sparkles className='mr-1 inline-block h-4 w-4' /> This
-                        will use 1 AI credit and suggest changes based on your
-                        instructions.
+                        <Sparkles className='mr-1 inline-block h-3.5 w-3.5 sm:h-4 sm:w-4' />{" "}
+                        This will use 1 AI credit and suggest changes based on
+                        your instructions.
                       </p>
                     </div>
 
-                    <div className='mb-4 text-sm text-gray-500 dark:text-gray-400'>
+                    <div className='mb-3 text-xs text-gray-500 dark:text-gray-400 sm:mb-4 sm:text-sm'>
                       {userData?.credits !== undefined
                         ? `Available credits: ${userData.credits}`
                         : "Loading credits..."}
                     </div>
 
-                    <div className='flex flex-col justify-end space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0'>
+                    <div className='flex flex-col justify-end space-y-2 sm:flex-row sm:space-x-3 sm:space-y-0'>
                       <button
                         type='button'
-                        className='w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:w-auto'
+                        className='w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:w-auto sm:px-4 sm:py-2 sm:text-sm'
                         onClick={() => setAiPromptOpen(false)}
                         disabled={isSubmitting}
                       >
@@ -291,18 +452,18 @@ export function RefineFormModal({
                       </button>
                       <button
                         type='submit'
-                        className='flex w-full items-center justify-center rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50 dark:bg-purple-500 dark:hover:bg-purple-600 sm:w-auto'
+                        className='flex w-full items-center justify-center rounded-md bg-purple-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-purple-700 disabled:opacity-50 dark:bg-purple-500 dark:hover:bg-purple-600 sm:w-auto sm:px-4 sm:py-2 sm:text-sm'
                         disabled={isSubmitting || !hasCredits || !prompt.trim()}
                       >
                         {isSubmitting ? (
                           <>
-                            <Loader2 className='mr-2 h-4 w-4 animate-spin' />{" "}
+                            <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin sm:mr-1.5 sm:h-4 sm:w-4' />{" "}
                             Processing...
                           </>
                         ) : (
                           <>
-                            <Sparkles className='mr-2 h-4 w-4' /> Generate
-                            Changes
+                            <Sparkles className='mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4' />{" "}
+                            Generate Changes
                           </>
                         )}
                       </button>
@@ -315,40 +476,42 @@ export function RefineFormModal({
         </div>
 
         {/* Footer */}
-        <div className='flex flex-col items-center justify-between bg-gray-50 px-4 py-3 dark:bg-gray-700 sm:flex-row'>
-          <div className='mb-3 w-full sm:mb-0 sm:w-auto'>
+        <div className='sticky bottom-0 flex flex-col items-center justify-between bg-gray-50 px-3 py-2.5 dark:bg-gray-700 sm:flex-row sm:px-4 sm:py-3'>
+          <div className='mb-2 w-full sm:mb-0 sm:w-auto'>
             {hasCredits && (
               <button
                 onClick={handleOpenAIPrompt}
-                className='inline-flex w-full items-center justify-center rounded bg-purple-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 sm:w-auto'
+                className='inline-flex w-full items-center justify-center rounded bg-purple-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 sm:w-auto sm:px-3 sm:text-sm'
               >
-                <Sparkles className='mr-1 h-4 w-4' />
+                <Sparkles className='mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4' />
                 AI Assist
               </button>
             )}
           </div>
-          <div className='flex w-full flex-col justify-end space-y-3 sm:w-auto sm:flex-row sm:space-x-3 sm:space-y-0'>
+          <div className='flex w-full flex-col justify-end space-y-2 sm:w-auto sm:flex-row sm:space-x-3 sm:space-y-0'>
             <button
               type='button'
-              className='w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:w-auto'
-              onClick={onClose}
+              className='w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:w-auto sm:px-4 sm:py-2 sm:text-sm'
+              onClick={handleClose}
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type='button'
-              className='flex w-full items-center justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 dark:bg-green-500 dark:hover:bg-green-600 sm:w-auto'
+              className='flex w-full items-center justify-center rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50 dark:bg-green-500 dark:hover:bg-green-600 sm:w-auto sm:px-4 sm:py-2 sm:text-sm'
               onClick={handleSaveChanges}
               disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Saving...
+                  <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin sm:mr-1.5 sm:h-4 sm:w-4' />{" "}
+                  Saving...
                 </>
               ) : (
                 <>
-                  <Save className='mr-2 h-4 w-4' /> Save Changes
+                  <Save className='mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4' />{" "}
+                  Save Changes
                 </>
               )}
             </button>

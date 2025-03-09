@@ -102,6 +102,9 @@
 - Added transaction history tracking for AI credit usage with proper recording of successful AI generations and credit purchases.
 - Made saved feedback in the builder more subtle by replacing toast notifications with a green dot indicator on the save button and fixed layout shift issues with buttons.
 - Made form questions and context elements fully responsive with proper sizing for all screen sizes and simplified container structure.
+- Fixed TextModel disposal error in Monaco DiffEditor by improving cleanup sequence and adding safeguards against race conditions during component unmounting.
+- Enhanced RefineModal for mobile devices by optimizing the DiffEditor layout, adding responsive text sizes and spacing, and improving the overall mobile user experience with better touch targets and simplified UI.
+- Improved modal scroll behavior by preventing scroll propagation and implementing proper body scroll lock when modals are open.
 
 # 2024-03-06
 - Fixed form builder persistence issue with auto-save functionality and proper database updates.
