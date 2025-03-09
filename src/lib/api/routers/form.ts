@@ -143,7 +143,7 @@ const getFormRefinementPrompt = (
             "contextElements": [
                 {
                   "type": "paragraph|image|video",
-                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
+                  "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
                 }
             ]
           }
@@ -151,7 +151,7 @@ const getFormRefinementPrompt = (
         "contextElements": [
           {
             "type": "paragraph|image|video",
-            "content": "Detailed text content for the paragraph, and valid URL for image or video"
+            "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
           }
         ]
       }
@@ -161,13 +161,15 @@ const getFormRefinementPrompt = (
   Apply the following refinement instructions to the content: "${userPrompt}"`;
 };
 
-const getFormGenerationPrompt = () => {
+const getFormGenerationPrompt = (prompt: string) => {
   return `You are an expert content creator. Create a comprehensive content based on the user's needs.
         
   Your task is to generate a well-structured JSON content format following these specifications:
+  
+  1. Return a JSON object with this structure:
   {
-    "title": "Form Title",
-    "description": "Form description",
+    "title": "Content Title",
+    "description": "Content description",
     "pages": [
       {
         "title": "Page Title",
@@ -179,28 +181,30 @@ const getFormGenerationPrompt = () => {
             "required": true|false,
             "options": ["Option 1", "Option 2"], // Only for radio/checkbox
             "contextElements": [
-                {
-                  "type": "paragraph|image|video",
-                  "content": "Detailed text content for the paragraph, and valid URL for image or video"
-                }
-            ]
+              {
+                "type": "paragraph|image|video",
+                "content": "Detailed markdowntext content for the paragraph, and valid URL for image or video"
+              }
+        ]
           }
         ],
         "contextElements": [
           {
             "type": "paragraph|image|video",
-            "content": "Detailed text content for the paragraph, and valid URL for image or video"
+            "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
           }
         ]
       }
     ]
   }
   
-  Create a comprehensive form with multiple pages and relevant questions based on the user's requirements.
-  Use a mix of question types (text, radio, checkbox) as appropriate.
-  Ensure the form flows logically and captures all necessary information.
-  Add appropriate context elements (paragraphs, images) to guide the user.
-  `;
+  2. Make sure to create a logical flow of content across multiple pages
+  3. Use appropriate question types (text, radio, checkbox) for different question scenarios
+  4. Add context elements (detailed paragraphs, images/videos) to provide context where needed
+  5. For each page, include a clear title and description
+  6. Design the content that satisfies the user's prompt
+  
+  Generate a complete content structure based on this prompt: "${prompt}"`;
 };
 
 const handleAiCreditRefund = async (userId: string, errorMessage: string) => {
@@ -414,7 +418,7 @@ export const formRouter = createTRPCRouter({
         const { prompt, title, description } = input;
 
         // Get system prompt for AI
-        const systemPrompt = getFormGenerationPrompt();
+        const systemPrompt = getFormGenerationPrompt(prompt);
 
         // Call the AI to generate the form
         const aiResponse = await generateChatCompletion(
@@ -437,7 +441,7 @@ export const formRouter = createTRPCRouter({
         // Create the form with the AI-generated structure
         const form = await db.form.create({
           data: {
-            title: title || formStructure.title || "Generated Form",
+            title: title || formStructure.title || "Generated Content",
             description: description || formStructure.description || "",
             userId,
             status: "draft",
