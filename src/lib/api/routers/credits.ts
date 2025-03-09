@@ -3,6 +3,29 @@ import { createTRPCRouter, protectedProcedure } from "@/lib/api/trpc";
 import { db } from "@/lib/db";
 import { TRPCError } from "@trpc/server";
 import { CreditTransactionType } from "@/lib/types";
+import { cache } from "react";
+
+// Cache the database query for 10 seconds
+const getCachedUserCredits = cache(async (userId: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      credits: true,
+      lastCreditReset: true,
+    },
+  });
+
+  if (!user) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "User not found",
+    });
+  }
+
+  return user;
+});
 
 // Define credit package schema
 const creditPackageSchema = z.object({
@@ -25,25 +48,7 @@ export const creditsRouter = createTRPCRouter({
   // Get current user's credit information
   getCredits: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-
-    const user = await db.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        credits: true,
-        lastCreditReset: true,
-      },
-    });
-
-    if (!user) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "User not found",
-      });
-    }
-
-    return user;
+    return getCachedUserCredits(userId);
   }),
 
   // For backward compatibility

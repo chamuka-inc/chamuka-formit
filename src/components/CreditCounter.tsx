@@ -10,11 +10,12 @@ export function CreditCounter() {
     isLoading,
     refetch,
   } = api.credits.getCredits.useQuery(undefined, {
-    refetchOnWindowFocus: true,
-    refetchInterval: 10000, // Refetch every 10 seconds
+    refetchOnWindowFocus: false,
+    refetchInterval: 30000, // Reduced to 30 seconds
     refetchOnMount: true,
     refetchOnReconnect: true,
-    staleTime: 5000, // Consider data stale after 5 seconds
+    staleTime: 25000, // Increased stale time to 25 seconds
+    gcTime: 1000 * 60 * 5, // Garbage collection after 5 minutes
   });
 
   if (isLoading) {
