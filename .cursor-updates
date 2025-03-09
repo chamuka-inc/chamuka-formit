@@ -136,3 +136,6 @@
 # 2024-06-19
 - Fixed form title and description persistence in RefineModal by ensuring changes made to the JSON structure are also synchronized to the main form fields in the database.
 - Enhanced form display by adding form title and description at the top of both preview and public form views, with proper styling and dark mode support.
+
+# 2024-06-20
+- Fixed tRPC query options in CreditCounter by replacing deprecated `cacheTime` with `gcTime` property
