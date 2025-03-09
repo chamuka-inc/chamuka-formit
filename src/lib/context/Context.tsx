@@ -8,15 +8,9 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import {
-  FormContextType,
-  FormPage,
-  Question,
-  FormState,
-  FormAction,
-} from "../types";
+import { FormContextType, FormPage, Question } from "../types";
 import { formReducer, initialState } from "./Reducer";
-import { createHistoryReducer, HistoryState } from "./History";
+import { createHistoryReducer } from "./History";
 import { createStorageManager } from "./Storage";
 import { formSelectors } from "./Selectors";
 
@@ -42,8 +36,6 @@ export const FormContextProvider = ({
   initialTitle?: string;
   initialDescription?: string;
 }) => {
-  console.log("FormContextProvider initialPages:", initialPages);
-
   const [history, dispatch] = useReducer(createHistoryReducer(formReducer), {
     past: [],
     present: {
@@ -63,13 +55,8 @@ export const FormContextProvider = ({
   });
 
   const state = history.present;
-  console.log("FormContext state:", state);
 
   useEffect(() => {
-    console.log(
-      "FormContext useEffect initialPages.length:",
-      initialPages.length,
-    );
     if (initialPages.length > 0) {
       // If we have initialPages, load them directly
       loadForm(initialPages);
@@ -194,7 +181,6 @@ export const FormContextProvider = ({
   }, []);
 
   const setupSampleForm = () => {
-    console.log("Setting up sample form");
     const samplePages: FormPage[] = [
       {
         title: "Customer Feedback Form - Introduction",

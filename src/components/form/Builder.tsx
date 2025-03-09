@@ -52,12 +52,10 @@ const FormBuilderContent = ({ hideHeader = false }) => {
   // Mutations for saving and publishing
   const saveFormDataMutation = api.form.saveFormData.useMutation({
     onSuccess: (data) => {
-      console.log("Form data saved successfully:", data);
       setLastSaved(new Date());
       setIsSaving(false);
     },
     onError: (error) => {
-      console.error("Error saving form data:", error);
       setIsSaving(false);
       toast.error(`Error saving form data: ${error.message}`);
     },
@@ -180,9 +178,7 @@ const FormBuilderContent = ({ hideHeader = false }) => {
     // Skip saving during initial render or if already saving
     if (!formId || pages.length === 0 || isSaving) return;
 
-    console.log("Pages changed, scheduling autosave...");
     const timeoutId = setTimeout(() => {
-      console.log("Executing autosave...");
       // Create a function reference to avoid dependency issues
       const saveData = () => {
         const formData = {
@@ -487,8 +483,6 @@ export const FormBuilder = ({
   initialPages?: FormPage[];
   hideHeader?: boolean;
 }) => {
-  console.log("FormBuilder initialPages:", initialPages);
-
   // Ensure initialPages has the correct structure
   const validatedPages = initialPages.map((page) => ({
     title: page.title || "Untitled Page",

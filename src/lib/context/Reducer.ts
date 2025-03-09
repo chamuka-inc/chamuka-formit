@@ -20,8 +20,6 @@ export function formReducer(
   state: FormState = initialState,
   action: FormAction,
 ): FormState {
-  console.log("FormReducer action:", action.type, action);
-
   // Validate action before processing
   const actionErrors = validateAction(state, action);
   if (actionErrors.length > 0) {
@@ -43,8 +41,6 @@ export function formReducer(
       break;
 
     case "LOAD_SURVEY":
-      console.log("LOAD_SURVEY payload:", action.payload);
-
       // Ensure we have valid pages with required properties
       const validatedPages = action.payload.map((page) => ({
         title: page.title || "Untitled Page",
@@ -67,7 +63,6 @@ export function formReducer(
         isLoading: false,
         error: null,
       };
-      console.log("LOAD_SURVEY newState:", newState);
       break;
 
     case "ADD_PAGE":
@@ -107,11 +102,13 @@ export function formReducer(
     }
 
     case "SELECT_PAGE":
+      // For page navigation, we'll update the state even if there are validation errors
       newState = {
         ...state,
         currentPageIndex: action.payload,
       };
-      break;
+      // Return immediately for SELECT_PAGE action to bypass validation
+      return newState;
 
     case "MOVE_PAGE": {
       const { fromIndex, toIndex } = action.payload;
@@ -215,6 +212,5 @@ export function formReducer(
     };
   }
 
-  console.log("FormReducer returning newState:", newState);
   return newState;
 }
