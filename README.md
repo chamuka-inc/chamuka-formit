@@ -1,131 +1,137 @@
-# 🚀 Next.js Modern Stack Template
+# 🎯 Chamuka FormIt - Modern Form Builder
 
-A Next.js template that combines commonly used tools and libraries for building full-stack web applications. This stack is specifically designed to be optimized for AI coding assistants like Cursor.
+A modern form builder application built with Next.js 14, designed to create, manage, and collect responses for surveys and forms.
 
-## 🎯 Overview
+## ✨ Product Features
 
-This template includes [Next.js 14](https://nextjs.org/) with the App Router, [Supabase](https://supabase.com) for the database, [Resend](https://resend.com) for transactional emails, and optional integrations with various AI providers and AWS services.
+### 📋 Form Management
+- Multi-page form creation and management
+- Three question types supported:
+  - Text input
+  - Single choice (radio)
+  - Multiple choice (checkbox)
+- Draft, publish, and archive form states
+- Public share links for form distribution
+- Form analytics and submission tracking
+- Context elements support (paragraphs, images, videos)
 
-> ⚠️ **Note**: This is my personal template with tools that I personally have experience with and think are solid options for building modern full-stack web application. Your preferences very likely differ, so feel free to fork and modify it for your own use. I won't be accepting pull requests for additional features, but I'll be happy to help you out if you have any questions.
+### 👤 User Management
+- Secure authentication with email/password
+- Role-based access control (User/Admin)
+- Credit system for premium features
+- Email verification and password reset
 
-## ✨ Features
+### 💼 Form Builder Features
+- Drag-and-drop form builder interface
+- Real-time form preview
+- Required field validation
+- Question context elements for additional information
+- Form submission data export to CSV
+- IP and user agent tracking for submissions
 
-### 🏗️ Core Architecture
+## 🛠️ Technical Stack
 
-- [**Next.js 14**](https://nextjs.org/) - React framework with App Router
-- [**TypeScript**](https://www.typescriptlang.org/) - Type safety throughout
-- [**tRPC**](https://trpc.io/) - End-to-end type-safe APIs
-- [**Prisma**](https://www.prisma.io/) - Database ORM and schema management
-- [**NextAuth.js**](https://next-auth.js.org/) - Authentication with Prisma adapter
-- [**Supabase**](https://supabase.com) - Postgres database with realtime and auth
+### Core Technologies
+- **Frontend**: Next.js 14 with App Router and React 19
+- **Backend**: tRPC for end-to-end type-safe APIs
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: NextAuth.js
+- **Styling**: Tailwind CSS with dark mode support
+- **State Management**: React Query with tRPC
 
-### 🎨 UI & Styling
+### Key Libraries & Tools
+- **UI Components**: Custom Tailwind components
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Notifications**: React Toastify
+- **Date Handling**: Date-fns
+- **Markdown Support**: React Markdown
+- **Email**: Resend for transactional emails
+- **Background Jobs**: Inngest
 
-- [**Tailwind CSS**](https://tailwindcss.com/) - Utility-first CSS framework
-- [**Framer Motion**](https://www.framer.com/motion/) - Animation library
-- [**Lucide Icons**](https://lucide.dev/) - Icon set
-- Dark mode with Tailwind CSS
-
-### 🛠️ Development Tools
-
-- [**Storybook**](https://storybook.js.org/) - Component development environment
-- [**Geist Font**](https://vercel.com/font) - Typography by Vercel
-
-### 🤖 AI & Background Jobs
-
-- Multiple AI integrations available:
-  - [OpenAI](https://openai.com) - GPT-4 and o-series models
-  - [Anthropic](https://anthropic.com) - Sonnet-3.5
-  - [Perplexity](https://perplexity.ai) - Web search models
-  - [Groq](https://groq.com) - Fast inference
-- [**Inngest**](https://www.inngest.com/) - Background jobs and scheduled tasks
-
-### 🔧 Infrastructure & Services
-
-- [**Resend**](https://resend.com) - Email delivery
-- [**AWS S3**](https://aws.amazon.com/s3/) - File storage
-- [**Supabase**](https://supabase.com) - Primary database
-  (Note that I don't directly use the supabase client in this template, so you can switch out supabase with other database providers via the DATABASE_URL and DIRECT_URL environment variables.)
-
-### 🔔 Additional Features
-
-- [**react-toastify**](https://fkhadra.github.io/react-toastify/) - Toast notifications
-- Utility functions for common operations
-- TypeScript and ESLint configuration included
+### Development & Quality
+- TypeScript with strict mode
+- ESLint & Prettier configuration
+- Automated testing setup
 
 ## 🚀 Getting Started
 
-1. Fork this repository
-2. Install dependencies:
+1. Clone the repository:
+```bash
+git clone https://github.com/swiftugandan/chamuka-formit.git
+cd chamuka-formit
+```
 
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Copy `.env.example` to `.env` and configure your environment variables
-4. Set up your database:
+3. Set up your environment:
+- Copy `.env.example` to `.env`
+- Configure the required variables:
+  ```env
+  # Database
+  DATABASE_URL="postgresql://..."
+  
+  # Authentication
+  NEXTAUTH_SECRET="your-secret-here"
+  NEXTAUTH_URL="http://localhost:3000"
+  
+  # Email (Resend)
+  RESEND_API_KEY="re_..."
+  ```
 
+4. Initialize the database:
 ```bash
+npx prisma generate
 npx prisma migrate dev
 ```
 
 5. Start the development server:
-
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see your app.
+Visit [http://localhost:3000](http://localhost:3000) to start using the application.
 
-## 📁 Project Structure
+## 📦 Deployment
 
-- `app/` - Next.js app router pages and API routes
-- `src/`
-  - `components/` - UI components
-  - `lib/` - Utilities and configurations
-    - `api/` - tRPC routers
-    - `utils/` - Shared utilities
-  - `stories/` - Storybook files
-- `prisma/` - Database schema
+### Prerequisites
+- PostgreSQL database (recommended: Supabase)
+- Vercel account for hosting
+- Resend account for transactional emails
 
-## 🚀 Deployment
-
-This template is optimized for deployment on [Vercel](https://vercel.com).
-
-### Database Setup
-
-1. Create a new Supabase project at [supabase.com](https://supabase.com)
-2. Get your database connection strings from Supabase:
-   - Project Settings → Database
-   - Copy both the URI (for `DATABASE_URL`) and Direct Connection (for `DIRECT_URL`)
-
-### Vercel Setup
+### Deployment Steps
 
 1. Push your code to GitHub
-2. Go to [vercel.com/new](https://vercel.com/new)
-3. Import your repository
-4. Configure the following environment variables:
-   - `DATABASE_URL` - Your Supabase database URL
-   - `DIRECT_URL` - Your Supabase direct connection URL
-   - `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
-   - `NEXTAUTH_URL` - Your production URL (e.g., https://your-app.vercel.app)
-   - Add any other variables from `.env.example` that you're using
-5. Deploy!
 
-### Post-Deployment
+2. Deploy on Vercel:
+   - Connect your repository on [vercel.com/new](https://vercel.com/new)
+   - Configure environment variables from your `.env`
+   - Enable the Vercel PostgreSQL integration (optional)
+   - Deploy the project
 
-1. Run database migrations in the Vercel deployment:
-
+3. Set up the database:
 ```bash
-npx vercel env pull .env.production.local  # Pull production env vars
-npx prisma migrate deploy                  # Deploy migrations to production
+npx prisma migrate deploy
 ```
 
-2. Set up your custom domain in Vercel (optional):
-   - Go to your project settings
-   - Navigate to Domains
-   - Add your domain and follow the DNS configuration instructions
+4. Configure additional services:
+   - Set up Resend for transactional emails
+   - Configure authentication settings
+   - Set up background jobs with Inngest
 
-## 📝 License
+### Production Checklist
+- [ ] Configure custom domain and SSL certificates
+- [ ] Set up rate limiting
+- [ ] Configure monitoring
+- [ ] Set up automated database backups
+- [ ] Configure proper CORS settings
+- [ ] Test all form submissions
+- [ ] Verify email functionality
+- [ ] Review security headers
 
-MIT License
+---
+
+Built with ❤️ using Next.js and modern web technologies. For support, please [open an issue](https://github.com/swiftugandan/chamuka-formit/issues).
