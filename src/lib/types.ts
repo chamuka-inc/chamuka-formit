@@ -28,6 +28,8 @@ export interface FormState {
   previewPageIndex: number;
   isLoading: boolean;
   error: string | null;
+  title?: string;
+  description?: string;
   loadingStates: {
     savingPage: boolean;
     savingQuestion: boolean;
