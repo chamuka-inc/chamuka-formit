@@ -2,15 +2,11 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { db } from "@/lib/db";
 import { TRPCError } from "@trpc/server";
-import {
-  parseJsonResponse,
-  generateChatCompletion,
-  generateGeminiWebResponse,
-} from "@/lib/aiClient";
 import { aiCreditCheck } from "../middleware/creditCheck";
 import { CreditTransactionType } from "@/lib/types";
 import { randomUUID } from "crypto";
 import { Prisma, FormStatus } from "@prisma/client";
+import { getEdgeAuthHeaders } from "@/lib/auth/edgeAuth";
 
 // Define types for form data structure
 interface ContextElement {
@@ -468,28 +464,34 @@ export const formRouter = createTRPCRouter({
         const userId = ctx.session.user.id;
         const { prompt, title, description } = input;
 
-        // Get system prompt for AI
-        const systemPrompt = getFormGenerationPrompt(prompt);
-
-        // Call the AI to generate the form
-        const aiResponse = await generateGeminiWebResponse(
-          [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: prompt },
-          ],
-          "GEMINI_FLASH_WEB",
+        // Call the Edge API for AI generation
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL}/api/ai/generate`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getEdgeAuthHeaders(),
+            },
+            body: JSON.stringify({ prompt, title, description }),
+          },
         );
-        console.log("aiResponse: ", aiResponse);
-        // Parse the AI response into a JSON structure
-        const formStructure = parseJsonResponse(
-          aiResponse.text,
-        ) as unknown as FormData;
+
+        if (!response.ok) {
+          throw new Error("Failed to generate form with AI");
+        }
+
+        const {
+          formStructure,
+          title: generatedTitle,
+          description: generatedDescription,
+        } = await response.json();
 
         // Create the form with the AI-generated structure
         const form = await db.form.create({
           data: {
-            title: title || formStructure.title || "Generated Content",
-            description: description || formStructure.description || "",
+            title: generatedTitle,
+            description: generatedDescription,
             userId,
             status: "draft",
             data: toPrismaJson(formStructure),
@@ -525,7 +527,7 @@ export const formRouter = createTRPCRouter({
       }
     }),
 
-  // Refine form with AI (This is not used at the moment)
+  // Refine form with AI
   refineWithAI: protectedProcedure
     .input(refineFormSchema)
     .use(aiCreditCheck)
@@ -538,22 +540,24 @@ export const formRouter = createTRPCRouter({
         const existingForm = await verifyFormOwnership(id, userId);
         const existingData = existingForm.data as unknown as FormData;
 
-        // Generate system prompt for refinement
-        const systemPrompt = getFormRefinementPrompt(existingData, prompt);
-
-        // Call the AI to refine the form
-        const aiResponse = await generateGeminiWebResponse(
-          [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: prompt },
-          ],
-          "GEMINI_FLASH_WEB",
+        // Call the Edge API for AI refinement
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL}/api/ai/refine`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getEdgeAuthHeaders(),
+            },
+            body: JSON.stringify({ existingData, prompt }),
+          },
         );
 
-        // Parse the AI response into a JSON structure
-        const refinedFormStructure = parseJsonResponse(
-          aiResponse.text,
-        ) as unknown as FormData;
+        if (!response.ok) {
+          throw new Error("Failed to refine form with AI");
+        }
+
+        const { structure: refinedFormStructure } = await response.json();
 
         // Update the form with the refined data
         const updatedForm = await db.form.update({
@@ -616,22 +620,24 @@ export const formRouter = createTRPCRouter({
         const existingForm = await verifyFormOwnership(id, userId);
         const existingData = existingForm.data as unknown as FormData;
 
-        // Generate system prompt for refinement preview
-        const systemPrompt = getFormRefinementPrompt(existingData, prompt);
-
-        // Call the AI to refine the form
-        const aiResponse = await generateGeminiWebResponse(
-          [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: prompt },
-          ],
-          "GEMINI_FLASH_WEB",
+        // Call the Edge API for AI refinement
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL}/api/ai/refine`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getEdgeAuthHeaders(),
+            },
+            body: JSON.stringify({ existingData, prompt }),
+          },
         );
 
-        // Parse the AI response into a JSON structure
-        const refinedFormStructure = parseJsonResponse(
-          aiResponse.text,
-        ) as unknown as FormData;
+        if (!response.ok) {
+          throw new Error("Failed to preview form refinement with AI");
+        }
+
+        const { structure: refinedFormStructure } = await response.json();
 
         // Record the AI refinement transaction
         await db.creditTransaction.create({
