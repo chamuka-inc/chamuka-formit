@@ -4,6 +4,8 @@ import { uploadFile } from "@/lib/storage";
 // Add runtime configuration
 export const runtime = "edge";
 
+export const maxDuration = 60; // This function can run for a maximum of 60 seconds
+
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();

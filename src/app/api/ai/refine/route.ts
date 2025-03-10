@@ -4,6 +4,8 @@ import { verifyEdgeRequest } from "@/lib/auth/edgeAuth";
 
 export const runtime = "edge";
 
+export const maxDuration = 60; // This function can run for a maximum of 60 seconds
+
 export async function POST(req: NextRequest) {
   try {
     // Verify the request is from our own application

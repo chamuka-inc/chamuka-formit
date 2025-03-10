@@ -49,9 +49,19 @@ import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Custom type for Gemini API request
-interface GeminiGroundedResponse {
+interface GeminiResponse {
   text: string;
   sourceLink?: string;
+}
+
+interface GeminiMetadata {
+  candidates?: Array<{
+    groundingMetadata?: {
+      searchEntryPoint?: {
+        renderedContent?: string;
+      };
+    };
+  }>;
 }
 
 type AIClientType = {
@@ -98,6 +108,69 @@ function getClientForModel(model: AIModel): AIClientResponse {
 }
 
 /**
+ * Cleans up text by removing markdown code block markers
+ */
+function cleanMarkdownFormatting(text: string): string {
+  return text
+    .replace(/```json\n?/g, "")
+    .replace(/```\n?/g, "")
+    .trim();
+}
+
+/**
+ * Extracts JSON object from text if it exists
+ */
+function extractJsonFromText(text: string): string | null {
+  if (text.startsWith("{")) {
+    return text;
+  }
+
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  return jsonMatch ? jsonMatch[0] : null;
+}
+
+/**
+ * Extracts source link from Gemini response metadata
+ */
+function extractSourceLink(metadata: GeminiMetadata): string | undefined {
+  return metadata.candidates?.[0]?.groundingMetadata?.searchEntryPoint?.renderedContent;
+}
+
+/**
+ * Attempts to parse JSON from various text formats
+ */
+function parseJsonFromText(text: string): any {
+  // Try direct parsing first
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    // Try finding a single JSON object
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[0]);
+      } catch (innerError) {
+        console.error("Failed to parse JSON from match:", innerError);
+      }
+    }
+
+    // Try finding multiple JSON objects
+    const jsonLikeMatches = text.match(/\{[\s\S]*\}/g);
+    if (jsonLikeMatches) {
+      for (const match of jsonLikeMatches) {
+        try {
+          return JSON.parse(match);
+        } catch (innerError) {
+          continue;
+        }
+      }
+    }
+
+    throw new Error("No valid JSON found in response");
+  }
+}
+
+/**
  * Generates a response from Gemini models with optional web grounding.
  * @param messages Array of message objects with role and content
  * @param model The Gemini model to use
@@ -108,7 +181,7 @@ export async function generateGeminiWebResponse(
   messages: Array<{ role: "user" | "system" | "assistant"; content: string }>,
   model: AIModel = "GEMINI_FLASH_WEB",
   ground = true,
-): Promise<GeminiGroundedResponse> {
+): Promise<GeminiResponse> {
   const modelId = AI_MODELS[model];
   const geminiModel = genAI.getGenerativeModel({
     model: modelId,
@@ -116,22 +189,19 @@ export async function generateGeminiWebResponse(
     tools: ground ? [{ googleSearch: {} }] : undefined,
   });
 
-  // Convert messages to Gemini format
   const prompt = messages.map((m) => m.content).join("\n");
-
   const result = await geminiModel.generateContent(prompt);
   const response = await result.response;
-  const text = response.text();
-
-  let sourceLink: string | undefined = undefined;
-  if (
-    ground &&
-    response.candidates?.[0]?.groundingMetadata?.searchEntryPoint
-      ?.renderedContent
-  ) {
-    sourceLink =
-      response.candidates[0].groundingMetadata.searchEntryPoint.renderedContent;
+  
+  let text = response.text();
+  text = cleanMarkdownFormatting(text);
+  
+  const extractedJson = extractJsonFromText(text);
+  if (extractedJson) {
+    text = extractedJson;
   }
+
+  const sourceLink = ground ? extractSourceLink(response) : undefined;
 
   return {
     text,
@@ -140,24 +210,8 @@ export async function generateGeminiWebResponse(
 }
 
 export function parseJsonResponse(response: string): any {
-  // First try parsing the response directly
-  try {
-    return JSON.parse(response);
-  } catch (e) {
-    // If direct parsing fails, look for code blocks
-    const codeBlockRegex = /```(?:json|[^\n]*\n)?([\s\S]*?)```/;
-    const match = response.match(codeBlockRegex);
-
-    if (match && match[1]) {
-      try {
-        return JSON.parse(match[1].trim());
-      } catch (innerError) {
-        throw new Error("Failed to parse JSON from code block");
-      }
-    }
-
-    throw new Error("No valid JSON found in response");
-  }
+  const cleanedResponse = cleanMarkdownFormatting(response);
+  return parseJsonFromText(cleanedResponse);
 }
 
 export async function generateChatCompletion(

@@ -4,6 +4,8 @@ import Groq from "groq-sdk";
 // Add runtime configuration
 export const runtime = "edge";
 
+export const maxDuration = 60; // This function can run for a maximum of 60 seconds
+
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY! ?? "",
 });
