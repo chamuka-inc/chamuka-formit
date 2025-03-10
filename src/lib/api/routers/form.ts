@@ -92,6 +92,13 @@ const applyRefinementSchema = z.object({
   ),
 });
 
+// Add pagination and search input schema
+const getAllFormsSchema = z.object({
+  page: z.number().min(1).default(1),
+  limit: z.number().min(1).max(100).default(9),
+  search: z.string().optional(),
+});
+
 // Helper functions
 const verifyFormOwnership = async (formId: string, userId: string) => {
   const form = await db.form.findUnique({
@@ -245,24 +252,64 @@ export const formRouter = createTRPCRouter({
       });
     }),
 
-  // Get all forms for the current user
-  getAll: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id;
+  // Get all forms for the current user with pagination and search
+  getAll: protectedProcedure
+    .input(getAllFormsSchema)
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const skip = (input.page - 1) * input.limit;
 
-    return db.form.findMany({
-      where: { userId },
-      orderBy: { updatedAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-        publicShareToken: true,
-      },
-    });
-  }),
+      const where: Prisma.FormWhereInput = {
+        userId,
+        ...(input.search
+          ? {
+              OR: [
+                {
+                  title: {
+                    contains: input.search,
+                    mode: Prisma.QueryMode.insensitive,
+                  },
+                },
+                {
+                  description: {
+                    contains: input.search,
+                    mode: Prisma.QueryMode.insensitive,
+                  },
+                },
+              ],
+            }
+          : {}),
+      };
+
+      const [forms, total] = await Promise.all([
+        db.form.findMany({
+          where,
+          orderBy: { updatedAt: "desc" },
+          skip,
+          take: input.limit,
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+            publicShareToken: true,
+          },
+        }),
+        db.form.count({ where }),
+      ]);
+
+      return {
+        forms,
+        pagination: {
+          total,
+          pageCount: Math.ceil(total / input.limit),
+          page: input.page,
+          limit: input.limit,
+        },
+      };
+    }),
 
   // Get a form by ID (protected - only owner can access)
   getById: protectedProcedure
