@@ -201,7 +201,7 @@ const FormNavigation = ({
   };
 
   return (
-    <div className='flex items-center justify-between gap-4 border-t border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50 sm:px-8 sm:py-4'>
+    <div className='flex items-center justify-between gap-4 border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50 sm:px-8 sm:py-4'>
       <button
         onClick={onPrevious}
         disabled={currentPageIndex === 0}
@@ -215,21 +215,42 @@ const FormNavigation = ({
         <span className='hidden sm:inline'>Previous</span>
       </button>
 
-      <div className='hidden items-center gap-1.5 md:flex'>
-        {pages.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => handlePageDotClick(idx)}
-            className={`h-2.5 w-2.5 rounded-full transition-all ${
-              idx === currentPageIndex
-                ? "scale-125 bg-blue-500"
-                : idx < currentPageIndex
-                  ? "bg-green-500"
-                  : "bg-gray-300 dark:bg-gray-600"
-            }`}
-            aria-label={`Go to page ${idx + 1}`}
-          />
-        ))}
+      <div className='hidden items-center gap-2.5 md:flex'>
+        {pages.map((_, idx) => {
+          const isCurrent = idx === currentPageIndex;
+          const isCompleted = idx < currentPageIndex;
+          return (
+            <button
+              key={idx}
+              onClick={() => handlePageDotClick(idx)}
+              className={`group relative flex h-6 w-6 items-center justify-center rounded-full transition-all ${
+                isCurrent
+                  ? "bg-blue-100 dark:bg-blue-900/30"
+                  : isCompleted
+                    ? "bg-blue-50 dark:bg-blue-900/20"
+                    : "bg-gray-100 dark:bg-gray-800"
+              }`}
+              aria-label={`Go to page ${idx + 1}`}
+            >
+              <span
+                className={`h-2.5 w-2.5 rounded-full transition-all ${
+                  isCurrent
+                    ? "bg-blue-500"
+                    : isCompleted
+                      ? "bg-blue-400"
+                      : "bg-gray-300 dark:bg-gray-600"
+                }`}
+              />
+              {idx < pages.length - 1 && (
+                <span
+                  className={`absolute left-[24px] h-0.5 w-3 ${
+                    isCompleted ? "bg-blue-400" : "bg-gray-200 dark:bg-gray-700"
+                  }`}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <button
@@ -237,7 +258,7 @@ const FormNavigation = ({
         disabled={isSubmitting && !isPreview}
         className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:gap-2 sm:px-6 sm:py-2.5 ${
           isLastPage
-            ? "bg-green-500 text-white hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
+            ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
             : "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
         } ${isSubmitting && !isPreview ? "cursor-not-allowed opacity-70" : ""}`}
       >
@@ -664,6 +685,19 @@ export default function FormRenderer({
 
           {/* Page Content */}
           <div className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800'>
+            {/* Navigation Header - Moved from footer to top */}
+            <FormNavigation
+              currentPageIndex={currentPageIndex}
+              totalPages={totalPages}
+              isSubmitting={isSubmitting}
+              isPreview={isPreview}
+              onPrevious={goToPrevPage}
+              onNext={goToNextPage}
+              onSubmit={handleSubmit}
+              pages={pages}
+              setPageIndex={setCurrentPageIndex}
+            />
+
             <div className='p-5 sm:p-8'>
               <div className='mb-8 border-b border-gray-100 pb-4 dark:border-gray-700'>
                 <div className='flex items-center gap-2 sm:gap-3'>
@@ -749,19 +783,6 @@ export default function FormRenderer({
                 )}
               </div>
             </div>
-
-            {/* Navigation Footer */}
-            <FormNavigation
-              currentPageIndex={currentPageIndex}
-              totalPages={totalPages}
-              isSubmitting={isSubmitting}
-              isPreview={isPreview}
-              onPrevious={goToPrevPage}
-              onNext={goToNextPage}
-              onSubmit={handleSubmit}
-              pages={pages}
-              setPageIndex={setCurrentPageIndex}
-            />
           </div>
         </div>
       </div>

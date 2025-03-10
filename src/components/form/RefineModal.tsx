@@ -347,7 +347,7 @@ export function RefineFormModal({
                     renderOverviewRuler: false,
                     scrollBeyondLastLine: false,
                     automaticLayout: true,
-                    wordWrap: "on",
+                    //wordWrap: "on",
                     scrollbar: {
                       verticalScrollbarSize: 10,
                       horizontalScrollbarSize: 10,
