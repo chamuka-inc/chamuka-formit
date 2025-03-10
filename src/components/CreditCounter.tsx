@@ -32,7 +32,7 @@ export function CreditCounter() {
       <div className='flex items-center gap-1'>
         <Sparkles className='h-4 w-4 text-amber-500' />
         <span className='font-medium'>
-          {credits?.credits ?? 0} Generations Left
+          {credits?.credits ?? 0} Credits Left
         </span>
       </div>
       <Link href='/credits' className='text-xs text-blue-500 hover:underline'>
