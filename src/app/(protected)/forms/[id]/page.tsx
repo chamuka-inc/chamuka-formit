@@ -12,7 +12,7 @@ export default function FormPage() {
 
   return (
     <div className='min-h-screen bg-gray-50 py-12 dark:bg-gray-900'>
-      <ToastContainer position='top-right' autoClose={5000} />
+      <ToastContainer position='bottom-right' autoClose={5000} />
       <FormRenderer formToken={id} />
     </div>
   );
