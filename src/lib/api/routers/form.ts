@@ -6,7 +6,7 @@ import { aiCreditCheck } from "../middleware/creditCheck";
 import { CreditTransactionType } from "@/lib/types";
 import { randomUUID } from "crypto";
 import { Prisma, FormStatus } from "@prisma/client";
-import { getEdgeAuthHeaders } from "@/lib/auth/edgeAuth";
+import { makeEdgeRequest } from "@/lib/utils/api";
 
 // Define types for form data structure
 interface ContextElement {
@@ -118,102 +118,6 @@ const verifyFormOwnership = async (formId: string, userId: string) => {
   return form;
 };
 
-const getFormRefinementPrompt = (
-  existingData: FormData,
-  userPrompt: string,
-) => {
-  return `You are an expert content designer. Refine an existing content based on the user's instructions.
-        
-  Your task is to analyze the existing content structure and refine it according to the provided instructions.
-  
-  Here's the existing content structure:
-  ${JSON.stringify(existingData, null, 2)}
-  
-  Follow these guidelines:
-  1. Preserve the overall structure of the content
-  2. Make targeted improvements based on the user's instructions
-  3. Improve content clarity, organization, and flow
-  4. Return the complete refined content JSON with the same structure:
-  {
-    "title": "Content Title",
-    "description": "Content description",
-    "pages": [
-      {
-        "title": "Page Title",
-        "description": "Optional page description",
-        "questions": [
-          {
-            "type": "text|radio|checkbox",
-            "text": "Question text",
-            "required": true|false,
-            "options": ["Option 1", "Option 2"], // Only for radio/checkbox
-            "contextElements": [
-                {
-                  "type": "paragraph|image|video",
-                  "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
-                }
-            ]
-          }
-        ],
-        "contextElements": [
-          {
-            "type": "paragraph|image|video",
-            "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
-          }
-        ]
-      }
-    ]
-  }
-  
-  Apply the following refinement instructions to the content: "${userPrompt}"`;
-};
-
-const getFormGenerationPrompt = (prompt: string) => {
-  return `You are an expert content creator. Create a comprehensive content based on the user's needs.
-        
-  Your task is to generate a well-structured JSON content format following these specifications:
-  
-  1. Return a JSON object with this structure:
-  {
-    "title": "Content Title",
-    "description": "Content description",
-    "pages": [
-      {
-        "title": "Page Title",
-        "description": "Optional page description",
-        "questions": [
-          {
-            "type": "text|radio|checkbox",
-            "text": "Question text",
-            "required": true|false,
-            "options": ["Option 1", "Option 2"], // Only for radio/checkbox
-            "contextElements": [
-              {
-                "type": "paragraph|image|video",
-                "content": "Detailed markdowntext content for the paragraph, and valid URL for image or video"
-              }
-        ]
-          }
-        ],
-        "contextElements": [
-          {
-            "type": "paragraph|image|video",
-            "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
-          }
-        ]
-      }
-    ]
-  }
-  
-  2. Make sure to create a logical flow of content across multiple pages
-  3. Use appropriate question types (text, radio, checkbox) for different question scenarios
-  4. Add context elements (detailed paragraphs, images/videos) to provide context where needed
-  5. For each page, include a clear title and description
-  6. Design the content that satisfies the user's prompt
-  
-  Generate a complete content structure based on this prompt: "${prompt}"`;
-};
-
 const handleAiCreditRefund = async (userId: string, errorMessage: string) => {
   try {
     await db.user.update({
@@ -228,6 +132,25 @@ const handleAiCreditRefund = async (userId: string, errorMessage: string) => {
 // Helper to convert data to Prisma-compatible JSON
 const toPrismaJson = <T>(data: T): Prisma.InputJsonValue => {
   return data as unknown as Prisma.InputJsonValue;
+};
+
+// AI-related functions
+const generateFormWithAI = async (
+  prompt: string,
+  title?: string,
+  description?: string,
+) => {
+  return makeEdgeRequest<{
+    formStructure: FormData;
+    title: string;
+    description: string;
+  }>("/api/ai/generate", { prompt, title, description });
+};
+
+const refineFormWithAI = async (existingData: FormData, prompt: string) => {
+  return makeEdgeRequest<{
+    structure: FormData;
+  }>("/api/ai/refine", { existingData, prompt });
 };
 
 // Export the form router
@@ -464,28 +387,11 @@ export const formRouter = createTRPCRouter({
         const userId = ctx.session.user.id;
         const { prompt, title, description } = input;
 
-        // Call the Edge API for AI generation
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_URL}/api/ai/generate`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...getEdgeAuthHeaders(),
-            },
-            body: JSON.stringify({ prompt, title, description }),
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to generate form with AI");
-        }
-
         const {
           formStructure,
           title: generatedTitle,
           description: generatedDescription,
-        } = await response.json();
+        } = await generateFormWithAI(prompt, title, description);
 
         // Create the form with the AI-generated structure
         const form = await db.form.create({
@@ -540,31 +446,16 @@ export const formRouter = createTRPCRouter({
         const existingForm = await verifyFormOwnership(id, userId);
         const existingData = existingForm.data as unknown as FormData;
 
-        // Call the Edge API for AI refinement
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_URL}/api/ai/refine`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...getEdgeAuthHeaders(),
-            },
-            body: JSON.stringify({ existingData, prompt }),
-          },
+        const { structure: refinedFormStructure } = await refineFormWithAI(
+          existingData,
+          prompt,
         );
-
-        if (!response.ok) {
-          throw new Error("Failed to refine form with AI");
-        }
-
-        const { structure: refinedFormStructure } = await response.json();
 
         // Update the form with the refined data
         const updatedForm = await db.form.update({
           where: { id, userId },
           data: {
             data: toPrismaJson(refinedFormStructure),
-            // Also update the form title and description from the structure if they exist
             ...(refinedFormStructure.title && {
               title: refinedFormStructure.title,
             }),
@@ -620,24 +511,10 @@ export const formRouter = createTRPCRouter({
         const existingForm = await verifyFormOwnership(id, userId);
         const existingData = existingForm.data as unknown as FormData;
 
-        // Call the Edge API for AI refinement
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_URL}/api/ai/refine`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...getEdgeAuthHeaders(),
-            },
-            body: JSON.stringify({ existingData, prompt }),
-          },
+        const { structure: refinedFormStructure } = await refineFormWithAI(
+          existingData,
+          prompt,
         );
-
-        if (!response.ok) {
-          throw new Error("Failed to preview form refinement with AI");
-        }
-
-        const { structure: refinedFormStructure } = await response.json();
 
         // Record the AI refinement transaction
         await db.creditTransaction.create({
