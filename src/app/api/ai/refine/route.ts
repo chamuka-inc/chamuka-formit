@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     // Generate system prompt for refinement
     const systemPrompt = `You are an expert content designer. Refine an existing content based on the user's instructions.
-        
+            
     Your task is to analyze the existing content structure and refine it according to the provided instructions.
     
     Here's the existing content structure:
@@ -43,10 +43,10 @@ export async function POST(req: NextRequest) {
               "required": true|false,
               "options": ["Option 1", "Option 2"], // Only for radio/checkbox
               "contextElements": [
-                {
-                  "type": "paragraph|image|video",
-                  "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
-                }
+                  {
+                    "type": "paragraph|image|video",
+                    "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
+                  }
               ]
             }
           ],

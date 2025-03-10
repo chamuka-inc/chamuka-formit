@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
                   "type": "paragraph|image|video",
                   "content": "Detailed markdown text content for the paragraph, and valid URL for image or video"
                 }
-              ]
+          ]
             }
           ],
           "contextElements": [
