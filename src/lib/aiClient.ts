@@ -133,7 +133,8 @@ function extractJsonFromText(text: string): string | null {
  * Extracts source link from Gemini response metadata
  */
 function extractSourceLink(metadata: GeminiMetadata): string | undefined {
-  return metadata.candidates?.[0]?.groundingMetadata?.searchEntryPoint?.renderedContent;
+  return metadata.candidates?.[0]?.groundingMetadata?.searchEntryPoint
+    ?.renderedContent;
 }
 
 /**
@@ -192,10 +193,10 @@ export async function generateGeminiWebResponse(
   const prompt = messages.map((m) => m.content).join("\n");
   const result = await geminiModel.generateContent(prompt);
   const response = await result.response;
-  
+
   let text = response.text();
   text = cleanMarkdownFormatting(text);
-  
+
   const extractedJson = extractJsonFromText(text);
   if (extractedJson) {
     text = extractedJson;

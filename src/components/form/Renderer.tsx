@@ -195,7 +195,6 @@ const FormNavigation = ({
     // Only allow skipping ahead in preview mode
     if (isPreview || idx <= currentPageIndex) {
       setPageIndex(idx);
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       toast.error("Please complete the current page before skipping ahead");
     }
@@ -519,14 +518,12 @@ export default function FormRenderer({
 
     if (currentPageIndex < totalPages - 1) {
       setCurrentPageIndex((current) => current + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [currentPageIndex, totalPages, validateRequiredFields]);
 
   const goToPrevPage = useCallback(() => {
     if (currentPageIndex > 0) {
       setCurrentPageIndex((current) => current - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [currentPageIndex]);
 
@@ -657,7 +654,6 @@ export default function FormRenderer({
 
               setCurrentPageIndex(index);
               setSidebarVisible(false); // Hide sidebar on mobile after selection
-              window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           />
         </div>

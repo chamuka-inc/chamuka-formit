@@ -1,5 +1,6 @@
 # Cursor Updates
 
+- Fixed form navigation scrolling issue by removing automatic scrolling when clicking previous/next buttons.
 - Ran production build verification - build completed successfully with no TypeScript or compilation errors
 - Performed build check on Next.js app with tRPC and Tailwind configuration
 - Successfully ran production build with Prisma generation and Next.js compilation
