@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { uploadFile } from "@/lib/storage";
 
+// Add runtime configuration
+export const runtime = "edge";
+
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
