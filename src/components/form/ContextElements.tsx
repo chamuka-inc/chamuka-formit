@@ -89,18 +89,42 @@ const VideoContent = ({ url }: { url: string }) => (
  */
 const processMarkdownContent = (content: string): string => {
   const lines = content.split("\n");
-  const firstLine = lines[0].trim();
+  const processedLines: string[] = [];
+  let currentCodeBlock: string[] = [];
+  let currentLanguage = "";
 
-  // If first line is just a language identifier (no backticks)
-  if (/^[a-zA-Z0-9_+-]+$/.test(firstLine) && lines.length > 1) {
-    const language = firstLine;
-    const remainingContent = lines.slice(1).join("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
 
-    // Format as proper markdown code block
-    return `\`\`\`${language}\n${remainingContent}\n\`\`\``;
+    // Check if line is a language identifier
+    if (/^[a-zA-Z0-9_+-]+$/.test(line)) {
+      // If we have a previous code block, process it
+      if (currentCodeBlock.length > 0) {
+        processedLines.push(
+          `\`\`\`${currentLanguage}\n${currentCodeBlock.join("\n")}\n\`\`\``,
+        );
+        currentCodeBlock = [];
+      }
+      currentLanguage = line;
+      continue;
+    }
+
+    // If we have a language set, collect code block lines
+    if (currentLanguage) {
+      currentCodeBlock.push(lines[i]);
+    } else {
+      processedLines.push(lines[i]);
+    }
   }
 
-  return content;
+  // Process any remaining code block
+  if (currentCodeBlock.length > 0) {
+    processedLines.push(
+      `\`\`\`${currentLanguage}\n${currentCodeBlock.join("\n")}\n\`\`\``,
+    );
+  }
+
+  return processedLines.join("\n");
 };
 
 // Type for code component props that includes the inline property
