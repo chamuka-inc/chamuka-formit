@@ -57,9 +57,10 @@ export async function POST(req: NextRequest) {
     
     2. Make sure to create a logical flow of content across multiple pages
     3. Use appropriate question types (text, radio, checkbox) for different question scenarios
-    4. Add context elements (detailed paragraphs, images/videos) to provide context where needed
+    4. Add context elements (detailed paragraphs, images/videos) to provide context where needed.
     5. For each page, include a clear title and description
     6. Design the content that satisfies the user's prompt
+    7. Use placeholder image from https://placehold.co/{widthxheight}/{bg-color}/{text-color}/?text={Short-caption}&font={font-family}
     
     Generate a complete content structure based on this prompt: "${prompt}"`;
 

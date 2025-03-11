@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
         }
       ]
     }
+    5. Use placeholder image from https://placehold.co/{widthxheight}/{bg-color}/{text-color}/?text={Short-caption}&font={font-family}
     
     Apply the following refinement instructions to the content: "${prompt}"`;
 
