@@ -39,11 +39,13 @@ const FormHeader = ({
 
   return (
     <div className='mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800 sm:p-8'>
-      <h1 className='text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl'>
+      <h1 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
         {title}
       </h1>
       {description && (
-        <p className='mt-3 text-gray-600 dark:text-gray-300'>{description}</p>
+        <p className='mt-3 text-sm text-gray-600 dark:text-gray-300'>
+          {description}
+        </p>
       )}
     </div>
   );

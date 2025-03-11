@@ -520,19 +520,32 @@ export default function DashboardPage() {
   return (
     <div className='p-4'>
       {/* Header */}
-      <div className='mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
-        <div>
-          <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
-            My Collection
-          </h1>
-          <p className='mt-1 text-sm text-gray-600 dark:text-gray-400'>
-            Manage and analyze your collection
-          </p>
+      <div className='mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
+        <div className='min-w-0 flex-1'>
+          <div className='flex items-center justify-between gap-4 lg:justify-start'>
+            <div className='min-w-0 flex-1'>
+              <h1 className='truncate text-xl font-bold text-gray-900 dark:text-white sm:text-2xl'>
+                My Collection
+              </h1>
+              <p className='mt-1 text-sm text-gray-600 dark:text-gray-400'>
+                Manage and analyze your collection
+              </p>
+            </div>
+            <div className='flex shrink-0 lg:hidden'>
+              <Link
+                href='/forms/create'
+                className='inline-flex items-center justify-center rounded-md bg-blue-600 p-2 text-white shadow-sm transition-colors hover:bg-blue-700 sm:px-4 sm:py-2'
+              >
+                <Plus className='h-5 w-5 sm:mr-1.5' />
+                <span className='hidden sm:inline'>Create</span>
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className='flex space-x-3'>
+        <div className='hidden lg:flex lg:items-center lg:space-x-3'>
           <Link
             href='/forms/create'
-            className='inline-flex items-center rounded-md bg-blue-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-blue-700'
+            className='inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700'
           >
             <Plus className='mr-1.5 h-5 w-5' />
             Create

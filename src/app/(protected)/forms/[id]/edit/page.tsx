@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-toastify";
@@ -13,8 +13,6 @@ import {
   CheckCircle,
   X,
   ExternalLink,
-  FileText,
-  Sparkles,
   Edit,
 } from "lucide-react";
 import { api } from "@/lib/trpc/react";
@@ -29,7 +27,7 @@ export default function EditFormPage() {
   const router = useRouter();
 
   // State for UI
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleEditModal, setTitleEditModal] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -85,7 +83,6 @@ export default function EditFormPage() {
     onSuccess: () => {
       setLastSaved(new Date());
       setIsSaving(false);
-      setIsEditingTitle(false);
       refetch();
     },
     onError: (err) => {
@@ -121,6 +118,7 @@ export default function EditFormPage() {
       title,
       description: description || undefined,
     });
+    setTitleEditModal(false);
   };
 
   // Save the form
@@ -261,146 +259,135 @@ export default function EditFormPage() {
   return (
     <div className='flex min-h-screen flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800'>
       {/* Unified Header */}
-      <div className='relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-500 dark:via-indigo-500 dark:to-purple-500'>
+      <div className='sticky top-0 z-20 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-md dark:from-blue-500 dark:via-indigo-500 dark:to-purple-500'>
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-        <div className='relative z-10 w-full px-3 py-4 sm:px-6 sm:py-5 lg:px-8'>
-          <div className='flex w-full flex-col justify-between gap-3 md:flex-row md:items-center md:gap-4'>
-            <div className='flex items-center gap-2'>
+        <div className='relative z-10 w-full px-2 py-2'>
+          <div className='flex items-center justify-between'>
+            {/* Left section: Back and title */}
+            <div className='flex items-center gap-2 overflow-hidden'>
               <Link
                 href='/dashboard'
-                className='rounded-full p-1.5 text-white/80 hover:bg-white/10 hover:text-white'
+                className='rounded p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white'
+                title='Back to dashboard'
               >
                 <ArrowLeft className='h-5 w-5' />
               </Link>
 
-              {isEditingTitle ? (
-                <div className='flex w-full flex-1 flex-col gap-2 sm:w-auto'>
-                  <input
-                    type='text'
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className='rounded border border-white/30 bg-white/10 px-3 py-1.5 text-base font-semibold text-white focus:outline-none focus:ring-2 focus:ring-white/50'
-                    placeholder='Enter form title'
-                    autoFocus
-                  />
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className='rounded border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/50'
-                    placeholder='Enter description (optional)'
-                    rows={2}
-                  />
-                  <div className='mt-1 flex gap-2'>
-                    <button
-                      onClick={handleUpdateFormDetails}
-                      className='flex w-[80px] items-center justify-center rounded bg-white px-3 py-1 text-xs text-blue-600 hover:bg-white/90'
-                      disabled={updateFormMutation.isPending}
-                    >
-                      <span className='whitespace-nowrap'>
-                        {updateFormMutation.isPending ? "Saving..." : "Save"}
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsEditingTitle(false);
-                        setTitle(form?.title || "Untitled Form");
-                        setDescription(form?.description || "");
-                      }}
-                      className='rounded bg-white/20 px-3 py-1 text-xs text-white hover:bg-white/30'
-                    >
-                      Cancel
-                    </button>
-                  </div>
+              {/* Replace the inline editing with a button to open modal */}
+              <div
+                className='group max-w-full cursor-pointer overflow-hidden truncate rounded p-1 transition-colors hover:bg-white/5'
+                onClick={() => setTitleEditModal(true)}
+              >
+                <div className='flex items-center'>
+                  <h1
+                    className='mr-1 truncate text-sm font-semibold text-white sm:text-base'
+                    title={form?.title || "Untitled Form"}
+                  >
+                    {form?.title || "Untitled Form"}
+                  </h1>
+                  <Pencil className='h-3.5 w-3.5 flex-shrink-0 text-white/40 transition-colors group-hover:text-white/70' />
                 </div>
-              ) : (
-                <div className='flex-1 overflow-hidden'>
-                  <div className='flex items-center gap-2'>
-                    <h1 className='truncate text-lg font-semibold text-white sm:text-xl'>
-                      {form?.title || "Untitled Form"}
-                    </h1>
-                    <button
-                      onClick={() => setIsEditingTitle(true)}
-                      className='flex-shrink-0 rounded-full p-1 text-white/70 hover:bg-white/10 hover:text-white'
-                      title='Edit form details'
-                    >
-                      <Pencil className='h-4 w-4' />
-                    </button>
-                  </div>
-                  {form?.description && (
-                    <p className='mt-1 line-clamp-1 text-xs text-white/80 sm:text-sm'>
-                      {form.description}
-                    </p>
-                  )}
-                </div>
-              )}
+                {form?.description ? (
+                  <p className='mt-0.5 line-clamp-1 hidden w-full pr-2 text-xs text-white/80 sm:block sm:text-sm'>
+                    {form.description}
+                  </p>
+                ) : (
+                  <p className='mt-0.5 line-clamp-1 hidden w-full pr-2 text-xs italic text-white/50 sm:block sm:text-sm'>
+                    Add description...
+                  </p>
+                )}
+              </div>
             </div>
 
-            <div className='mt-2 flex flex-wrap items-center gap-2 md:mt-0 md:gap-3'>
+            {/* Right section: Action icons */}
+            <div className='flex items-center gap-1'>
+              {/* Last saved indicator (hidden on mobile) */}
               {lastSaved && (
-                <span className='hidden text-xs text-white/70 md:inline-flex'>
+                <span className='mr-2 hidden text-xs text-white/70 lg:inline-flex'>
                   Last saved: {lastSaved.toLocaleTimeString()}
                 </span>
               )}
 
-              <div className='flex w-full flex-wrap gap-2 sm:w-auto sm:flex-nowrap'>
-                <span className='flex items-center rounded-md border border-white/10 bg-white/20 px-2 py-1.5 text-xs font-medium text-white/90 sm:px-3'>
-                  <FileText className='mr-1 h-3.5 w-3.5 opacity-80 sm:mr-1.5' />
-                  {formPages.length} page{formPages.length !== 1 ? "s" : ""}
+              {/* Edit JSON button */}
+              <button
+                onClick={handleOpenRefineModal}
+                className='rounded bg-transparent p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white sm:flex sm:items-center sm:gap-1.5 sm:px-3'
+                title='Edit JSON'
+              >
+                <Edit className='h-5 w-5' />
+                <span className='hidden text-sm font-medium sm:inline'>
+                  Edit
                 </span>
+              </button>
 
-                {/* Add the Refine with AI button here */}
-                <button
-                  onClick={handleOpenRefineModal}
-                  className='flex flex-grow items-center justify-center rounded-md bg-white/20 px-2 py-1.5 text-sm font-medium text-white hover:bg-white/30 sm:flex-grow-0 sm:px-3'
-                  title='Edit form JSON'
-                >
-                  <Edit className='mr-1 h-4 w-4 text-blue-300 sm:mr-1.5' />
-                  Edit JSON
-                </button>
-
-                <button
-                  onClick={handleSaveForm}
-                  disabled={isSaving}
-                  className='relative flex flex-grow items-center justify-center rounded-md bg-white/20 px-2 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30 sm:w-auto sm:flex-grow-0 sm:px-3'
-                  title='Save form'
-                >
-                  <Save className='mr-1 h-4 w-4 flex-shrink-0 sm:mr-1.5' />
-                  <span className='whitespace-nowrap'>
-                    {isSaving ? "Saving..." : "Save"}
-                  </span>
-                  {lastSaved && !isSaving && (
-                    <span className='absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-green-400'></span>
-                  )}
-                </button>
-
-                <button
-                  onClick={handlePublishForm}
-                  disabled={isPublishing}
-                  className='flex flex-grow items-center justify-center rounded-md bg-white/90 px-2 py-1.5 text-sm font-medium text-blue-600 transition-colors hover:bg-white sm:w-auto sm:flex-grow-0 sm:px-3'
-                  title={
-                    form?.status === "published"
-                      ? "Update published form"
-                      : "Publish form"
-                  }
-                >
-                  <Share className='mr-1 h-4 w-4 flex-shrink-0 sm:mr-1.5' />
-                  <span className='whitespace-nowrap'>
-                    {isPublishing ? "Publishing..." : "Publish"}
-                  </span>
-                </button>
-
-                {/* Share button - only shown for published forms */}
-                {form?.status === "published" && (
-                  <button
-                    onClick={handleOpenShareModal}
-                    className='flex flex-grow items-center justify-center rounded-md border border-transparent bg-green-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:ml-2 sm:flex-grow-0'
-                    title='Share form'
-                  >
-                    <Share className='mr-1 h-4 w-4 sm:mr-1.5' />
-                    Share
-                  </button>
+              {/* Save button */}
+              <button
+                onClick={handleSaveForm}
+                disabled={isSaving}
+                className='relative rounded bg-transparent p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white sm:flex sm:items-center sm:gap-1.5 sm:px-3'
+                title='Save form'
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className='h-5 w-5 animate-spin' />
+                    <span className='hidden text-sm font-medium sm:inline'>
+                      Saving...
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Save className='h-5 w-5' />
+                    <span className='hidden text-sm font-medium sm:inline'>
+                      Save
+                    </span>
+                  </>
                 )}
-              </div>
+                {lastSaved && !isSaving && (
+                  <span className='absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-green-400 sm:right-2 sm:top-2'></span>
+                )}
+              </button>
+
+              {/* Publish button */}
+              <button
+                onClick={handlePublishForm}
+                disabled={isPublishing}
+                className='rounded bg-transparent p-1.5 text-blue-100 transition-colors hover:bg-blue-500/20 sm:flex sm:items-center sm:gap-1.5 sm:px-3'
+                title={
+                  form?.status === "published"
+                    ? "Update published form"
+                    : "Publish form"
+                }
+              >
+                {isPublishing ? (
+                  <>
+                    <Loader2 className='h-5 w-5 animate-spin' />
+                    <span className='hidden text-sm font-medium sm:inline'>
+                      Publishing...
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Share className='h-5 w-5' />
+                    <span className='hidden text-sm font-medium sm:inline'>
+                      Publish
+                    </span>
+                  </>
+                )}
+              </button>
+
+              {/* Share button - only shown for published forms */}
+              {form?.status === "published" && (
+                <button
+                  onClick={handleOpenShareModal}
+                  className='rounded bg-transparent p-1.5 text-green-100 transition-colors hover:bg-green-500/20 sm:flex sm:items-center sm:gap-1.5 sm:px-3'
+                  title='Share form'
+                >
+                  <ExternalLink className='h-5 w-5' />
+                  <span className='hidden text-sm font-medium sm:inline'>
+                    Share
+                  </span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -478,6 +465,89 @@ export default function EditFormPage() {
           }}
           onSuccess={handleRefinementSuccess}
         />
+      )}
+
+      {/* Add Modal for Title and Description Editing */}
+      {titleEditModal && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50 p-4 sm:p-6 md:p-8'>
+          <div className='relative w-full max-w-md rounded-lg bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-6'>
+            <button
+              onClick={() => setTitleEditModal(false)}
+              className='absolute right-3 top-3 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 sm:right-4 sm:top-4'
+            >
+              <X className='h-5 w-5' />
+            </button>
+
+            <div className='mb-6'>
+              <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900'>
+                <Pencil className='h-6 w-6 text-blue-600 dark:text-blue-300' />
+              </div>
+              <h3 className='text-center text-lg font-medium text-gray-900 dark:text-white'>
+                Edit Form Details
+              </h3>
+
+              <div className='mt-4 space-y-4'>
+                <div>
+                  <label
+                    htmlFor='form-title'
+                    className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'
+                  >
+                    Form Title *
+                  </label>
+                  <input
+                    id='form-title'
+                    type='text'
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className='w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                    placeholder='Enter form title'
+                    autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor='form-description'
+                    className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'
+                  >
+                    Description (optional)
+                  </label>
+                  <textarea
+                    id='form-description'
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className='w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                    placeholder='Add a description for your form'
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
+              <button
+                onClick={() => setTitleEditModal(false)}
+                className='flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateFormDetails}
+                disabled={updateFormMutation.isPending}
+                className='flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600'
+              >
+                {updateFormMutation.isPending ? (
+                  <>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

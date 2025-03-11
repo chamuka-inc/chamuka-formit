@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   ChevronDown,
   ChevronRight,
@@ -17,6 +18,9 @@ import {
   Star,
   MessageSquare,
   Sparkles,
+  LogOut,
+  User,
+  LogIn,
 } from "lucide-react";
 import { api } from "@/lib/trpc/react";
 
@@ -119,8 +123,15 @@ const SidebarSection = ({
   );
 };
 
-export default function Sidebar({ className = "" }: { className?: string }) {
+interface SidebarProps {
+  className?: string;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ className = "", onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const { data: credits } = api.credits.getCredits.useQuery();
 
   const isActive = (path: string) => {
     if (path === "/" && pathname === "/") return true;
@@ -128,13 +139,38 @@ export default function Sidebar({ className = "" }: { className?: string }) {
     return false;
   };
 
-  const { data: credits } = api.credits.getCredits.useQuery();
-
   return (
     <aside
       className={`h-full border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 ${className}`}
     >
       <div className='flex h-full flex-col p-4'>
+        {/* Account section at the top */}
+        {status === "authenticated" && session?.user && (
+          <div className='mb-6 px-2'>
+            <div className='flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700/50'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white dark:bg-blue-500'>
+                {session.user.image ? (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    className='h-10 w-10 rounded-full'
+                  />
+                ) : (
+                  <User className='h-5 w-5' />
+                )}
+              </div>
+              <div className='min-w-0 flex-1'>
+                <p className='truncate text-sm font-medium text-gray-900 dark:text-white'>
+                  {session.user.name || "User"}
+                </p>
+                <p className='truncate text-sm text-gray-500 dark:text-gray-400'>
+                  {session.user.email}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className='mb-2 px-2'>
           <div className='mb-2 ml-2 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'>
             Main
@@ -145,6 +181,7 @@ export default function Sidebar({ className = "" }: { className?: string }) {
               icon={<LayoutGrid className='h-5 w-5' />}
               title='Dashboard'
               active={isActive("/dashboard") || pathname === "/"}
+              onClick={onClose}
             />
             <SidebarItem
               href='/forms/create'
@@ -152,6 +189,7 @@ export default function Sidebar({ className = "" }: { className?: string }) {
               title='Create'
               active={pathname === "/forms/create"}
               isNew={false}
+              onClick={onClose}
             />
             <SidebarItem
               href='/credits'
@@ -159,6 +197,7 @@ export default function Sidebar({ className = "" }: { className?: string }) {
               title='Credits'
               active={isActive("/credits")}
               badge={credits?.credits?.toString()}
+              onClick={onClose}
             />
           </div>
         </div>
@@ -169,45 +208,67 @@ export default function Sidebar({ className = "" }: { className?: string }) {
               Support
             </div>
             <div className='space-y-1'>
-              <SidebarItem
-                href='/settings'
-                icon={<Settings className='h-5 w-5' />}
-                title='Settings'
-                active={isActive("/settings")}
-              />
+              {status === "authenticated" && (
+                <SidebarItem
+                  href='/settings'
+                  icon={<Settings className='h-5 w-5' />}
+                  title='Settings'
+                  active={isActive("/settings")}
+                  onClick={onClose}
+                />
+              )}
               <SidebarItem
                 href='/help'
                 icon={<HelpCircle className='h-5 w-5' />}
                 title='Help & Support'
                 active={isActive("/help")}
+                onClick={onClose}
               />
+              {status === "authenticated" ? (
+                <SidebarItem
+                  href='/auth/signout'
+                  icon={<LogOut className='h-5 w-5' />}
+                  title='Sign out'
+                  onClick={onClose}
+                />
+              ) : (
+                <SidebarItem
+                  href='/auth/signin'
+                  icon={<LogIn className='h-5 w-5' />}
+                  title='Sign in'
+                  onClick={onClose}
+                />
+              )}
             </div>
           </div>
 
-          <div className='mx-2 mt-6 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 px-4 py-4 dark:from-blue-900/20 dark:to-indigo-900/20'>
-            <div className='mb-2 flex items-center justify-between'>
-              <span className='text-xs font-medium uppercase tracking-wider text-blue-700 dark:text-blue-400'>
-                Credits
-              </span>
-              <span className='text-xs font-medium text-blue-600 dark:text-blue-400'>
-                {credits?.credits || 0} remaining
-              </span>
+          {status === "authenticated" && (
+            <div className='mx-2 mt-6 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 px-4 py-4 dark:from-blue-900/20 dark:to-indigo-900/20'>
+              <div className='mb-2 flex items-center justify-between'>
+                <span className='text-xs font-medium uppercase tracking-wider text-blue-700 dark:text-blue-400'>
+                  Credits
+                </span>
+                <span className='text-xs font-medium text-blue-600 dark:text-blue-400'>
+                  {credits?.credits || 0} remaining
+                </span>
+              </div>
+              <div className='h-1.5 w-full overflow-hidden rounded-full bg-white/50 dark:bg-white/10'>
+                <div
+                  className='h-1.5 rounded-full bg-blue-500'
+                  style={{
+                    width: `${Math.min(100, (credits?.credits || 0) * 20)}%`,
+                  }}
+                ></div>
+              </div>
+              <Link
+                href='/credits'
+                className='mt-3 block text-xs font-medium text-blue-700 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300'
+                onClick={onClose}
+              >
+                Get more credits →
+              </Link>
             </div>
-            <div className='h-1.5 w-full overflow-hidden rounded-full bg-white/50 dark:bg-white/10'>
-              <div
-                className='h-1.5 rounded-full bg-blue-500'
-                style={{
-                  width: `${Math.min(100, (credits?.credits || 0) * 20)}%`,
-                }}
-              ></div>
-            </div>
-            <Link
-              href='/credits'
-              className='mt-3 block text-xs font-medium text-blue-700 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300'
-            >
-              Get more credits →
-            </Link>
-          </div>
+          )}
         </div>
       </div>
     </aside>

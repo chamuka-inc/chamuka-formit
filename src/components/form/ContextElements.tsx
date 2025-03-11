@@ -51,7 +51,7 @@ const MarkdownContent = ({ content }: { content: string }) => {
   const processedContent = processMarkdownContent(content);
 
   return (
-    <div className='prose prose-sm w-full max-w-none text-xs dark:prose-invert sm:prose-base sm:text-sm md:text-base'>
+    <div className='prose prose-sm w-full max-w-none text-sm dark:prose-invert sm:prose-base md:text-base'>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize]}
@@ -126,7 +126,7 @@ const markdownComponents: Components = {
           style={atomDark}
           language={match[1]}
           PreTag='div'
-          className='rounded-md text-xs sm:text-sm md:text-base'
+          className='rounded-md text-sm md:text-base'
           customStyle={{
             borderRadius: "0.375rem",
             padding: "0.75rem",
@@ -143,7 +143,7 @@ const markdownComponents: Components = {
       </div>
     ) : (
       <code
-        className={`${className} break-words rounded bg-gray-100 px-1 py-0.5 text-xs dark:bg-gray-800 sm:text-sm`}
+        className={`${className} break-words rounded bg-gray-100 px-1 py-0.5 text-sm dark:bg-gray-800`}
         {...rest}
       >
         {children}
@@ -153,7 +153,7 @@ const markdownComponents: Components = {
   p(props) {
     return (
       <p
-        className='mb-4 hyphens-auto break-words text-xs sm:text-sm md:text-base'
+        className='mb-4 hyphens-auto break-words text-sm md:text-base'
         {...props}
       />
     );
@@ -185,7 +185,7 @@ const markdownComponents: Components = {
   h4(props) {
     return (
       <h4
-        className='mb-2 mt-3 break-words text-xs font-semibold sm:text-sm md:text-base lg:text-lg'
+        className='mb-2 mt-3 break-words text-sm font-semibold sm:text-base md:text-lg lg:text-xl'
         {...props}
       />
     );
@@ -193,7 +193,7 @@ const markdownComponents: Components = {
   ul(props) {
     return (
       <ul
-        className='mb-4 list-disc pl-4 text-xs sm:pl-5 sm:text-sm md:text-base'
+        className='mb-4 list-disc pl-4 text-sm sm:pl-5 md:text-base'
         {...props}
       />
     );
@@ -201,18 +201,13 @@ const markdownComponents: Components = {
   ol(props) {
     return (
       <ol
-        className='mb-4 list-decimal pl-4 text-xs sm:pl-5 sm:text-sm md:text-base'
+        className='mb-4 list-decimal pl-4 text-sm sm:pl-5 md:text-base'
         {...props}
       />
     );
   },
   li(props) {
-    return (
-      <li
-        className='mb-1 break-words text-xs sm:text-sm md:text-base'
-        {...props}
-      />
-    );
+    return <li className='mb-1 break-words text-sm md:text-base' {...props} />;
   },
   a(props) {
     return (
@@ -228,7 +223,7 @@ const markdownComponents: Components = {
     return (
       <div className='my-4 w-full overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800'>
         <table
-          className='w-full table-auto border-collapse text-xs sm:text-sm md:text-base'
+          className='w-full table-auto border-collapse text-sm md:text-base'
           {...props}
         />
       </div>
@@ -240,7 +235,7 @@ const markdownComponents: Components = {
   th(props) {
     return (
       <th
-        className='border-b border-gray-200 px-2 py-2 text-left text-xs font-medium uppercase tracking-wider dark:border-gray-700 sm:px-3 sm:py-2'
+        className='border-b border-gray-200 px-2 py-2 text-left text-sm font-medium uppercase tracking-wider dark:border-gray-700 sm:px-3 sm:py-2'
         {...props}
       />
     );
@@ -261,7 +256,7 @@ const markdownComponents: Components = {
   blockquote(props) {
     return (
       <blockquote
-        className='my-4 border-l-4 border-gray-300 pl-4 text-xs italic text-gray-700 dark:border-gray-700 dark:text-gray-300 sm:text-sm md:text-base'
+        className='my-4 border-l-4 border-gray-300 pl-4 text-sm italic text-gray-700 dark:border-gray-700 dark:text-gray-300'
         {...props}
       />
     );
