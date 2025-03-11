@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import {
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/trpc/react";
 import Link from "next/link";
+import { examplePrompts } from "@/lib/constants/example-prompts";
 
 export default function CreateFormPage() {
   const router = useRouter();
@@ -57,6 +58,21 @@ export default function CreateFormPage() {
       utils.credits.getAICredits.invalidate();
     },
   });
+
+  // Randomly select 4 example prompts
+  const [examplePromptsSeed, setExamplePromptsSeed] = useState(0);
+  const examplePromptsList = useMemo(() => {
+    const allPrompts = [...examplePrompts.forms, ...examplePrompts.content];
+    const shuffled = [...allPrompts].sort(() => {
+      // Use the seed to generate different but consistent random orders
+      return 0.5 - Math.random() + Math.sin(examplePromptsSeed);
+    });
+    return shuffled.slice(0, 4);
+  }, [examplePromptsSeed]);
+
+  const handleRefreshExamples = () => {
+    setExamplePromptsSeed((prev) => prev + 1);
+  };
 
   // Handle manual form submission
   const handleManualSubmit = (e: React.FormEvent) => {
@@ -296,20 +312,62 @@ export default function CreateFormPage() {
 
             <div className='mb-6 flex items-start rounded-lg border border-purple-100 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20'>
               <Lightbulb className='mr-3 mt-0.5 h-5 w-5 flex-shrink-0 text-purple-500 dark:text-purple-400' />
-              <div>
+              <div className='w-full'>
                 <h3 className='mb-1 text-sm font-medium text-purple-800 dark:text-purple-300'>
-                  Let AI Design Your Form
+                  Let AI Design Your Content
                 </h3>
                 <p className='text-sm text-purple-700 dark:text-purple-200'>
-                  Describe the form you want to create in detail, and our AI
-                  will generate a complete multi-page form with relevant
-                  questions. You can edit the generated form afterward.
+                  Describe what you want to create in detail, and our AI will
+                  generate a complete multi-page structure with relevant
+                  content. You can edit the generated content afterward.
                 </p>
-                <p className='mt-1 text-sm text-purple-700 dark:text-purple-200'>
-                  <strong>Example:</strong> "Create a customer feedback form for
-                  a coffee shop that asks about service quality, product
-                  satisfaction, and suggestions for improvement."
-                </p>
+                <div className='mt-4'>
+                  <div className='mb-3 flex items-center justify-between'>
+                    <p className='text-sm font-medium text-purple-800 dark:text-purple-300'>
+                      Example prompts:
+                    </p>
+                    <button
+                      onClick={handleRefreshExamples}
+                      className='inline-flex items-center rounded-lg bg-purple-100 px-2.5 py-1.5 text-xs font-medium text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50'
+                    >
+                      <ArrowRight className='mr-1 h-3 w-3' />
+                      Load New Examples
+                    </button>
+                  </div>
+                  <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+                    {examplePromptsList.map((prompt, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setAiPrompt(prompt.prompt)}
+                        className='group flex flex-col overflow-hidden rounded-lg border border-purple-100 bg-white transition-all hover:border-purple-300 hover:shadow-md dark:border-purple-800 dark:bg-gray-800 dark:hover:border-purple-600'
+                      >
+                        <div className='bg-purple-25 border-b border-purple-50 p-2.5 dark:border-purple-800/50 dark:bg-purple-900/20'>
+                          <div className='flex items-center justify-between'>
+                            <span className='inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/50 dark:text-purple-300'>
+                              {prompt.type}
+                            </span>
+                            <span className='flex items-center text-xs text-purple-600 dark:text-purple-400'>
+                              {prompt.pages}{" "}
+                              {prompt.pages === 1 ? "page" : "pages"}
+                            </span>
+                          </div>
+                          <div className='mt-1.5 text-xs font-medium text-purple-700 dark:text-purple-300'>
+                            {prompt.action}
+                          </div>
+                        </div>
+                        <div className='flex flex-1 flex-col p-2.5'>
+                          <p className='line-clamp-3 flex-1 text-sm text-gray-600 dark:text-gray-300'>
+                            {prompt.description}
+                          </p>
+                          <div className='mt-2 flex items-center justify-end text-xs font-medium text-purple-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-purple-400'>
+                            Use this template{" "}
+                            <ArrowRight className='ml-1 h-3 w-3' />
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
