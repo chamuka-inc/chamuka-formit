@@ -18,7 +18,7 @@ export default function PublicLayout({
   return (
     <div className='flex min-h-screen flex-col bg-white dark:bg-gray-900'>
       {/* Header */}
-      <div className='relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-500 dark:via-indigo-500 dark:to-purple-500'>
+      <div className='relative bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 dark:from-blue-500 dark:via-indigo-500 dark:to-blue-600'>
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         <div className='relative z-10 w-full px-4 py-4 sm:px-6 sm:py-5 lg:px-8'>
           <div className='flex w-full items-center justify-between'>
