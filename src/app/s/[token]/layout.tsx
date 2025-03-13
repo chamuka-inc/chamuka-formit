@@ -1,18 +1,12 @@
-"use client";
+import { generateMetadata } from "./metadata";
+import FormLayoutClient from "@/components/layout/FormLayoutClient";
 
-import React from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+export { generateMetadata };
 
-export default function PublicFormLayout({
+export default function FormLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className='min-h-screen'>
-      {children}
-      <ToastContainer position='bottom-right' />
-    </div>
-  );
+  return <FormLayoutClient>{children}</FormLayoutClient>;
 }
