@@ -5,8 +5,15 @@ export const defaultMetadata: Metadata = {
     default: "Chamuka FormIt - Create and Share Forms",
     template: "%s | Chamuka FormIt",
   },
-  description: "Create and share forms with ease using Chamuka FormIt. No coding required.",
-  keywords: ["forms", "form builder", "online forms", "form creator", "form sharing"],
+  description:
+    "Create and share forms with ease using Chamuka FormIt. No coding required.",
+  keywords: [
+    "forms",
+    "form builder",
+    "online forms",
+    "form creator",
+    "form sharing",
+  ],
   authors: [{ name: "Chamuka FormIt" }],
   creator: "Chamuka FormIt",
   publisher: "Chamuka FormIt",
@@ -25,7 +32,8 @@ export const defaultMetadata: Metadata = {
     url: "https://chamuka-formit.com",
     siteName: "Chamuka FormIt",
     title: "Chamuka FormIt - Create and Share Forms",
-    description: "Create and share forms with ease using Chamuka FormIt. No coding required.",
+    description:
+      "Create and share forms with ease using Chamuka FormIt. No coding required.",
     images: [
       {
         url: "/og-image.png",
@@ -38,11 +46,12 @@ export const defaultMetadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Chamuka FormIt - Create and Share Forms",
-    description: "Create and share forms with ease using Chamuka FormIt. No coding required.",
+    description:
+      "Create and share forms with ease using Chamuka FormIt. No coding required.",
     images: ["/og-image.png"],
     creator: "@chamukaformit",
   },
   verification: {
     google: "your-verification-code", // Replace with your actual verification code
   },
-}; 
+};
