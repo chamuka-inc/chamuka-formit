@@ -38,12 +38,12 @@ const FormHeader = ({
   if (!title) return null;
 
   return (
-    <div className='mb-8 bg-white dark:border-gray-700 dark:bg-gray-800'>
+    <div className='mb-6 sm:mb-8'>
       <h1 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
         {title}
       </h1>
       {description && (
-        <p className='mt-3 text-sm text-gray-600 dark:text-gray-300'>
+        <p className='mt-2 text-sm text-gray-600 dark:text-gray-300 sm:mt-3'>
           {description}
         </p>
       )}
