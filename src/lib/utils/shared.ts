@@ -9,4 +9,12 @@ export function isPathActive(currentPath: string, path: string) {
   return false;
 }
 
+/**
+ * Generates a unique ID for content elements
+ * @param prefix Optional prefix for the ID
+ * @returns A string unique ID
+ */
+export const generateId = (prefix = "id") =>
+  `${prefix}-${Math.random().toString(36).substring(2, 11)}`;
+
 // Add other shared utility functions here
