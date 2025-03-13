@@ -1,8 +1,8 @@
 "use client";
 
 import { ContextElement, ContextElementType } from "@/lib/types";
-import { Plus, Trash2 } from "lucide-react";
-import { useId } from "react";
+import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { useId, useState } from "react";
 
 interface ContextElementEditorProps {
   elements: ContextElement[];
@@ -54,6 +54,7 @@ export const ContextElementEditor = ({
   setElements,
 }: ContextElementEditorProps) => {
   const headingId = useId();
+  const [collapsedElements, setCollapsedElements] = useState<number[]>([]);
 
   const handleAddElement = (elementType: ContextElementType): void => {
     setElements([...elements, { type: elementType, content: "" }]);
@@ -61,12 +62,22 @@ export const ContextElementEditor = ({
 
   const handleRemoveElement = (index: number): void => {
     setElements(elements.filter((_, i) => i !== index));
+    // Remove the index from collapsed state if it exists
+    setCollapsedElements(collapsedElements.filter((i) => i !== index));
   };
 
   const handleUpdateElement = (index: number, content: string): void => {
     const updatedElements = [...elements];
     updatedElements[index] = { ...updatedElements[index], content };
     setElements(updatedElements);
+  };
+
+  const toggleCollapse = (index: number): void => {
+    if (collapsedElements.includes(index)) {
+      setCollapsedElements(collapsedElements.filter((i) => i !== index));
+    } else {
+      setCollapsedElements([...collapsedElements, index]);
+    }
   };
 
   const getPlaceholder = (type: ContextElementType): string => {
@@ -94,31 +105,72 @@ export const ContextElementEditor = ({
       <div className='space-y-2 sm:space-y-3' aria-labelledby={headingId}>
         {elements.map((element, index) => {
           const inputId = `element-${index}-${element.type}`;
+          const isCollapsed = collapsedElements.includes(index);
+
           return (
             <div
               key={index}
-              className='flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2'
+              className='overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700'
             >
-              <ElementLabel type={element.type} />
-              <div className='flex w-full items-center gap-1 sm:gap-2'>
-                <input
-                  id={inputId}
-                  type='text'
-                  value={element.content}
-                  onChange={(e) => handleUpdateElement(index, e.target.value)}
-                  className='flex-1 rounded border p-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 sm:p-2 sm:text-base'
-                  placeholder={getPlaceholder(element.type)}
-                  aria-label={`${element.type} content`}
-                />
+              <div className='flex items-center justify-between bg-gray-50 p-2 dark:bg-gray-800 sm:p-3'>
+                <div className='flex items-center gap-2'>
+                  <button
+                    onClick={() => toggleCollapse(index)}
+                    className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                    aria-label={isCollapsed ? "Expand" : "Collapse"}
+                    title={isCollapsed ? "Expand" : "Collapse"}
+                  >
+                    {isCollapsed ? (
+                      <ChevronDown className='h-4 w-4' />
+                    ) : (
+                      <ChevronUp className='h-4 w-4' />
+                    )}
+                  </button>
+                  <ElementLabel type={element.type} />
+                  {isCollapsed && (
+                    <span className='max-w-[200px] truncate text-xs text-gray-500 dark:text-gray-400'>
+                      {element.content || "Empty"}
+                    </span>
+                  )}
+                </div>
                 <button
                   onClick={() => handleRemoveElement(index)}
-                  className='rounded-full p-1.5 text-red-500 hover:bg-gray-100 hover:text-red-700 dark:hover:bg-gray-700 sm:p-2'
+                  className='ml-2 rounded-full p-1 text-red-500 hover:bg-gray-200 hover:text-red-700 dark:hover:bg-gray-700'
                   aria-label={`Remove ${element.type}`}
                   title={`Remove ${element.type}`}
                 >
                   <Trash2 className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
                 </button>
               </div>
+
+              {!isCollapsed && (
+                <div className='p-2 sm:p-3'>
+                  {element.type === "paragraph" ? (
+                    <textarea
+                      id={inputId}
+                      value={element.content}
+                      onChange={(e) =>
+                        handleUpdateElement(index, e.target.value)
+                      }
+                      className='min-h-[100px] w-full resize-y rounded border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 sm:text-base'
+                      placeholder={getPlaceholder(element.type)}
+                      aria-label={`${element.type} content`}
+                    />
+                  ) : (
+                    <input
+                      id={inputId}
+                      type='text'
+                      value={element.content}
+                      onChange={(e) =>
+                        handleUpdateElement(index, e.target.value)
+                      }
+                      className='w-full rounded border p-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 sm:p-2 sm:text-base'
+                      placeholder={getPlaceholder(element.type)}
+                      aria-label={`${element.type} content`}
+                    />
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

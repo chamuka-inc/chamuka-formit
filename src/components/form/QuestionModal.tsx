@@ -9,10 +9,8 @@ import {
   AlignLeft,
   Plus,
   Trash2,
-  Type,
-  Image,
-  Video,
 } from "lucide-react";
+import { ContextElementEditor } from "./ContextElementEditor";
 
 // Type definitions
 type QuestionType = "text" | "radio" | "checkbox";
@@ -104,49 +102,6 @@ const OptionTypeButton = ({
   </button>
 );
 
-const ContextElementItem = ({
-  element,
-  onRemove,
-}: {
-  element: ContextElement;
-  onRemove: () => void;
-}) => {
-  // Determine which icon to use based on element type
-  const ElementIcon = useMemo(() => {
-    switch (element.type) {
-      case "paragraph":
-        return Type;
-      case "image":
-        return Image;
-      case "video":
-        return Video;
-      default:
-        return Type;
-    }
-  }, [element.type]);
-
-  return (
-    <div className='group flex items-start gap-2 rounded-lg border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800 sm:gap-3 sm:p-3'>
-      <ElementIcon className='mt-0.5 h-4 w-4 text-gray-400 sm:h-5 sm:w-5' />
-      <div className='min-w-0 flex-1'>
-        <div className='mb-1 text-xs font-medium text-gray-500 dark:text-gray-400'>
-          {element.type.charAt(0).toUpperCase() + element.type.slice(1)}
-        </div>
-        <div className='break-words text-sm text-gray-700 dark:text-gray-300 sm:text-base'>
-          {element.content}
-        </div>
-      </div>
-      <button
-        onClick={onRemove}
-        className='rounded-md p-1 text-gray-400 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-red-400'
-        aria-label='Remove context element'
-      >
-        <Trash2 className='h-4 w-4' />
-      </button>
-    </div>
-  );
-};
-
 const OptionItem = ({
   option,
   type,
@@ -182,6 +137,7 @@ const AddItemInput = <T extends string>({
   placeholder,
   buttonLabel,
   mobileButtonLabel,
+  contextType,
 }: {
   value: T;
   onChange: (value: T) => void;
@@ -189,19 +145,31 @@ const AddItemInput = <T extends string>({
   placeholder: string;
   buttonLabel: string;
   mobileButtonLabel: string;
+  contextType?: ContextElementType;
 }) => {
   const isDisabled = !value.trim();
+  const isTextarea = contextType === "paragraph";
 
   return (
     <div className='flex flex-1 gap-2'>
-      <input
-        type='text'
-        value={value}
-        onChange={(e) => onChange(e.target.value as T)}
-        onKeyDown={(e) => e.key === "Enter" && !isDisabled && onAdd()}
-        placeholder={placeholder}
-        className='min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400 sm:px-4 sm:py-2.5'
-      />
+      {isTextarea ? (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value as T)}
+          placeholder={placeholder}
+          rows={2}
+          className='min-h-[60px] min-w-0 flex-1 resize-y rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400'
+        />
+      ) : (
+        <input
+          type='text'
+          value={value}
+          onChange={(e) => onChange(e.target.value as T)}
+          onKeyDown={(e) => e.key === "Enter" && !isDisabled && onAdd()}
+          placeholder={placeholder}
+          className='min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400 sm:px-4 sm:py-2.5'
+        />
+      )}
       <button
         onClick={onAdd}
         disabled={isDisabled}
@@ -425,55 +393,15 @@ export const QuestionModal = ({
 
               {/* Context Elements Section */}
               <div className='space-y-3 pt-3 sm:space-y-4 sm:pt-4'>
-                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  Question Context
-                </label>
-
-                {/* Context Elements List */}
-                {formState.contextElements.length > 0 && (
-                  <div className='space-y-3'>
-                    {formState.contextElements.map((element, index) => (
-                      <ContextElementItem
-                        key={index}
-                        element={element}
-                        onRemove={() => handleRemoveContextElement(index)}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Add Context Element */}
-                <div className='space-y-3'>
-                  <div className='flex flex-col gap-2 sm:flex-row sm:gap-3'>
-                    <select
-                      value={newContextElement.type}
-                      onChange={(e) =>
-                        setNewContextElement({
-                          ...newContextElement,
-                          type: e.target.value as ContextElementType,
-                        })
-                      }
-                      className='w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 sm:w-auto sm:px-4 sm:py-2.5'
-                    >
-                      <option value='paragraph'>Paragraph</option>
-                      <option value='image'>Image URL</option>
-                      <option value='video'>Video URL</option>
-                    </select>
-
-                    <AddItemInput
-                      value={newContextElement.content}
-                      onChange={(content) =>
-                        setNewContextElement((prev) => ({ ...prev, content }))
-                      }
-                      onAdd={handleAddContextElement}
-                      placeholder={getContextPlaceholder(
-                        newContextElement.type,
-                      )}
-                      buttonLabel='Add Context'
-                      mobileButtonLabel='Add'
-                    />
-                  </div>
-                </div>
+                <ContextElementEditor
+                  elements={formState.contextElements}
+                  setElements={(elements) =>
+                    setFormState((prev) => ({
+                      ...prev,
+                      contextElements: elements,
+                    }))
+                  }
+                />
               </div>
 
               {/* Options Section - Only show for radio or checkbox question types */}
