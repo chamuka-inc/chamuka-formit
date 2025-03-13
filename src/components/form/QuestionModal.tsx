@@ -20,6 +20,7 @@ interface QuestionFormState {
   type: QuestionType;
   options: string[];
   contextElements: ContextElement[];
+  required: boolean;
 }
 
 interface NewContextElementState {
@@ -200,6 +201,7 @@ export const QuestionModal = ({
     type: "text",
     options: [],
     contextElements: [],
+    required: false,
   });
 
   // Input state
@@ -218,6 +220,7 @@ export const QuestionModal = ({
         type: currentQuestion.type,
         options: currentQuestion.options || [],
         contextElements: currentQuestion.contextElements || [],
+        required: currentQuestion.required || false,
       });
     } else {
       setFormState({
@@ -225,6 +228,7 @@ export const QuestionModal = ({
         type: "text",
         options: [],
         contextElements: [],
+        required: false,
       });
     }
     setNewOption("");
@@ -270,18 +274,21 @@ export const QuestionModal = ({
   }, []);
 
   const handleSave = useCallback(() => {
-    const { text, type, options, contextElements } = formState;
-
-    const newQuestion: Question = {
-      text,
-      type,
-      options: ["radio", "checkbox"].includes(type) ? options : undefined,
-      contextElements: contextElements.length > 0 ? contextElements : undefined,
-    };
-
-    onSave(newQuestion);
-    onClose();
-  }, [formState, onSave, onClose]);
+    if (formState.text.trim()) {
+      onSave({
+        ...(currentQuestion?.id ? { id: currentQuestion.id } : {}),
+        text: formState.text.trim(),
+        type: formState.type,
+        options: formState.type !== "text" ? formState.options : undefined,
+        contextElements:
+          formState.contextElements.length > 0
+            ? formState.contextElements
+            : undefined,
+        required: formState.required,
+      });
+      onClose();
+    }
+  }, [formState, currentQuestion, onSave, onClose]);
 
   // Memoized values
   const isFormValid = useMemo(() => {
@@ -333,135 +340,149 @@ export const QuestionModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6'>
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-opacity ${
+        isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+    >
       <div
-        className='fixed inset-0 animate-fade-in bg-black/40 backdrop-blur-sm transition-opacity'
-        onClick={onClose}
-      />
-      <div className='relative max-h-[90vh] w-full animate-fade-in sm:max-w-lg md:max-w-xl lg:max-w-2xl'>
-        <div className='relative overflow-hidden rounded-lg bg-white shadow-2xl dark:bg-gray-800 md:rounded-xl lg:rounded-2xl'>
-          {/* Header */}
-          <ModalHeader
-            title={currentQuestion ? "Edit Question" : "Add Question"}
-            icon={QuestionTypeIcon}
-            onClose={onClose}
-          />
+        className={`w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-xl transition-transform dark:bg-gray-900 ${
+          isOpen ? "scale-100" : "scale-95"
+        }`}
+      >
+        <ModalHeader
+          title={currentQuestion ? "Edit Question" : "Add Question"}
+          icon={MessageSquare}
+          onClose={onClose}
+        />
 
-          {/* Content */}
-          <div className='max-h-[calc(80vh-8rem)] overflow-y-auto px-4 py-4 sm:px-6 md:px-8 md:py-6'>
-            <div className='space-y-4 sm:space-y-6'>
-              {/* Question Text */}
-              <div className='space-y-2'>
-                <label
-                  htmlFor='question-text'
-                  className='block text-sm font-medium text-gray-700 dark:text-gray-300'
-                >
-                  Question Text
-                </label>
-                <textarea
-                  id='question-text'
-                  value={formState.text}
+        <div className='space-y-6 p-4 sm:p-6 md:p-8'>
+          {/* Question Text Input */}
+          <div className='space-y-2'>
+            <label
+              htmlFor='questionText'
+              className='text-sm font-medium text-gray-700 dark:text-gray-300'
+            >
+              Question Text
+            </label>
+            <div className='flex items-center gap-2'>
+              <input
+                id='questionText'
+                type='text'
+                value={formState.text}
+                onChange={(e) =>
+                  setFormState((prev) => ({ ...prev, text: e.target.value }))
+                }
+                placeholder='Enter your question here...'
+                className='flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400'
+              />
+              <label className='flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800'>
+                <input
+                  type='checkbox'
+                  checked={formState.required}
                   onChange={(e) =>
-                    setFormState((prev) => ({ ...prev, text: e.target.value }))
-                  }
-                  rows={3}
-                  className='w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400 sm:px-4 sm:py-3'
-                  placeholder='Enter your question here...'
-                />
-              </div>
-
-              {/* Question Type */}
-              <div className='space-y-2'>
-                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  Question Type
-                </label>
-                <div className='grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4'>
-                  {questionTypeOptions.map(({ type, label, icon }) => (
-                    <OptionTypeButton
-                      key={type}
-                      type={type}
-                      label={label}
-                      icon={icon}
-                      selected={formState.type === type}
-                      onClick={() =>
-                        setFormState((prev) => ({ ...prev, type }))
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Context Elements Section */}
-              <div className='space-y-3 pt-3 sm:space-y-4 sm:pt-4'>
-                <ContextElementEditor
-                  elements={formState.contextElements}
-                  setElements={(elements) =>
                     setFormState((prev) => ({
                       ...prev,
-                      contextElements: elements,
+                      required: e.target.checked,
                     }))
                   }
+                  className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-400'
                 />
-              </div>
-
-              {/* Options Section - Only show for radio or checkbox question types */}
-              {["radio", "checkbox"].includes(formState.type) && (
-                <div className='space-y-3 pt-3 sm:space-y-4 sm:pt-4'>
-                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                    Answer Options
-                  </label>
-
-                  {/* Options List */}
-                  {formState.options.length > 0 && (
-                    <div className='space-y-2 sm:space-y-3'>
-                      {formState.options.map((option, index) => (
-                        <OptionItem
-                          key={index}
-                          option={option}
-                          type={formState.type as QuestionType}
-                          onRemove={() => handleRemoveOption(index)}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Add Option */}
-                  <div className='flex gap-2 sm:gap-3'>
-                    <AddItemInput
-                      value={newOption}
-                      onChange={setNewOption}
-                      onAdd={handleAddOption}
-                      placeholder='Add a new option...'
-                      buttonLabel='Add Option'
-                      mobileButtonLabel='Add'
-                    />
-                  </div>
-                </div>
-              )}
+                <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  Required
+                </span>
+              </label>
             </div>
           </div>
 
-          {/* Footer */}
-          <div className='sticky bottom-0 border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-700 dark:bg-gray-800/50 sm:px-6 md:px-8 md:py-6'>
-            <div className='flex justify-end gap-2 sm:gap-4'>
-              <button
-                onClick={onClose}
-                className='rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 sm:px-6 sm:py-2.5'
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={!isFormValid}
-                className={`rounded-lg px-4 py-2 font-medium transition-all sm:px-6 sm:py-2.5 ${
-                  isFormValid
-                    ? "transform bg-blue-500 text-white hover:scale-[1.02] hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                    : "cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
-                } `}
-              >
-                {currentQuestion ? "Save Changes" : "Create Question"}
-              </button>
+          {/* Question Type */}
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              Question Type
+            </label>
+            <div className='grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4'>
+              {questionTypeOptions.map(({ type, label, icon }) => (
+                <OptionTypeButton
+                  key={type}
+                  type={type}
+                  label={label}
+                  icon={icon}
+                  selected={formState.type === type}
+                  onClick={() => setFormState((prev) => ({ ...prev, type }))}
+                />
+              ))}
             </div>
+          </div>
+
+          {/* Context Elements Section */}
+          <div className='space-y-3 pt-3 sm:space-y-4 sm:pt-4'>
+            <ContextElementEditor
+              elements={formState.contextElements}
+              setElements={(elements) =>
+                setFormState((prev) => ({
+                  ...prev,
+                  contextElements: elements,
+                }))
+              }
+            />
+          </div>
+
+          {/* Options Section - Only show for radio or checkbox question types */}
+          {["radio", "checkbox"].includes(formState.type) && (
+            <div className='space-y-3 pt-3 sm:space-y-4 sm:pt-4'>
+              <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                Answer Options
+              </label>
+
+              {/* Options List */}
+              {formState.options.length > 0 && (
+                <div className='space-y-2 sm:space-y-3'>
+                  {formState.options.map((option, index) => (
+                    <OptionItem
+                      key={index}
+                      option={option}
+                      type={formState.type as QuestionType}
+                      onRemove={() => handleRemoveOption(index)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Add Option */}
+              <div className='flex gap-2 sm:gap-3'>
+                <AddItemInput
+                  value={newOption}
+                  onChange={setNewOption}
+                  onAdd={handleAddOption}
+                  placeholder='Add a new option...'
+                  buttonLabel='Add Option'
+                  mobileButtonLabel='Add'
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className='sticky bottom-0 border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-700 dark:bg-gray-800/50 sm:px-6 md:px-8 md:py-6'>
+          <div className='flex justify-end gap-2 sm:gap-4'>
+            <button
+              onClick={onClose}
+              className='rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 sm:px-6 sm:py-2.5'
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!isFormValid}
+              className={`rounded-lg px-4 py-2 font-medium transition-all sm:px-6 sm:py-2.5 ${
+                isFormValid
+                  ? "transform bg-blue-500 text-white hover:scale-[1.02] hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                  : "cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
+              } `}
+            >
+              {currentQuestion ? "Save Changes" : "Create Question"}
+            </button>
           </div>
         </div>
       </div>
