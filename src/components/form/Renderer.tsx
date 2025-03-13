@@ -38,7 +38,7 @@ const FormHeader = ({
   if (!title) return null;
 
   return (
-    <div className='mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800 sm:p-8'>
+    <div className='mb-8 bg-white dark:border-gray-700 dark:bg-gray-800'>
       <h1 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
         {title}
       </h1>
