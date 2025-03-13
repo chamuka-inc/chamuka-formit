@@ -14,9 +14,10 @@ import {
   BarChart3,
   FileText,
   ChevronRight,
+  LogIn,
 } from "lucide-react";
 import PublicLayout from "@/components/layout/PublicLayout";
-import Image from "next/image";
+import { LoginButton } from "@/components/auth/LoginButton";
 
 export const dynamic = "force-dynamic";
 
@@ -448,12 +449,10 @@ export default async function Home() {
                   Get Started for Free
                   <ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 sm:h-5 sm:w-5' />
                 </Link>
-                <Link
-                  href='/help'
-                  className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-transparent px-5 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-white/10 sm:px-6 sm:py-3.5 sm:text-base'
-                >
-                  Contact Sales
-                </Link>
+                <LoginButton className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-transparent px-5 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-white/10 sm:px-6 sm:py-3.5 sm:text-base'>
+                  <LogIn className='mr-2 h-4 w-4' />
+                  Log In
+                </LoginButton>
               </div>
             </div>
           </div>
