@@ -1,6 +1,7 @@
 export type ContextElementType = "paragraph" | "image" | "video";
 
 export interface ContextElement {
+  id?: string;
   type: ContextElementType;
   content: string;
 }
@@ -17,6 +18,7 @@ export interface Question {
 }
 
 export interface FormPage {
+  id?: string;
   title: string;
   questions?: Question[];
   contextElements?: ContextElement[];

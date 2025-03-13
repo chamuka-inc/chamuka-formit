@@ -93,7 +93,7 @@ export const PageContent = ({
         {/* Questions Section */}
         {currentPage.questions?.map((question, index) => (
           <Question
-            key={index}
+            key={question.id || index}
             question={question}
             index={index}
             mode='builder'

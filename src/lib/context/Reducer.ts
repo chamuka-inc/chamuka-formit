@@ -1,4 +1,5 @@
 import { FormState, FormAction } from "../types";
+import { generateId } from "../utils/shared";
 import { validateAction, validateFormState } from "./Validation";
 
 export const initialState: FormState = {
@@ -43,16 +44,25 @@ export function formReducer(
     case "LOAD_SURVEY":
       // Ensure we have valid pages with required properties
       const validatedPages = action.payload.map((page) => ({
+        id: page.id || generateId(),
         title: page.title || "Untitled Page",
         questions: (page.questions || []).map((q) => ({
-          id: q.id || `q-${Math.random().toString(36).substr(2, 9)}`,
+          id: q.id || generateId(),
           type: q.type || "text",
           text: q.text || "Untitled Question",
           required: q.required !== undefined ? q.required : false,
           options: q.options || [],
-          contextElements: q.contextElements || [],
+          contextElements: (q.contextElements || []).map((ce) => ({
+            id: ce.id || generateId(),
+            type: ce.type,
+            content: ce.content,
+          })),
         })),
-        contextElements: page.contextElements || [],
+        contextElements: (page.contextElements || []).map((ce) => ({
+          id: ce.id || generateId(),
+          type: ce.type,
+          content: ce.content,
+        })),
       }));
 
       newState = {
@@ -66,18 +76,55 @@ export function formReducer(
       break;
 
     case "ADD_PAGE":
+      const newPage = {
+        ...action.payload,
+        id: action.payload.id || generateId(),
+        contextElements: (action.payload.contextElements || []).map((ce) => ({
+          ...ce,
+          id: ce.id || generateId(),
+        })),
+        questions: (action.payload.questions || []).map((q) => ({
+          ...q,
+          id: q.id || generateId(),
+          contextElements: (q.contextElements || []).map((ce) => ({
+            ...ce,
+            id: ce.id || generateId(),
+          })),
+        })),
+      };
+
       newState = {
         ...state,
-        pages: [...state.pages, action.payload],
+        pages: [...state.pages, newPage],
         currentPageIndex: state.pages.length,
       };
       break;
 
     case "UPDATE_PAGE":
+      // Ensure the page has an ID and all context elements and questions have IDs
+      const updatedPage = {
+        ...action.payload.page,
+        id: action.payload.page.id || generateId(),
+        contextElements: (action.payload.page.contextElements || []).map(
+          (ce) => ({
+            ...ce,
+            id: ce.id || generateId(),
+          }),
+        ),
+        questions: (action.payload.page.questions || []).map((q) => ({
+          ...q,
+          id: q.id || generateId(),
+          contextElements: (q.contextElements || []).map((ce) => ({
+            ...ce,
+            id: ce.id || generateId(),
+          })),
+        })),
+      };
+
       newState = {
         ...state,
         pages: state.pages.map((page, index) =>
-          index === action.payload.index ? action.payload.page : page,
+          index === action.payload.index ? updatedPage : page,
         ),
       };
       break;
@@ -142,13 +189,24 @@ export function formReducer(
     }
 
     case "ADD_QUESTION":
+      const newQuestion = {
+        ...action.payload.question,
+        id: action.payload.question.id || generateId(),
+        contextElements: (action.payload.question.contextElements || []).map(
+          (ce) => ({
+            ...ce,
+            id: ce.id || generateId(),
+          }),
+        ),
+      };
+
       newState = {
         ...state,
         pages: state.pages.map((page, index) =>
           index === action.payload.pageIndex
             ? {
                 ...page,
-                questions: [...(page.questions || []), action.payload.question],
+                questions: [...(page.questions || []), newQuestion],
               }
             : page,
         ),
@@ -156,6 +214,18 @@ export function formReducer(
       break;
 
     case "UPDATE_QUESTION":
+      // Preserve the existing question ID if available, otherwise generate a new one
+      const updatedQuestion = {
+        ...action.payload.question,
+        id: action.payload.question.id || generateId(),
+        contextElements: (action.payload.question.contextElements || []).map(
+          (ce) => ({
+            ...ce,
+            id: ce.id || generateId(),
+          }),
+        ),
+      };
+
       newState = {
         ...state,
         pages: state.pages.map((page, index) =>
@@ -163,9 +233,7 @@ export function formReducer(
             ? {
                 ...page,
                 questions: page.questions.map((q, qIndex) =>
-                  qIndex === action.payload.questionIndex
-                    ? action.payload.question
-                    : q,
+                  qIndex === action.payload.questionIndex ? updatedQuestion : q,
                 ),
               }
             : page,

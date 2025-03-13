@@ -40,6 +40,7 @@ export const Question = ({
           ? "border-gray-200 hover:border-blue-500 dark:border-gray-700 dark:hover:border-blue-400"
           : "border-transparent"
       } bg-white shadow-sm hover:shadow-md dark:bg-gray-800`}
+      data-question-id={question.id}
     >
       {question.contextElements && question.contextElements.length > 0 && (
         <div className='mb-2 sm:mb-3 md:mb-6'>
@@ -49,6 +50,9 @@ export const Question = ({
 
       <h3 className='mb-2 pr-12 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:mb-3 sm:pr-14 md:mb-4 md:pr-0 md:text-lg'>
         {question.text}
+        {question.required && (
+          <span className='ml-1 text-red-500 dark:text-red-400'>*</span>
+        )}
       </h3>
 
       {question.type === "text" && !isBuilder && (

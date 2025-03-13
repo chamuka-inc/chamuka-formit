@@ -18,12 +18,12 @@ import {
   CheckCircle,
   X,
   ExternalLink,
-  AlertCircle,
   FileText,
 } from "lucide-react";
 import { Question, FormPage } from "@/lib/types";
 import { api } from "@/lib/trpc/react";
 import { toast } from "react-toastify";
+import { generateId } from "@/lib/utils/shared";
 
 const FormBuilderContent = ({ hideHeader = false }) => {
   const router = useRouter();
@@ -485,16 +485,25 @@ export const FormBuilder = ({
 }) => {
   // Ensure initialPages has the correct structure
   const validatedPages = initialPages.map((page) => ({
+    id: page.id || generateId(),
     title: page.title || "Untitled Page",
     questions: (page.questions || []).map((q) => ({
-      id: q.id || `q-${Math.random().toString(36).substr(2, 9)}`,
+      id: q.id || generateId(),
       type: q.type || "text",
       text: q.text || "Untitled Question",
       required: q.required !== undefined ? q.required : false,
       options: q.options || [],
-      contextElements: q.contextElements || [],
+      contextElements: (q.contextElements || []).map((ce) => ({
+        id: ce.id || generateId(),
+        type: ce.type,
+        content: ce.content,
+      })),
     })),
-    contextElements: page.contextElements || [],
+    contextElements: (page.contextElements || []).map((ce) => ({
+      id: ce.id || generateId(),
+      type: ce.type,
+      content: ce.content,
+    })),
   }));
 
   return (

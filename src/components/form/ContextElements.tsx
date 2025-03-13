@@ -26,7 +26,7 @@ export const ContextElements = ({ elements }: ContextElementsProps) => {
   return (
     <div className='w-full max-w-full space-y-4 overflow-hidden'>
       {elements.map((element, index) => (
-        <RenderContextElement key={index} element={element} />
+        <RenderContextElement key={element.id || index} element={element} />
       ))}
     </div>
   );
