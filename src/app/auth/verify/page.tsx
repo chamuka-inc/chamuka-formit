@@ -7,28 +7,28 @@ import PublicLayout from "@/components/layout/PublicLayout";
 
 export default function VerifyRequest() {
   return (
-    <PublicLayout showBackButton backButtonText='Back to Home'>
-      <div className='flex flex-1 items-center justify-center px-4 py-12'>
-        <div className='w-full max-w-md space-y-8'>
+    <PublicLayout>
+      <div className='flex min-h-[calc(100vh-180px)] flex-1 items-center justify-center px-4 sm:px-6 lg:px-8'>
+        <div className='-mt-8 w-full max-w-md space-y-4 sm:-mt-16 sm:space-y-6'>
           <div className='text-center'>
-            <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900'>
-              <Mail className='h-6 w-6 text-blue-600 dark:text-blue-400' />
+            <div className='mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 sm:mb-4 sm:h-12 sm:w-12'>
+              <Mail className='h-5 w-5 text-blue-600 dark:text-blue-400 sm:h-6 sm:w-6' />
             </div>
-            <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
+            <h1 className='text-xl font-bold text-gray-900 dark:text-white sm:text-2xl'>
               Check your email
             </h1>
-            <p className='mt-3 text-gray-600 dark:text-gray-300'>
+            <p className='mt-2 text-sm text-gray-600 dark:text-gray-300 sm:mt-3 sm:text-base'>
               A sign in link has been sent to your email address. Please check
               your inbox and click the link to continue.
             </p>
           </div>
 
-          <div className='rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800'>
-            <div className='space-y-4 text-sm text-gray-600 dark:text-gray-400'>
+          <div className='rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-8'>
+            <div className='space-y-3 text-xs text-gray-600 dark:text-gray-400 sm:space-y-4 sm:text-sm'>
               <p>
                 <strong>Didn't receive the email?</strong>
               </p>
-              <ul className='list-disc space-y-2 pl-4'>
+              <ul className='list-disc space-y-1 pl-4 sm:space-y-2'>
                 <li>Check your spam folder</li>
                 <li>Make sure you entered the correct email address</li>
                 <li>
@@ -41,12 +41,12 @@ export default function VerifyRequest() {
                   </Link>
                 </li>
               </ul>
-              <div className='pt-4'>
+              <div className='pt-3 sm:pt-4'>
                 <Link
                   href='/auth/signin'
-                  className='inline-flex items-center justify-center gap-2 rounded-lg bg-blue-100 px-4 py-2 text-blue-600 transition-colors hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-400 dark:hover:bg-blue-800'
+                  className='inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-100 px-3 py-2 text-xs text-blue-600 transition-colors hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-400 dark:hover:bg-blue-800 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm'
                 >
-                  <Mail className='h-4 w-4' />
+                  <Mail className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
                   Send another verification email
                 </Link>
               </div>

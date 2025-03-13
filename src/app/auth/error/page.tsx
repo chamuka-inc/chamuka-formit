@@ -10,14 +10,14 @@ function ErrorContent() {
   const error = searchParams.get("error");
 
   return (
-    <PublicLayout showBackButton backButtonText='Back to Home'>
-      <div className='flex flex-1 items-center justify-center px-4 py-12'>
-        <div className='w-full max-w-md space-y-8'>
+    <PublicLayout>
+      <div className='flex min-h-[calc(100vh-180px)] flex-1 items-center justify-center px-4 sm:px-6 lg:px-8'>
+        <div className='-mt-8 w-full max-w-md space-y-4 sm:-mt-16 sm:space-y-6'>
           <div className='text-center'>
-            <h1 className='text-3xl font-bold text-red-600 dark:text-red-500'>
+            <h1 className='text-xl font-bold text-red-600 dark:text-red-500 sm:text-3xl'>
               Authentication Error
             </h1>
-            <p className='mt-3 text-gray-600 dark:text-gray-300'>
+            <p className='mt-2 text-sm text-gray-600 dark:text-gray-300 sm:mt-3 sm:text-base'>
               {error === "AccessDenied"
                 ? "Access denied. You do not have permission to access this resource."
                 : error === "Verification"
@@ -30,10 +30,10 @@ function ErrorContent() {
             </p>
           </div>
 
-          <div className='flex justify-center'>
+          <div className='mt-4 flex justify-center sm:mt-6'>
             <Link
               href='/auth/signin'
-              className='rounded-lg bg-blue-600 px-6 py-3 text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+              className='rounded-lg bg-blue-600 px-4 py-2 text-sm text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 sm:px-6 sm:py-3 sm:text-base'
             >
               Try Again
             </Link>

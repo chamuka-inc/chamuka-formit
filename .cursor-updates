@@ -180,3 +180,5 @@
 - Removed back button from header to provide a cleaner interface across all pages.
 - Merged FormLayoutClient and PublicLayout into a single unified layout component for better consistency and reduced code duplication.
 - Fixed double header issue by removing nested PublicLayout in PublicFormClient component.
+- Improved all authentication forms (sign-in, verify, error, sign-out) to be perfectly centered vertically and horizontally on the page for better user experience.
+- Enhanced overall application responsiveness with mobile-first design approach, including responsive typography, properly sized touch targets, and optimized spacing for different screen sizes.
