@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, FileText } from "lucide-react";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -31,15 +34,19 @@ export default function PublicLayout({
                 Chamuka FormIt
               </Link>
             </div>
-            {showBackButton && (
-              <Link
-                href={backButtonHref}
-                className='flex items-center gap-2 rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/30'
-              >
-                <ArrowLeft className='h-4 w-4' />
-                {backButtonText}
-              </Link>
-            )}
+            <div className='flex items-center gap-4'>
+              {showBackButton && (
+                <Link
+                  href={backButtonHref}
+                  className='flex items-center gap-2 rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/30'
+                >
+                  <ArrowLeft className='h-4 w-4' />
+                  {backButtonText}
+                </Link>
+              )}
+
+              <AuthProvider className='flex items-center gap-2 rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/30' />
+            </div>
           </div>
         </div>
       </div>
