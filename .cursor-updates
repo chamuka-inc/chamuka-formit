@@ -176,3 +176,7 @@
 
 # 2024-06-25
 - Fixed type errors in Next.js 15 layout/pages with proper Promise-based params handling for dynamic routes.
+- Enhanced PublicLayout with fully responsive header that adapts to mobile, tablet, and desktop views.
+- Removed back button from header to provide a cleaner interface across all pages.
+- Merged FormLayoutClient and PublicLayout into a single unified layout component for better consistency and reduced code duplication.
+- Fixed double header issue by removing nested PublicLayout in PublicFormClient component.

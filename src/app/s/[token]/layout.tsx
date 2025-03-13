@@ -1,4 +1,4 @@
-import FormLayoutClient from "@/components/layout/FormLayoutClient";
+import PublicLayout from "@/components/layout/PublicLayout";
 
 export default async function FormLayout({
   children,
@@ -8,5 +8,5 @@ export default async function FormLayout({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  return <FormLayoutClient>{children}</FormLayoutClient>;
+  return <PublicLayout showToasts>{children}</PublicLayout>;
 }

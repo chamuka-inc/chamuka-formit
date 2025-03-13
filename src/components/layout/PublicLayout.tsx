@@ -2,14 +2,17 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, FileText, Menu, X } from "lucide-react";
+import { FileText, Menu, X } from "lucide-react";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface PublicLayoutProps {
   children: React.ReactNode;
   showBackButton?: boolean;
   backButtonText?: string;
   backButtonHref?: string;
+  showToasts?: boolean;
 }
 
 export default function PublicLayout({
@@ -17,6 +20,7 @@ export default function PublicLayout({
   showBackButton = false,
   backButtonText = "Back to Home",
   backButtonHref = "/",
+  showToasts = false,
 }: PublicLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -40,16 +44,6 @@ export default function PublicLayout({
 
             {/* Desktop Navigation */}
             <div className='hidden items-center gap-4 md:flex'>
-              {showBackButton && (
-                <Link
-                  href={backButtonHref}
-                  className='flex items-center gap-2 rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30'
-                >
-                  <ArrowLeft className='h-4 w-4' />
-                  {backButtonText}
-                </Link>
-              )}
-
               <AuthProvider className='flex items-center gap-2 rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30' />
             </div>
 
@@ -74,16 +68,6 @@ export default function PublicLayout({
           {/* Mobile menu, show/hide based on menu state */}
           {mobileMenuOpen && (
             <div className='mt-2 space-y-2 border-t border-white/20 pb-3 pt-3 md:hidden'>
-              {showBackButton && (
-                <Link
-                  href={backButtonHref}
-                  className='flex items-center gap-2 px-4 py-2 text-base font-medium text-white hover:bg-white/10'
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <ArrowLeft className='h-5 w-5' />
-                  {backButtonText}
-                </Link>
-              )}
               <div
                 className='px-4 py-2'
                 onClick={() => setMobileMenuOpen(false)}
@@ -109,6 +93,9 @@ export default function PublicLayout({
           </div>
         </div>
       </footer>
+
+      {/* Toast notifications */}
+      {showToasts && <ToastContainer position='bottom-right' />}
     </div>
   );
 }
