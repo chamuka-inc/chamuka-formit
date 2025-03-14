@@ -18,7 +18,8 @@ import {
   Code, 
   Link as LinkIcon,
   Undo,
-  Redo
+  Redo,
+  FileCode
 } from "lucide-react";
 
 interface TiptapEditorProps {
@@ -75,7 +76,13 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
   // Initialize TipTap editor with Markdown extension
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: {
+          HTMLAttributes: {
+            class: 'rounded bg-gray-100 p-2 font-mono dark:bg-gray-800',
+          },
+        },
+      }),
       Placeholder.configure({
         placeholder,
       }),
@@ -248,6 +255,14 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
             title="Inline Code"
           >
             <Code className="h-4 w-4" />
+          </ToolbarButton>
+          
+          <ToolbarButton
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            isActive={editor.isActive('codeBlock')}
+            title="Code Block"
+          >
+            <FileCode className="h-4 w-4" />
           </ToolbarButton>
           
           <div className="h-4 w-px bg-gray-300 dark:bg-gray-600 mx-1" />
