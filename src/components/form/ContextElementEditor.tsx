@@ -3,6 +3,7 @@
 import { ContextElement, ContextElementType } from "@/lib/types";
 import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 import { useId, useState } from "react";
+import { TiptapEditor } from "./TiptapEditor";
 
 interface ContextElementEditorProps {
   elements: ContextElement[];
@@ -146,15 +147,10 @@ export const ContextElementEditor = ({
               {!isCollapsed && (
                 <div className='p-2 sm:p-3'>
                   {element.type === "paragraph" ? (
-                    <textarea
-                      id={inputId}
-                      value={element.content}
-                      onChange={(e) =>
-                        handleUpdateElement(index, e.target.value)
-                      }
-                      className='min-h-[100px] w-full resize-y rounded border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 sm:text-base'
+                    <TiptapEditor
+                      content={element.content}
+                      onChange={(content) => handleUpdateElement(index, content)}
                       placeholder={getPlaceholder(element.type)}
-                      aria-label={`${element.type} content`}
                     />
                   ) : (
                     <input

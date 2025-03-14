@@ -183,3 +183,7 @@
 - Improved all authentication forms (sign-in, verify, error, sign-out) to be perfectly centered vertically and horizontally on the page for better user experience.
 - Enhanced overall application responsiveness with mobile-first design approach, including responsive typography, properly sized touch targets, and optimized spacing for different screen sizes.
 - Fixed form title/description section styling to appear flat against the page background on mobile, removing card-like appearance for a cleaner visual hierarchy.
+
+# 2024-06-26
+- Implemented dual-mode editor for paragraph context elements using ProseMirror, allowing users to toggle between Markdown and WYSIWYG editing modes with synchronized content and formatting toolbar.
+- Enhanced the WYSIWYG editor with a clean, modern toolbar featuring formatting options for bold, italic, code, headings, and lists, and made WYSIWYG the default editing mode.
