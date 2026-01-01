@@ -29,46 +29,44 @@ export function UserMenu({ userEmail }: UserMenuProps) {
     <div className='relative ml-2' ref={menuRef}>
       <button
         type='button'
-        className='flex items-center gap-x-1 rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white'
+        className='flex items-center gap-x-2 rounded-xl border border-transparent px-3 py-1.5 transition-all hover:bg-muted'
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className='flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white dark:bg-blue-500'>
+        <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm shadow-primary/20'>
           <User className='h-4 w-4' />
         </div>
-        <span className='hidden md:inline'>Account</span>
-        <ChevronDown className='h-4 w-4' aria-hidden='true' />
+        <span className='hidden text-sm font-semibold text-foreground md:inline'>Account</span>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} aria-hidden='true' />
       </button>
 
       {isOpen && (
-        <div className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800'>
-          <div className='border-b border-gray-200 px-4 py-3 dark:border-gray-700'>
-            <p className='text-sm text-gray-500 dark:text-gray-400'>
+        <div className='absolute right-0 z-[100] mt-2 w-64 origin-top-right rounded-2xl border border-border bg-popover p-1.5 shadow-xl shadow-primary/10 focus:outline-none'>
+          <div className='px-4 py-3 border-b border-border/50 mb-1'>
+            <p className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70'>
               Signed in as
             </p>
-            <p className='truncate text-sm font-medium text-gray-900 dark:text-white'>
+            <p className='truncate text-sm font-semibold text-foreground'>
               {userEmail}
             </p>
           </div>
-          <Link
-            href='/settings'
-            className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
-            onClick={() => setIsOpen(false)}
-          >
-            <div className='flex items-center'>
-              <Settings className='mr-2 h-4 w-4' />
+          <div className="space-y-0.5">
+            <Link
+              href='/settings'
+              className='flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl text-foreground transition-all hover:bg-muted'
+              onClick={() => setIsOpen(false)}
+            >
+              <Settings className='h-4 w-4 text-muted-foreground' />
               Settings
-            </div>
-          </Link>
-          <Link
-            href='/auth/signout'
-            className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
-            onClick={() => setIsOpen(false)}
-          >
-            <div className='flex items-center'>
-              <LogOut className='mr-2 h-4 w-4' />
+            </Link>
+            <Link
+              href='/auth/signout'
+              className='flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl text-destructive transition-all hover:bg-destructive/5'
+              onClick={() => setIsOpen(false)}
+            >
+              <LogOut className='h-4 w-4' />
               Sign out
-            </div>
-          </Link>
+            </Link>
+          </div>
         </div>
       )}
     </div>

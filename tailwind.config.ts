@@ -18,6 +18,10 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Geist', 'sans-serif'],
+        mono: ['Geist Mono', 'monospace'],
+      },
       colors: {
         // Base colors
         background: {
@@ -79,11 +83,18 @@ const config = {
           DEFAULT: "hsl(var(--popover) / <alpha-value>)",
           foreground: "hsl(var(--popover-foreground) / <alpha-value>)",
         },
+        overlay: "hsl(var(--overlay) / <alpha-value>)",
+      },
+      boxShadow: {
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
+        none: "0",
         sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 2px)",
+        lg: "var(--radius)",
       },
       keyframes: {
         "accordion-down": {

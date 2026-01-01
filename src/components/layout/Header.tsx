@@ -21,7 +21,7 @@ export default function Header({ toggleSidebar, sidebarOpen }: HeaderProps) {
   const { data: session } = useSession();
 
   return (
-    <header className='sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
+    <header className='sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md'>
       <div className='mx-auto w-full px-4 sm:px-6'>
         <nav
           className='flex h-16 items-center justify-between'
@@ -31,17 +31,19 @@ export default function Header({ toggleSidebar, sidebarOpen }: HeaderProps) {
             {/* Sidebar toggle button - now visible on all screen sizes */}
             <button
               type='button'
-              className='inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300'
+              className='inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground transition-all hover:bg-muted hover:text-foreground'
               onClick={toggleSidebar}
               aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
             >
               <Menu className='h-6 w-6' aria-hidden='true' />
             </button>
 
-            <Link href='/' className='flex items-center gap-2'>
-              <FileText className='h-8 w-8 text-blue-600 dark:text-blue-400' />
-              <span className='text-xl font-semibold text-gray-900 dark:text-white'>
-                Chamuka FormIt
+            <Link href='/' className='flex items-center gap-2 group'>
+              <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 transition-transform group-hover:scale-105'>
+                <FileText className='h-5 w-5 text-primary-foreground' />
+              </div>
+              <span className='text-xl font-bold tracking-tight text-foreground'>
+                Chamuka <span className="text-primary">FormIt</span>
               </span>
             </Link>
           </div>

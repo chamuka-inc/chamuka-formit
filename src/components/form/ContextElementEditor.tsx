@@ -27,7 +27,7 @@ const ElementLabel = ({ type }: ElementLabelProps) => {
         : "Video URL:";
 
   return (
-    <label className='min-w-[80px] text-sm font-medium text-gray-700 dark:text-gray-300 sm:min-w-[100px] sm:text-base'>
+    <label className='min-w-[80px] text-sm font-medium text-foreground sm:min-w-[100px] sm:text-base'>
       {labelText}
     </label>
   );
@@ -40,7 +40,7 @@ const AddElementButton = ({ type, onClick }: AddElementButtonProps) => {
     <button
       type='button'
       onClick={onClick}
-      className='flex items-center gap-1 rounded bg-gray-100 px-2 py-1.5 text-xs text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 sm:px-3 sm:py-2 sm:text-sm'
+      className='flex items-center gap-1 rounded bg-secondary px-2 py-1.5 text-xs text-secondary-foreground transition-colors hover:bg-secondary-hover sm:px-3 sm:py-2 sm:text-sm'
       aria-label={label}
     >
       <Plus className='h-3 w-3 sm:h-4 sm:w-4' />
@@ -97,7 +97,7 @@ export const ContextElementEditor = ({
     <div>
       <h3
         id={headingId}
-        className='mb-1 block text-sm font-bold text-gray-700 dark:text-gray-300 sm:mb-2 sm:text-base'
+        className='mb-1 block text-sm font-bold text-foreground sm:mb-2 sm:text-base'
       >
         Context Elements
       </h3>
@@ -110,13 +110,13 @@ export const ContextElementEditor = ({
           return (
             <div
               key={index}
-              className='overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700'
+              className='overflow-hidden rounded-lg border border-border'
             >
-              <div className='flex items-center justify-between bg-gray-50 p-2 dark:bg-gray-800 sm:p-3'>
+              <div className='flex items-center justify-between bg-muted p-2 sm:p-3'>
                 <div className='flex items-center gap-2'>
                   <button
                     onClick={() => toggleCollapse(index)}
-                    className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                    className='text-muted-foreground hover:text-foreground transition-colors'
                     aria-label={isCollapsed ? "Expand" : "Collapse"}
                     title={isCollapsed ? "Expand" : "Collapse"}
                   >
@@ -128,14 +128,14 @@ export const ContextElementEditor = ({
                   </button>
                   <ElementLabel type={element.type} />
                   {isCollapsed && (
-                    <span className='max-w-[200px] truncate text-xs text-gray-500 dark:text-gray-400'>
+                    <span className='max-w-[200px] truncate text-xs text-muted-foreground'>
                       {element.content || "Empty"}
                     </span>
                   )}
                 </div>
                 <button
                   onClick={() => handleRemoveElement(index)}
-                  className='ml-2 rounded-full p-1 text-red-500 hover:bg-gray-200 hover:text-red-700 dark:hover:bg-gray-700'
+                  className='ml-2 rounded-full p-1 text-destructive hover:bg-muted hover:text-destructive transition-colors'
                   aria-label={`Remove ${element.type}`}
                   title={`Remove ${element.type}`}
                 >
@@ -152,7 +152,7 @@ export const ContextElementEditor = ({
                       onChange={(e) =>
                         handleUpdateElement(index, e.target.value)
                       }
-                      className='min-h-[100px] w-full resize-y rounded border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 sm:text-base'
+                      className='min-h-[100px] w-full resize-y rounded border border-input bg-background p-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-input-focus focus:ring-2 focus:ring-ring sm:text-base'
                       placeholder={getPlaceholder(element.type)}
                       aria-label={`${element.type} content`}
                     />
@@ -164,7 +164,7 @@ export const ContextElementEditor = ({
                       onChange={(e) =>
                         handleUpdateElement(index, e.target.value)
                       }
-                      className='w-full rounded border p-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 sm:p-2 sm:text-base'
+                      className='w-full rounded border border-input bg-background p-1.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-input-focus focus:ring-2 focus:ring-ring sm:p-2 sm:text-base'
                       placeholder={getPlaceholder(element.type)}
                       aria-label={`${element.type} content`}
                     />
@@ -177,7 +177,7 @@ export const ContextElementEditor = ({
       </div>
 
       {elements.length === 0 && (
-        <p className='my-2 text-sm italic text-gray-500 dark:text-gray-400'>
+        <p className='my-2 text-sm italic text-muted-foreground'>
           No context elements added yet. Add elements using the buttons below.
         </p>
       )}

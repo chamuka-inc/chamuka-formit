@@ -109,117 +109,101 @@ export default function CreateFormPage() {
   };
 
   return (
-    <div className='mx-auto max-w-6xl px-4 py-8 sm:px-6'>
+    <div className='mx-auto max-w-5xl px-6 py-12'>
       {/* Header */}
-      <div className='mb-8'>
+      <div className='mb-12'>
         <Link
           href='/dashboard'
-          className='mb-4 inline-flex items-center text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-gray-200'
+          className='mb-6 inline-flex items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-primary'
         >
           <ChevronLeft className='mr-1 h-4 w-4' />
           Back to Dashboard
         </Link>
-        <h1 className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-gray-900 text-transparent dark:from-blue-400 dark:to-purple-400 dark:text-white'>
+        <h1 className='text-3xl font-bold tracking-tight'>
           Create New Form
         </h1>
-        <p className='mt-2 max-w-2xl text-gray-600 dark:text-gray-400'>
-          Choose how you want to create your form. You can build it manually or
-          let our AI generate one for you based on your description.
+        <p className='mt-3 max-w-2xl text-sm font-medium text-muted-foreground leading-relaxed'>
+          Choose your preferred method of creation. Build from scratch for full control, or use AI to generate a complete structure in seconds.
         </p>
       </div>
 
       {/* Creation mode toggle */}
-      <div className='mb-8 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
-        <div className='grid grid-cols-1 gap-0 sm:grid-cols-2 sm:gap-0'>
+      <div className='mb-12 rounded-3xl border border-border bg-background p-2 shadow-sm'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
           <button
             onClick={() => setCreationMode("ai")}
-            className={`group relative flex flex-col items-start p-6 text-left transition-all duration-200 sm:p-8 ${
+            className={`group relative flex flex-col items-start p-8 text-left transition-all rounded-2xl ${
               creationMode === "ai"
-                ? "bg-purple-50/80 dark:bg-purple-950/30"
-                : "dark:hover:bg-gray-750/50 bg-transparent hover:bg-gray-50"
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                : "bg-transparent hover:bg-muted"
             }`}
           >
             <div
-              className={`absolute inset-0 ${creationMode === "ai" ? "border-t-4 border-purple-500 dark:border-purple-400 sm:border-l-4 sm:border-t-0" : "border-transparent"}`}
-            ></div>
-            <div
-              className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${
+              className={`mb-6 flex h-14 w-14 items-center justify-center rounded-xl border-2 transition-all ${
                 creationMode === "ai"
-                  ? "bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-300"
-                  : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+                  ? "border-primary-foreground bg-primary-foreground/10 text-primary-foreground"
+                  : "border-border bg-muted text-muted-foreground"
               }`}
             >
-              <Sparkles className='h-6 w-6' />
+              <Sparkles className='h-7 w-7' />
             </div>
             <h3
-              className={`mb-2 text-lg font-semibold ${
-                creationMode === "ai"
-                  ? "text-purple-800 dark:text-purple-300"
-                  : "text-gray-800 dark:text-gray-300"
-              }`}
+              className='mb-2 text-xl font-bold tracking-tight'
             >
-              AI-Powered Creation
+              AI Generation
             </h3>
             <p
-              className={`w-full text-left text-sm ${
+              className={`text-sm font-medium leading-relaxed ${
                 creationMode === "ai"
-                  ? "text-purple-700 dark:text-purple-200"
-                  : "text-gray-600 dark:text-gray-400"
+                  ? "text-primary-foreground/80"
+                  : "text-muted-foreground"
               }`}
             >
-              Let AI generate a complete form based on your description.
+              Describe your needs and let AI build a fully functional form for you.
             </p>
 
             {creationMode === "ai" && (
-              <div className='mt-4 flex items-center text-sm font-medium text-purple-600 dark:text-purple-300'>
-                Selected <ArrowRight className='ml-1 h-4 w-4' />
+              <div className='mt-6 flex items-center text-xs font-bold uppercase tracking-widest'>
+                Selected <ArrowRight className='ml-2 h-4 w-4' />
               </div>
             )}
           </button>
 
           <button
             onClick={() => setCreationMode("manual")}
-            className={`group relative flex flex-col items-start p-6 text-left transition-all duration-200 sm:p-8 ${
+            className={`group relative flex flex-col items-start p-8 text-left transition-all rounded-2xl ${
               creationMode === "manual"
-                ? "bg-blue-50/80 dark:bg-blue-950/30"
-                : "dark:hover:bg-gray-750/50 bg-transparent hover:bg-gray-50"
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                : "bg-transparent hover:bg-muted"
             }`}
           >
             <div
-              className={`absolute inset-0 ${creationMode === "manual" ? "border-t-4 border-blue-500 dark:border-blue-400 sm:border-l-4 sm:border-t-0" : "border-transparent"}`}
-            ></div>
-            <div
-              className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${
+              className={`mb-6 flex h-14 w-14 items-center justify-center rounded-xl border-2 transition-all ${
                 creationMode === "manual"
-                  ? "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300"
-                  : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+                  ? "border-primary-foreground bg-primary-foreground/10 text-primary-foreground"
+                  : "border-border bg-muted text-muted-foreground"
               }`}
             >
-              <LayoutTemplate className='h-6 w-6' />
+              <LayoutTemplate className='h-7 w-7' />
             </div>
             <h3
-              className={`mb-2 text-lg font-semibold ${
-                creationMode === "manual"
-                  ? "text-blue-800 dark:text-blue-300"
-                  : "text-gray-800 dark:text-gray-300"
-              }`}
+              className='mb-2 text-xl font-bold tracking-tight'
             >
-              Manual Creation
+              Manual Build
             </h3>
             <p
-              className={`w-full text-left text-sm ${
+              className={`text-sm font-medium leading-relaxed ${
                 creationMode === "manual"
-                  ? "text-blue-700 dark:text-blue-200"
-                  : "text-gray-600 dark:text-gray-400"
+                  ? "text-primary-foreground/80"
+                  : "text-muted-foreground"
               }`}
             >
-              Design your form from scratch with full control over questions and
-              layout.
+              Start from scratch and design every aspect of your form manually.
             </p>
 
             {creationMode === "manual" && (
-              <div className='mt-4 flex items-center text-sm font-medium text-blue-600 dark:text-blue-300'>
-                Selected <ArrowRight className='ml-1 h-4 w-4' />
+              <div className='mt-6 flex items-center text-xs font-bold uppercase tracking-widest'>
+                Selected <ArrowRight className='ml-2 h-4 w-4' />
               </div>
             )}
           </button>
@@ -228,63 +212,63 @@ export default function CreateFormPage() {
 
       {/* Create form - Manual Mode */}
       {creationMode === "manual" && (
-        <div className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
-          <div className='p-6 sm:p-8'>
-            <h2 className='mb-6 flex items-center text-xl font-semibold text-gray-900 dark:text-white'>
-              <LayoutTemplate className='mr-2 h-5 w-5 text-purple-500 dark:text-purple-400' />
-              Create Form Manually
+        <div className='rounded-3xl border border-border bg-background shadow-sm'>
+          <div className='p-8'>
+            <h2 className='mb-8 flex items-center text-2xl font-bold tracking-tight text-foreground'>
+              <LayoutTemplate className='mr-4 h-7 w-7 text-primary' />
+              Form Details
             </h2>
 
             <form onSubmit={handleManualSubmit}>
-              <div className='mb-6'>
+              <div className='mb-8'>
                 <label
                   htmlFor='title'
-                  className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'
+                  className='mb-3 block text-sm font-semibold text-foreground'
                 >
-                  Form Title <span className='text-red-500'>*</span>
+                  Form Title <span className='text-primary'>*</span>
                 </label>
                 <input
                   type='text'
                   id='title'
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Enter form title'
+                  className='w-full rounded-2xl border border-border bg-background px-4 py-4 text-base font-medium placeholder-muted-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10'
+                  placeholder='E.g., Customer Feedback Survey'
                   required
                 />
               </div>
 
-              <div className='mb-6'>
+              <div className='mb-10'>
                 <label
                   htmlFor='description'
-                  className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'
+                  className='mb-3 block text-sm font-semibold text-foreground'
                 >
-                  Description (optional)
+                  Description <span className='text-muted-foreground'>(Optional)</span>
                 </label>
                 <textarea
                   id='description'
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Enter form description'
+                  className='w-full rounded-2xl border border-border bg-background px-4 py-4 text-base font-medium placeholder-muted-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10'
+                  placeholder='Describe the purpose of this form...'
                 ></textarea>
-                <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                  Add context about your form's purpose to guide respondents.
+                <p className='mt-3 text-xs font-medium text-muted-foreground'>
+                  Provide context to help your respondents understand the form's objective.
                 </p>
               </div>
 
-              <div className='flex flex-col justify-end gap-3 pt-2 sm:flex-row'>
+              <div className='flex flex-col justify-end gap-4 pt-4 sm:flex-row'>
                 <Link
                   href='/dashboard'
-                  className='inline-flex items-center justify-center rounded-lg border border-transparent bg-gray-100 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  className='inline-flex items-center justify-center rounded-xl bg-secondary px-8 py-3.5 text-sm font-bold text-secondary-foreground transition-all hover:bg-secondary-hover'
                 >
                   Cancel
                 </Link>
                 <button
                   type='submit'
                   disabled={createMutation.isPending}
-                  className='inline-flex items-center justify-center rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                  className='inline-flex items-center justify-center rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   {createMutation.isPending ? (
                     <>
@@ -292,7 +276,7 @@ export default function CreateFormPage() {
                       Creating...
                     </>
                   ) : (
-                    "Create"
+                    "Create Form"
                   )}
                 </button>
               </div>
@@ -303,65 +287,57 @@ export default function CreateFormPage() {
 
       {/* Create form - AI Mode */}
       {creationMode === "ai" && (
-        <div className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800'>
-          <div className='p-6 sm:p-8'>
-            <h2 className='mb-6 flex items-center text-xl font-semibold text-gray-900 dark:text-white'>
-              <Sparkles className='mr-2 h-5 w-5 text-purple-500 dark:text-purple-400' />
-              Generate Form with AI
+        <div className='rounded-3xl border border-border bg-background shadow-sm'>
+          <div className='p-8'>
+            <h2 className='mb-8 flex items-center text-2xl font-bold tracking-tight text-foreground'>
+              <Sparkles className='mr-4 h-7 w-7 text-primary' />
+              AI Form Generation
             </h2>
 
-            <div className='mb-6 flex items-start rounded-lg border border-purple-100 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20'>
-              <Lightbulb className='mr-3 mt-0.5 h-5 w-5 flex-shrink-0 text-purple-500 dark:text-purple-400' />
-              <div className='w-full'>
-                <h3 className='mb-1 text-sm font-medium text-purple-800 dark:text-purple-300'>
-                  Let AI Design Your Content
-                </h3>
-                <p className='text-sm text-purple-700 dark:text-purple-200'>
-                  Describe what you want to create in detail, and our AI will
-                  generate a complete multi-page structure with relevant
-                  content. You can edit the generated content afterward.
-                </p>
-                <div className='mt-4'>
-                  <div className='mb-3 flex items-center justify-between'>
-                    <p className='text-sm font-medium text-purple-800 dark:text-purple-300'>
-                      Example prompts:
+            <div className='mb-10 rounded-2xl border border-primary/10 bg-primary/[0.03] p-6'>
+              <div className='flex items-start'>
+                <Lightbulb className='mr-4 mt-1 h-6 w-6 flex-shrink-0 text-primary' />
+                <div className='w-full'>
+                  <h3 className='mb-2 text-base font-bold tracking-tight text-foreground'>
+                    How it works
+                  </h3>
+                  <p className='mb-8 text-sm font-medium text-muted-foreground leading-relaxed'>
+                    Describe the form you need in plain English. Our AI will automatically design the questions, pages, and structure for you. You can review and refine the results at any time.
+                  </p>
+                  
+                  <div className='mb-4 flex items-center justify-between'>
+                    <p className='text-xs font-bold uppercase tracking-wider text-foreground'>
+                      Example Prompts
                     </p>
                     <button
                       onClick={handleRefreshExamples}
-                      className='inline-flex items-center rounded-lg bg-purple-100 px-2.5 py-1.5 text-xs font-medium text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50'
+                      className='inline-flex items-center rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-all'
                     >
-                      <ArrowRight className='mr-1 h-3 w-3' />
-                      Load New Examples
+                      <ArrowRight className='mr-1.5 h-3 w-3' />
+                      Refresh Examples
                     </button>
                   </div>
-                  <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+                  <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
                     {examplePromptsList.map((prompt, index) => (
                       <button
                         key={index}
                         onClick={() => setAiPrompt(prompt.prompt)}
-                        className='group flex flex-col overflow-hidden rounded-lg border border-purple-100 bg-white transition-all hover:border-purple-300 hover:shadow-md dark:border-purple-800 dark:bg-gray-800 dark:hover:border-purple-600'
+                        className='group flex flex-col rounded-xl border border-border bg-background transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/5'
                       >
-                        <div className='bg-purple-25 border-b border-purple-50 p-2.5 dark:border-purple-800/50 dark:bg-purple-900/20'>
-                          <div className='flex items-center justify-between'>
-                            <span className='inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/50 dark:text-purple-300'>
-                              {prompt.type}
-                            </span>
-                            <span className='flex items-center text-xs text-purple-600 dark:text-purple-400'>
-                              {prompt.pages}{" "}
-                              {prompt.pages === 1 ? "page" : "pages"}
-                            </span>
-                          </div>
-                          <div className='mt-1.5 text-xs font-medium text-purple-700 dark:text-purple-300'>
-                            {prompt.action}
-                          </div>
+                        <div className='border-b border-border bg-muted/30 p-3 flex items-center justify-between gap-2'>
+                          <span className='rounded-md border border-border bg-background px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground'>
+                            {prompt.type}
+                          </span>
+                          <span className='text-[9px] font-bold text-primary uppercase'>
+                            {prompt.pages} {prompt.pages === 1 ? 'Page' : 'Pages'}
+                          </span>
                         </div>
-                        <div className='flex flex-1 flex-col p-2.5'>
-                          <p className='line-clamp-3 flex-1 text-sm text-gray-600 dark:text-gray-300'>
+                        <div className='flex flex-1 flex-col p-3 text-left'>
+                          <p className='line-clamp-3 text-xs font-semibold leading-relaxed text-muted-foreground transition-colors group-hover:text-foreground'>
                             {prompt.description}
                           </p>
-                          <div className='mt-2 flex items-center justify-end text-xs font-medium text-purple-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-purple-400'>
-                            Use this template{" "}
-                            <ArrowRight className='ml-1 h-3 w-3' />
+                          <div className='mt-3 flex items-center justify-end text-[10px] font-bold uppercase tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100'>
+                            Use Prompt <ArrowRight className='ml-1.5 h-3 w-3' />
                           </div>
                         </div>
                       </button>
@@ -372,103 +348,79 @@ export default function CreateFormPage() {
             </div>
 
             <form onSubmit={handleAiSubmit}>
-              <div className='mb-6'>
+              <div className='mb-8'>
                 <label
                   htmlFor='title'
-                  className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'
+                  className='mb-3 block text-sm font-semibold text-foreground'
                 >
-                  Form Title (optional)
+                  Form Title <span className='text-muted-foreground'>(Optional)</span>
                 </label>
                 <input
                   type='text'
                   id='title'
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Enter form title (or let AI generate one)'
+                  className='w-full rounded-2xl border border-border bg-background px-4 py-4 text-base font-medium placeholder-muted-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10'
+                  placeholder='Leave blank for AI-generated title...'
                 />
-                <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                  Leave blank to use AI-generated title
-                </p>
               </div>
 
-              <div className='mb-6'>
-                <label
-                  htmlFor='description'
-                  className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'
-                >
-                  Description (optional)
-                </label>
-                <textarea
-                  id='description'
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={2}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Enter form description (or let AI generate one)'
-                ></textarea>
-                <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                  Leave blank to use AI-generated description
-                </p>
-              </div>
-
-              <div className='mb-6'>
+              <div className='mb-8'>
                 <label
                   htmlFor='aiPrompt'
-                  className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'
+                  className='mb-3 block text-sm font-semibold text-foreground'
                 >
-                  Describe Your Form <span className='text-red-500'>*</span>
+                  Generation Prompt <span className='text-primary'>*</span>
                 </label>
                 <textarea
                   id='aiPrompt'
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
                   rows={6}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                  placeholder='Describe the form you want to create in detail...'
+                  className='w-full rounded-2xl border border-border bg-background px-4 py-4 text-base font-medium placeholder-muted-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10'
+                  placeholder='E.g., A multi-page survey for a coffee shop to collect feedback on drink quality and service...'
                   required
                 ></textarea>
-                <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                  The more details you provide, the better the AI-generated form
-                  will be.
+                <p className='mt-3 text-xs font-medium text-muted-foreground'>
+                  Be as specific as possible to get the best results from the AI.
                 </p>
               </div>
 
               {aiGenerationError && (
-                <div className='mb-6 flex items-start rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20'>
-                  <AlertCircle className='mr-2 h-5 w-5 flex-shrink-0 text-red-500' />
+                <div className='mb-8 flex items-start rounded-2xl border border-destructive/20 bg-destructive/[0.03] p-4'>
+                  <AlertCircle className='mr-3 h-5 w-5 flex-shrink-0 text-destructive' />
                   <div>
-                    <h3 className='text-sm font-medium text-red-800 dark:text-red-300'>
-                      Error
+                    <h3 className='text-sm font-bold text-destructive'>
+                      Generation Failed
                     </h3>
-                    <p className='text-sm text-red-700 dark:text-red-200'>
+                    <p className='text-xs font-medium text-destructive/80'>
                       {aiGenerationError}
                     </p>
                   </div>
                 </div>
               )}
 
-              <div className='flex flex-col justify-end gap-3 pt-2 sm:flex-row'>
+              <div className='flex flex-col justify-end gap-4 pt-4 sm:flex-row'>
                 <Link
                   href='/dashboard'
-                  className='inline-flex items-center justify-center rounded-lg border border-transparent bg-gray-100 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  className='inline-flex items-center justify-center rounded-xl bg-secondary px-8 py-3.5 text-sm font-bold text-secondary-foreground transition-all hover:bg-secondary-hover'
                 >
                   Cancel
                 </Link>
                 <button
                   type='submit'
                   disabled={isGenerating || generateMutation.isPending}
-                  className='inline-flex items-center justify-center rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                  className='inline-flex items-center justify-center rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   {isGenerating || generateMutation.isPending ? (
                     <>
                       <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      Generating with AI...
+                      Generating...
                     </>
                   ) : (
                     <>
                       <Sparkles className='mr-2 h-4 w-4' />
-                      Generate with AI
+                      Generate Form
                     </>
                   )}
                 </button>

@@ -92,10 +92,10 @@ const SubmissionDetailsModal: React.FC<SubmissionDetailsModalProps> = ({
   });
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 p-4'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-overlay/50 p-4'>
       <div
         ref={modalRef}
-        className='relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-6'
+        className='relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-background p-4 shadow-xl border border-border sm:p-6'
         aria-modal='true'
         role='dialog'
         aria-labelledby='modal-title'

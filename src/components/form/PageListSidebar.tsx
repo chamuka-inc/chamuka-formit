@@ -36,14 +36,14 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
 
   return (
     <div className='flex-shrink-0 lg:w-80'>
-      <div className='rounded-lg border border-gray-200 bg-white/95 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/95'>
+      <div className='rounded-lg border border-border bg-background/95 backdrop-blur-sm'>
         <div className='p-4'>
           <div className='mb-4 flex items-center justify-between'>
             <div>
-              <h2 className='text-base font-semibold text-gray-900 dark:text-gray-100 sm:text-lg'>
+              <h2 className='text-base font-semibold text-foreground sm:text-lg'>
                 Form Pages
               </h2>
-              <p className='mt-0.5 text-xs text-gray-500 dark:text-gray-400 sm:text-sm'>
+              <p className='mt-0.5 text-xs text-muted-foreground sm:text-sm'>
                 {pages.length} page{pages.length !== 1 ? "s" : ""} in total
               </p>
             </div>
@@ -51,7 +51,7 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
             <div className='flex items-center'>
               <button
                 onClick={handleAddPage}
-                className='inline-flex items-center justify-center gap-1.5 rounded-lg bg-gray-100 p-2 text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-700'
+                className='inline-flex items-center justify-center gap-1.5 rounded-lg bg-secondary p-2 text-secondary-foreground transition-colors hover:bg-secondary-hover'
                 title='Add New Page'
               >
                 <PlusCircle className='h-5 w-5' />
@@ -61,7 +61,7 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
 
           <button
             onClick={handleAddPage}
-            className='mb-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700'
+            className='mb-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary-hover'
           >
             <Plus className='h-4 w-4' />
             Add New Page
@@ -70,15 +70,15 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
           <div className='custom-scrollbar max-h-[calc(100vh-280px)] space-y-2 overflow-y-auto pr-1'>
             {pages.length === 0 ? (
               <div className='px-4 py-6 text-center'>
-                <div className='mb-3 inline-flex items-center justify-center rounded-full bg-gray-100 p-3 dark:bg-gray-700/50'>
-                  <FileText className='h-6 w-6 text-gray-500 dark:text-gray-400' />
+                <div className='mb-3 inline-flex items-center justify-center rounded-full bg-muted p-3'>
+                  <FileText className='h-6 w-6 text-muted-foreground' />
                 </div>
-                <p className='mb-3 text-sm text-gray-500 dark:text-gray-400'>
+                <p className='mb-3 text-sm text-muted-foreground'>
                   No pages yet. Start by adding your first page.
                 </p>
                 <button
                   onClick={handleAddPage}
-                  className='inline-flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-700'
+                  className='inline-flex items-center justify-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary-hover'
                 >
                   <Plus className='h-4 w-4' />
                   Create First Page
@@ -91,8 +91,8 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                   onClick={() => handlePageClick(index)}
                   className={`group relative cursor-pointer rounded-lg border transition-colors duration-200 ${
                     index === currentPageIndex
-                      ? "border-blue-500 bg-blue-50/50 dark:border-blue-400 dark:bg-blue-500/5"
-                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-700/30"
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-border-hover hover:bg-muted/50"
                   } `}
                   role='button'
                   aria-current={index === currentPageIndex ? "page" : undefined}
@@ -108,8 +108,8 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                       <div
                         className={`mt-0.5 flex-shrink-0 rounded-md p-1.5 ${
                           index === currentPageIndex
-                            ? "bg-blue-100/50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                            : "text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300"
+                            ? "bg-primary/20 text-primary"
+                            : "text-muted-foreground group-hover:text-foreground"
                         }`}
                       >
                         <FileText className='h-4 w-4' />
@@ -118,14 +118,14 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                         <h3
                           className={`truncate text-sm font-medium ${
                             index === currentPageIndex
-                              ? "text-blue-700 dark:text-blue-400"
-                              : "text-gray-900 dark:text-gray-100"
+                              ? "text-primary"
+                              : "text-foreground"
                           }`}
                         >
                           {page.title || "Untitled Page"}
                         </h3>
                         <div className='mt-1'>
-                          <span className='text-xs text-gray-500 dark:text-gray-400'>
+                          <span className='text-xs text-muted-foreground'>
                             {[
                               page.questions && page.questions.length
                                 ? `${page.questions.length} ${page.questions.length === 1 ? "question" : "questions"}`
@@ -150,7 +150,7 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                         e.stopPropagation();
                         movePageUp(index);
                       }}
-                      className='rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100/50 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-30 dark:text-gray-500 dark:hover:bg-gray-700/50 dark:hover:text-gray-300'
+                      className='rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30'
                       disabled={index === 0}
                       title='Move Up'
                     >
@@ -161,7 +161,7 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
                         e.stopPropagation();
                         movePageDown(index);
                       }}
-                      className='rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100/50 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-30 dark:text-gray-500 dark:hover:bg-gray-700/50 dark:hover:text-gray-300'
+                      className='rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30'
                       disabled={index === pages.length - 1}
                       title='Move Down'
                     >
@@ -183,11 +183,11 @@ export const PageListSidebar = ({ onAddPage }: PageListSidebarProps) => {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: rgba(156, 163, 175, 0.2);
+          background-color: hsl(var(--muted-foreground) / 0.2);
           border-radius: 2px;
         }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: rgba(156, 163, 175, 0.15);
+          background-color: hsl(var(--muted-foreground) / 0.15);
         }
       `}</style>
     </div>

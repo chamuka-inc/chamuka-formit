@@ -141,7 +141,7 @@ export const PageModal = ({
     >
       {/* Backdrop overlay */}
       <div
-        className='fixed inset-0 animate-fade-in bg-black/40 backdrop-blur-sm transition-opacity'
+        className='fixed inset-0 animate-fade-in bg-overlay/40 backdrop-blur-sm transition-opacity'
         onClick={onClose}
         aria-hidden='true'
       />

@@ -65,60 +65,56 @@ export function CreditPurchaseForm() {
   };
 
   return (
-    <div className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800'>
-      <div className='mb-4 flex items-center justify-between'>
-        <h3 className='text-lg font-medium'>Purchase Credits</h3>
-        <div className='text-sm'>
-          <span className='text-gray-500 dark:text-gray-400'>
-            Current Balance:
-          </span>{" "}
-          <span className='font-medium'>{credits?.credits || 0} credits</span>
-        </div>
+    <div className='rounded-3xl border border-border bg-background p-8 shadow-sm'>
+      <div className='mb-8'>
+        <h3 className='text-xl font-bold tracking-tight mb-1'>Buy Credits</h3>
+        <p className='text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+          Balance: <span className='text-primary'>{credits?.credits || 0} Units</span>
+        </p>
       </div>
 
-      <div className='mb-6 space-y-3'>
+      <div className='mb-8 space-y-4'>
         {creditPackages.map((pkg) => (
-          <div
+          <button
             key={pkg.id}
-            className={`cursor-pointer rounded-lg border p-4 transition ${
+            className={`w-full flex flex-col items-start p-4 transition-all rounded-2xl border-2 text-left ${
               selectedPackage === pkg.id
-                ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                : "border-gray-200 hover:border-blue-300 dark:border-gray-700 dark:hover:border-blue-700"
+                ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
+                : "border-border bg-background text-foreground hover:bg-muted"
             } ${pkg.popular ? "relative" : ""} `}
             onClick={() => setSelectedPackage(pkg.id)}
           >
             {pkg.popular && (
-              <div className='absolute -right-2 -top-2 rounded-full bg-blue-500 px-2 py-1 text-xs text-white'>
-                Most Popular
+              <div className='absolute -right-1 -top-2 rounded-full bg-primary px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-primary-foreground shadow-sm'>
+                Popular
               </div>
             )}
-            <div className='flex justify-between'>
-              <div>
-                <div className='font-medium'>{pkg.name}</div>
-                <div className='text-sm text-gray-500 dark:text-gray-400'>
+            <div className='flex justify-between items-center w-full'>
+              <div className='min-w-0'>
+                <div className='text-sm font-bold tracking-tight'>{pkg.name}</div>
+                <div className={`text-[11px] font-medium truncate ${selectedPackage === pkg.id ? 'text-primary/70' : 'text-muted-foreground'}`}>
                   {pkg.description}
                 </div>
               </div>
-              <div className='text-right'>
-                <div className='font-bold'>{pkg.credits} credits</div>
-                <div className='text-sm'>${(pkg.amount / 100).toFixed(2)}</div>
+              <div className='text-right shrink-0 ml-4'>
+                <div className='text-sm font-bold tracking-tight text-primary'>{pkg.credits} Units</div>
+                <div className='text-xs font-semibold text-muted-foreground'>${(pkg.amount / 100).toFixed(2)}</div>
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
 
       <button
-        className='w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+        className='w-full rounded-xl bg-primary px-6 py-4 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50'
         onClick={handlePurchase}
         disabled={isLoading}
       >
         {isLoading ? "Processing..." : "Purchase Credits"}
       </button>
 
-      <div className='mt-4 text-center text-xs text-gray-500 dark:text-gray-400'>
-        Secure payment processing. No credit card information is stored on our
-        servers.
+      <div className='mt-6 text-center text-[10px] font-medium text-muted-foreground'>
+        Payments are processed securely. No credit card data is stored on our servers.
       </div>
     </div>
   );

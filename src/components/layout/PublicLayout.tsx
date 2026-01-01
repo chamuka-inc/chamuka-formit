@@ -25,26 +25,26 @@ export default function PublicLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className='flex min-h-screen flex-col bg-white dark:bg-gray-900'>
+    <div className='flex min-h-screen flex-col bg-background'>
       {/* Header */}
-      <div className='relative bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 dark:from-blue-500 dark:via-indigo-500 dark:to-blue-600'>
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+      <div className='relative bg-primary'>
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-light"></div>
         <div className='relative z-10 w-full px-4 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-4'>
           <div className='flex w-full items-center justify-between'>
             {/* Logo - Visible on all screens */}
             <div className='flex items-center gap-1.5 sm:gap-2'>
               <Link
                 href='/'
-                className='flex items-center gap-1.5 text-base font-semibold text-white sm:gap-2 sm:text-lg md:text-xl'
+                className='flex items-center gap-1.5 text-base font-semibold text-primary-foreground sm:gap-2 sm:text-lg md:text-xl font-display'
               >
-                <FileText className='h-5 w-5 text-white sm:h-6 sm:w-6 md:h-7 md:w-7' />
+                <FileText className='h-5 w-5 text-primary-foreground sm:h-6 sm:w-6 md:h-7 md:w-7' />
                 <span className='whitespace-nowrap'>Chamuka FormIt</span>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <div className='hidden items-center gap-4 md:flex'>
-              <AuthProvider className='flex items-center gap-2 rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30' />
+              <AuthProvider className='flex items-center gap-2 rounded-md bg-primary-foreground/20 px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/30' />
             </div>
 
             {/* Mobile menu button */}
@@ -52,7 +52,7 @@ export default function PublicLayout({
               <button
                 type='button'
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className='inline-flex items-center justify-center rounded-md p-1.5 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 sm:p-2'
+                className='inline-flex items-center justify-center rounded-md p-1.5 text-primary-foreground hover:bg-primary-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50 sm:p-2'
                 aria-expanded='false'
               >
                 <span className='sr-only'>Open main menu</span>
@@ -67,12 +67,12 @@ export default function PublicLayout({
 
           {/* Mobile menu, show/hide based on menu state */}
           {mobileMenuOpen && (
-            <div className='mt-2 space-y-1.5 border-t border-white/20 pb-2 pt-2 sm:space-y-2 sm:pb-3 sm:pt-3 md:hidden'>
+            <div className='mt-2 space-y-1.5 border-t border-primary-foreground/20 pb-2 pt-2 sm:space-y-2 sm:pb-3 sm:pt-3 md:hidden'>
               <div
                 className='px-3 py-1.5 sm:px-4 sm:py-2'
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <AuthProvider className='flex w-full items-center justify-center gap-1.5 rounded-md bg-white/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/30 sm:gap-2 sm:py-2' />
+                <AuthProvider className='flex w-full items-center justify-center gap-1.5 rounded-md bg-primary-foreground/20 px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/30 sm:gap-2 sm:py-2' />
               </div>
             </div>
           )}
@@ -83,9 +83,9 @@ export default function PublicLayout({
       <div className='flex-grow'>{children}</div>
 
       {/* Footer */}
-      <footer className='border-t border-gray-200 bg-white py-4 dark:border-gray-700 dark:bg-gray-800 sm:py-6 lg:py-8'>
+      <footer className='border-t border-border bg-background-secondary py-4 sm:py-6 lg:py-8'>
         <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='text-center text-xs text-gray-600 dark:text-gray-400 sm:text-sm'>
+          <div className='text-center text-xs text-muted-foreground sm:text-sm'>
             <p>
               &copy; {new Date().getFullYear()} Chamuka FormIt. All rights
               reserved.

@@ -266,9 +266,9 @@ export const SpeechToTextArea = forwardRef<
         <motion.div
           className={`${
             waveformActive
-              ? "border-aurora-500/50 from-aurora-500/30 via-aurora-50/30 to-aurora-500/30 bg-gradient-to-r text-transparent"
+              ? "border-primary/50 from-primary/30 via-accent/30 to-primary/30 bg-gradient-to-r text-transparent"
               : ""
-          } hide-scrollbar border-aurora-100 bg-aurora-50/30 flex h-full w-full items-center overflow-hidden overflow-y-scroll rounded-2xl dark:border-sky-600/30 dark:bg-slate-700`}
+          } hide-scrollbar border-accent bg-accent/30 flex h-full w-full items-center overflow-hidden overflow-y-scroll rounded-2xl dark:border-primary/30 dark:bg-background-secondary`}
           animate={{
             padding: waveformActive ? "1.5rem" : "0.375rem",
           }}
@@ -279,7 +279,7 @@ export const SpeechToTextArea = forwardRef<
             className={`${
               waveformActive
                 ? "text-transparent"
-                : "text-dark-blue dark:text-slate-100"
+                : "text-foreground dark:text-foreground"
             } ${
               isLoading ? "opacity-50" : ""
             } hide-scrollbar transition-height m-0 flex-1 resize-none border-0 bg-transparent px-3 py-2 transition-colors focus:outline-none focus:ring-0 focus-visible:ring-0`}
@@ -306,9 +306,9 @@ export const SpeechToTextArea = forwardRef<
               type='button'
               className={`${
                 waveformActive
-                  ? "text-blossom-500 hover:text-blossom-700 z-20 mr-5"
-                  : "text-aurora-500 hover:text-aurora-600"
-              } transform text-xl dark:text-gray-300 dark:hover:text-gray-500`}
+                  ? "text-primary hover:text-primary-hover z-20 mr-5"
+                  : "text-primary hover:text-primary-hover"
+              } transform text-xl dark:text-foreground-secondary dark:hover:text-foreground`}
               onClick={isRecording ? stopRecording : startRecording}
               aria-label={isRecording ? "Stop recording" : "Start recording"}
               disabled={isTranscribing || isUploading}
@@ -327,7 +327,7 @@ export const SpeechToTextArea = forwardRef<
                 type='button'
                 className={`${
                   waveformActive ? "hidden" : ""
-                } bg-aurora-500 hover:bg-aurora-600 flex h-8 w-8 items-center justify-center rounded-full text-white transition-colors focus-visible:outline-none disabled:bg-gray-300 dark:bg-sky-600 dark:hover:bg-sky-700 dark:disabled:bg-gray-600`}
+                } bg-primary hover:bg-primary-hover flex h-8 w-8 items-center justify-center rounded-full text-primary-foreground transition-colors focus-visible:outline-none disabled:bg-muted dark:bg-primary dark:hover:bg-primary-hover dark:disabled:bg-muted`}
                 disabled={
                   !value.trim() || isLoading || waveformActive || isUploading
                 }
@@ -371,10 +371,10 @@ export const SpeechToTextArea = forwardRef<
                       key={index}
                       className={`w-1 rounded-full ${
                         adjustedHeight > 100
-                          ? "bg-aurora-500"
+                          ? "bg-primary"
                           : adjustedHeight > 50
-                            ? "bg-aurora-500/80"
-                            : "bg-aurora-500/40"
+                            ? "bg-primary/80"
+                            : "bg-primary/40"
                       }`}
                       style={{
                         height: "50px",

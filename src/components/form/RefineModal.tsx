@@ -383,12 +383,12 @@ export function RefineFormModal({
 
           {aiPromptOpen && (
             <div
-              className='fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50 p-2 sm:p-4 md:p-6'
+              className='fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-overlay/50 p-2 sm:p-4 md:p-6'
               onScroll={handleContentScroll}
               onClick={() => setAiPromptOpen(false)}
             >
               <div
-                className='relative max-h-[95vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-gray-800'
+                className='relative max-h-[95vh] w-full max-w-lg overflow-y-auto rounded-lg bg-background shadow-xl border border-border'
                 onScroll={handleContentScroll}
                 onClick={handleContentClick}
               >

@@ -59,7 +59,7 @@ const SearchBar = ({
 }) => (
   <div className='relative flex flex-1 sm:max-w-xs'>
     <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
-      <Search className='h-5 w-5 text-gray-400' />
+      <Search className='h-4 w-4 text-muted-foreground' />
     </div>
     <input
       type='text'
@@ -67,14 +67,8 @@ const SearchBar = ({
       onChange={onChange}
       onKeyDown={onKeyDown}
       placeholder='Search forms...'
-      className='block w-full rounded-l-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400'
+      className='block w-full rounded-xl border border-border bg-background py-2.5 pl-10 pr-3 text-sm transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10'
     />
-    <button
-      onClick={onSearch}
-      className='inline-flex items-center rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-    >
-      Search
-    </button>
   </div>
 );
 
@@ -93,35 +87,33 @@ const StatusFilter = ({
   ];
 
   const getFilterStyle = (status: string | null) => {
+    if (status === null) return "bg-primary text-primary-foreground";
     switch (status) {
       case "draft":
-        return "bg-yellow-100 text-yellow-800 ring-1 ring-yellow-400 dark:bg-yellow-900/30 dark:text-yellow-300 dark:ring-yellow-500";
+        return "bg-warning/10 text-warning border-warning/20";
       case "published":
-        return "bg-green-100 text-green-800 ring-1 ring-green-400 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-500";
+        return "bg-success/10 text-success border-success/20";
       case "archived":
-        return "bg-gray-300 text-gray-800 ring-1 ring-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:ring-gray-500";
-      case null:
-        return "bg-blue-100 text-blue-800 ring-1 ring-blue-400 dark:bg-blue-900/30 dark:text-blue-300 dark:ring-blue-500";
+        return "bg-secondary text-secondary-foreground";
       default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600";
+        return "bg-background text-foreground border-border";
     }
   };
 
   return (
-    <div className='flex flex-wrap items-center gap-2'>
-      <span className='mr-2 text-sm font-medium text-gray-700 dark:text-gray-300'>
-        <Filter className='mr-1.5 inline h-4 w-4' />
-        Filter by status:
+    <div className='flex flex-wrap items-center gap-3'>
+      <span className='text-xs font-semibold text-muted-foreground'>
+        Filter:
       </span>
       <div className='flex flex-wrap gap-2'>
         {filters.map(({ label, value }) => (
           <button
             key={label}
             onClick={() => onFilterChange(value)}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
               currentFilter === value
-                ? getFilterStyle(value)
-                : "bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                ? getFilterStyle(value) + " shadow-sm"
+                : "border border-border bg-background text-foreground hover:bg-muted"
             }`}
           >
             {label}
@@ -142,13 +134,13 @@ const FormCard = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "draft":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+        return "bg-warning/10 text-warning";
       case "published":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+        return "bg-success/10 text-success";
       case "archived":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+        return "bg-muted text-muted-foreground";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+        return "bg-muted text-muted-foreground";
     }
   };
 
@@ -157,77 +149,77 @@ const FormCard = ({
   };
 
   return (
-    <div className='group flex h-full flex-col overflow-hidden rounded-lg bg-white shadow transition-shadow hover:shadow-md dark:bg-gray-800'>
+    <div className='group flex h-full flex-col rounded-2xl border border-border bg-background transition-all hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5'>
       <div className='flex flex-1 flex-col p-6'>
         <div className='mb-4 flex items-start justify-between'>
           <span
-            className={`rounded-full px-2.5 py-1 text-xs font-medium ${getStatusBadge(
+            className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getStatusBadge(
               form.status,
             )}`}
           >
-            {form.status.charAt(0).toUpperCase() + form.status.slice(1)}
+            {form.status}
           </span>
         </div>
 
         <Link
           href={`/forms/${form.id}/edit`}
-          className='block transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400'
+          className='block'
         >
-          <h2 className='mb-2 line-clamp-1 text-lg font-semibold text-gray-900 dark:text-white'>
+          <h2 className='mb-2 line-clamp-1 text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary'>
             {form.title}
           </h2>
         </Link>
 
         {form.description && (
-          <p className='mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-300'>
+          <p className='mb-6 line-clamp-2 text-sm font-medium leading-relaxed text-muted-foreground'>
             {form.description}
           </p>
         )}
 
-        <div className='mt-auto space-y-2 text-xs text-gray-500 dark:text-gray-400'>
+        <div className='mt-auto space-y-2 border-t border-border/50 pt-4 text-[11px] font-medium text-muted-foreground'>
           <div className='flex items-center'>
-            <Calendar className='mr-1.5 h-3.5 w-3.5' />
-            <span>Created: {formatDate(form.createdAt)}</span>
+            <Calendar className='mr-2 h-3 w-3 opacity-60' />
+            <span>Created {formatDate(form.createdAt)}</span>
           </div>
           <div className='flex items-center'>
-            <Clock className='mr-1.5 h-3.5 w-3.5' />
-            <span>Updated: {formatDate(form.updatedAt)}</span>
+            <Clock className='mr-2 h-3 w-3 opacity-60' />
+            <span>Updated {formatDate(form.updatedAt)}</span>
           </div>
         </div>
       </div>
 
-      <div className='border-t border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800'>
+      <div className='border-t border-border bg-muted/30 p-4 rounded-b-2xl'>
         <div className='flex items-center justify-between'>
-          <div className='flex space-x-2'>
+          <div className='flex gap-1'>
             <Link
               href={`/forms/${form.id}/edit`}
-              className='rounded p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20'
+              className='rounded-lg p-2 text-muted-foreground hover:bg-background hover:text-primary transition-all'
               title='Edit Form'
             >
               <Edit className='h-4 w-4' />
             </Link>
             <button
               onClick={() => onDelete(form.id)}
-              className='rounded p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20'
+              className='rounded-lg p-2 text-muted-foreground hover:bg-background hover:text-destructive transition-all'
               title='Delete Form'
             >
               <Trash2 className='h-4 w-4' />
             </button>
           </div>
-          <div className='flex space-x-2'>
+          <div className='flex gap-1'>
             {form.status === "published" && (
               <>
                 <Link
                   href={`/s/${form.publicShareToken}`}
                   target='_blank'
-                  className='rounded p-2 text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20'
+                  className='rounded-lg p-2 text-muted-foreground hover:bg-background hover:text-success transition-all'
                   title='Open Form'
                 >
                   <ExternalLink className='h-4 w-4' />
                 </Link>
                 <Link
                   href={`/forms/${form.id}/analytics`}
-                  className='rounded p-2 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20'
+                  className='rounded-lg p-2 text-muted-foreground hover:bg-background hover:text-primary transition-all'
                   title='View Analytics'
                 >
                   <LineChart className='h-4 w-4' />
@@ -252,20 +244,20 @@ const Pagination = ({
   total: number;
   onPageChange: (page: number) => void;
 }) => (
-  <div className='mt-6 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700 sm:px-6'>
+  <div className='mt-8 flex items-center justify-between rounded-2xl border border-border bg-background p-4 shadow-sm'>
     {/* Mobile pagination */}
     <div className='flex flex-1 justify-between sm:hidden'>
       <button
         onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
         disabled={currentPage === 1}
-        className='relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+        className='rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted disabled:opacity-50 transition-all'
       >
         Previous
       </button>
       <button
         onClick={() => onPageChange(Math.min(currentPage + 1, pageCount))}
         disabled={currentPage === pageCount}
-        className='relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+        className='rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted disabled:opacity-50 transition-all'
       >
         Next
       </button>
@@ -274,30 +266,21 @@ const Pagination = ({
     {/* Desktop pagination */}
     <div className='hidden sm:flex sm:flex-1 sm:items-center sm:justify-between'>
       <div>
-        <p className='text-sm text-gray-700 dark:text-gray-300'>
-          Showing{" "}
-          <span className='font-medium'>
-            {(currentPage - 1) * ITEMS_PER_PAGE + 1}
-          </span>{" "}
-          to{" "}
-          <span className='font-medium'>
-            {Math.min(currentPage * ITEMS_PER_PAGE, total)}
-          </span>{" "}
-          of <span className='font-medium'>{total}</span> results
+        <p className='text-xs font-medium text-muted-foreground'>
+          Showing <span className='font-bold text-foreground'>{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className='font-bold text-foreground'>{Math.min(currentPage * ITEMS_PER_PAGE, total)}</span> of <span className='font-bold text-foreground'>{total}</span> forms
         </p>
       </div>
       <div>
         <nav
-          className='isolate inline-flex -space-x-px rounded-md shadow-sm'
+          className='flex gap-1.5'
           aria-label='Pagination'
         >
           <button
             onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
-            className='relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+            className='rounded-lg border border-border bg-background p-2 hover:bg-muted disabled:opacity-50 transition-all'
           >
-            <span className='sr-only'>Previous</span>
-            <ChevronLeft className='h-5 w-5' />
+            <ChevronLeft className='h-4 w-4' />
           </button>
           {Array.from({ length: pageCount }).map((_, index) => {
             const pageNumber = index + 1;
@@ -307,10 +290,10 @@ const Pagination = ({
               <button
                 key={pageNumber}
                 onClick={() => onPageChange(pageNumber)}
-                className={`relative inline-flex items-center border px-4 py-2 text-sm font-medium ${
+                className={`flex h-9 w-9 items-center justify-center rounded-lg border text-xs font-bold transition-all ${
                   isCurrentPage
-                    ? "z-10 border-blue-600 bg-blue-600 text-white dark:border-blue-700 dark:bg-blue-700"
-                    : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                    ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                    : "border-border bg-background text-foreground hover:bg-muted"
                 }`}
               >
                 {pageNumber}
@@ -320,10 +303,9 @@ const Pagination = ({
           <button
             onClick={() => onPageChange(Math.min(currentPage + 1, pageCount))}
             disabled={currentPage === pageCount}
-            className='relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+            className='rounded-lg border border-border bg-background p-2 hover:bg-muted disabled:opacity-50 transition-all'
           >
-            <span className='sr-only'>Next</span>
-            <ChevronRight className='h-5 w-5' />
+            <ChevronRight className='h-4 w-4' />
           </button>
         </nav>
       </div>
@@ -459,41 +441,38 @@ export default function DashboardPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className='p-4'>
-        <div className='mb-8 flex items-center justify-between'>
-          <h1 className='text-2xl font-bold'>My Collection</h1>
-          <div className='h-10 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700'></div>
+      <div className='p-8 max-w-7xl mx-auto'>
+        <div className='mb-10 flex items-end justify-between'>
+          <div className='space-y-3'>
+            <div className='h-9 w-48 animate-pulse rounded-lg bg-muted'></div>
+            <div className='h-4 w-64 animate-pulse rounded-lg bg-muted'></div>
+          </div>
+          <div className='h-12 w-40 animate-pulse rounded-xl bg-muted'></div>
         </div>
 
-        <div className='mb-6 flex gap-2'>
-          <div className='h-6 w-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700'></div>
-          <div className='h-6 w-20 animate-pulse rounded bg-gray-200 dark:bg-gray-700'></div>
-          <div className='h-6 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700'></div>
+        <div className='mb-10 rounded-2xl border border-border bg-background p-6 shadow-sm'>
+          <div className='flex gap-6'>
+            <div className='h-10 flex-1 animate-pulse rounded-xl bg-muted'></div>
+            <div className='h-10 w-64 animate-pulse rounded-xl bg-muted'></div>
+          </div>
         </div>
 
-        <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+        <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className='flex h-full animate-pulse flex-col rounded-lg bg-white shadow dark:bg-gray-800'
+              className='flex h-[400px] animate-pulse flex-col rounded-2xl border border-border bg-background'
             >
               <div className='flex-1 p-6'>
-                <div className='mb-4 flex items-start justify-between'>
-                  <div className='h-6 w-20 rounded bg-gray-200 dark:bg-gray-700'></div>
-                </div>
-                <div className='mb-4 h-6 w-3/4 rounded bg-gray-200 dark:bg-gray-700'></div>
-                <div className='mb-6 h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700'></div>
-                <div className='mt-auto space-y-2'>
-                  <div className='h-4 w-40 rounded bg-gray-200 dark:bg-gray-700'></div>
-                  <div className='h-4 w-32 rounded bg-gray-200 dark:bg-gray-700'></div>
+                <div className='mb-4 h-5 w-16 rounded-full bg-muted'></div>
+                <div className='mb-4 h-7 w-3/4 rounded-lg bg-muted'></div>
+                <div className='mb-6 h-4 w-1/2 rounded-lg bg-muted'></div>
+                <div className='mt-auto space-y-3'>
+                  <div className='h-3 w-40 rounded bg-muted'></div>
+                  <div className='h-3 w-32 rounded bg-muted'></div>
                 </div>
               </div>
-              <div className='border-t border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800'>
-                <div className='flex justify-between'>
-                  <div className='h-8 w-20 rounded bg-gray-200 dark:bg-gray-700'></div>
-                  <div className='h-8 w-20 rounded bg-gray-200 dark:bg-gray-700'></div>
-                </div>
-              </div>
+              <div className='h-20 border-t border-border bg-muted/30 rounded-b-2xl'></div>
             </div>
           ))}
         </div>
@@ -518,44 +497,31 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className='p-4'>
+    <div className='p-8 max-w-7xl mx-auto'>
       {/* Header */}
-      <div className='mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
+      <div className='mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
         <div className='min-w-0 flex-1'>
-          <div className='flex items-center justify-between gap-4 lg:justify-start'>
-            <div className='min-w-0 flex-1'>
-              <h1 className='truncate text-xl font-bold text-gray-900 dark:text-white sm:text-2xl'>
-                My Collection
-              </h1>
-              <p className='mt-1 text-sm text-gray-600 dark:text-gray-400'>
-                Manage and analyze your collection
-              </p>
-            </div>
-            <div className='flex shrink-0 lg:hidden'>
-              <Link
-                href='/forms/create'
-                className='inline-flex items-center justify-center rounded-md bg-blue-600 p-2 text-white shadow-sm transition-colors hover:bg-blue-700 sm:px-4 sm:py-2'
-              >
-                <Plus className='h-5 w-5 sm:mr-1.5' />
-                <span className='hidden sm:inline'>Create</span>
-              </Link>
-            </div>
-          </div>
+          <h1 className='text-3xl font-bold tracking-tight mb-2'>
+            My Forms
+          </h1>
+          <p className='text-sm font-medium text-muted-foreground'>
+            Manage your content and view performance analytics.
+          </p>
         </div>
-        <div className='hidden lg:flex lg:items-center lg:space-x-3'>
+        <div className='flex shrink-0'>
           <Link
             href='/forms/create'
-            className='inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700'
+            className='inline-flex items-center rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:scale-[1.02] active:scale-100'
           >
-            <Plus className='mr-1.5 h-5 w-5' />
-            Create
+            <Plus className='mr-2 h-5 w-5' />
+            Create New Form
           </Link>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className='mb-6 rounded-lg bg-white p-4 shadow dark:bg-gray-800'>
-        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+      <div className='mb-10 rounded-2xl border border-border bg-background p-6 shadow-sm'>
+        <div className='flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between'>
           <SearchBar
             value={searchInput}
             onChange={handleSearchChange}
@@ -572,7 +538,7 @@ export default function DashboardPage() {
       {/* Form list */}
       {filteredForms && filteredForms.length > 0 ? (
         <>
-          <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
             {filteredForms.map((form) => (
               <FormCard
                 key={form.id}
@@ -593,28 +559,26 @@ export default function DashboardPage() {
           )}
         </>
       ) : (
-        <div className='rounded-lg border-2 border-dashed border-gray-300 p-12 text-center dark:border-gray-700'>
-          <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800'>
-            <FileText className='h-6 w-6 text-gray-600 dark:text-gray-400' />
+        <div className='rounded-2xl border border-dashed border-border bg-muted/30 p-16 text-center'>
+          <div className='mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-background shadow-sm'>
+            <FileText className='h-8 w-8 text-primary' />
           </div>
-          <h3 className='mt-2 text-sm font-medium text-gray-900 dark:text-white'>
-            No forms found
+          <h3 className='mb-2 text-xl font-bold tracking-tight'>
+            No forms yet
           </h3>
-          <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
+          <p className='mb-8 text-sm font-medium text-muted-foreground'>
             {search
               ? "No forms match your search criteria"
-              : "Get started by creating a new form"}
+              : "Get started by creating your first form structure."}
           </p>
           {!search && (
-            <div className='mt-6'>
-              <Link
-                href='/forms/create'
-                className='inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700'
-              >
-                <Plus className='mr-1.5 h-5 w-5' />
-                Create Form
-              </Link>
-            </div>
+            <Link
+              href='/forms/create'
+              className='inline-flex items-center rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:scale-[1.02]'
+            >
+              <Plus className='mr-2 h-5 w-5' />
+              Create Form
+            </Link>
           )}
         </div>
       )}
