@@ -12,6 +12,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { ReactNode } from "react";
 import { Components } from "react-markdown";
+import { LatexText } from "@/components/LatexText";
 
 interface ContextElementsProps {
   elements?: ContextElement[];
@@ -127,6 +128,22 @@ const processMarkdownContent = (content: string): string => {
   return processedLines.join("\n");
 };
 
+// Helper function to process React children and wrap text nodes with LaTeX support
+const processChildrenForLatex = (children: ReactNode): ReactNode => {
+  if (typeof children === "string") {
+    return <LatexText>{children}</LatexText>;
+  }
+  if (Array.isArray(children)) {
+    return children.map((child, index) => {
+      if (typeof child === "string") {
+        return <LatexText key={index}>{child}</LatexText>;
+      }
+      return child;
+    });
+  }
+  return children;
+};
+
 // Type for code component props that includes the inline property
 interface CodeProps {
   className?: string;
@@ -179,7 +196,9 @@ const markdownComponents: Components = {
       <p
         className='mb-4 hyphens-auto break-words text-sm md:text-base'
         {...props}
-      />
+      >
+        {processChildrenForLatex(props.children)}
+      </p>
     );
   },
   h1(props) {
@@ -187,7 +206,9 @@ const markdownComponents: Components = {
       <h1
         className='mb-4 mt-6 break-words text-lg font-bold sm:text-xl md:text-2xl lg:text-3xl'
         {...props}
-      />
+      >
+        {processChildrenForLatex(props.children)}
+      </h1>
     );
   },
   h2(props) {
@@ -195,7 +216,9 @@ const markdownComponents: Components = {
       <h2
         className='mb-3 mt-5 break-words text-base font-bold sm:text-lg md:text-xl lg:text-2xl'
         {...props}
-      />
+      >
+        {processChildrenForLatex(props.children)}
+      </h2>
     );
   },
   h3(props) {
@@ -203,7 +226,9 @@ const markdownComponents: Components = {
       <h3
         className='mb-2 mt-4 break-words text-sm font-semibold sm:text-base md:text-lg lg:text-xl'
         {...props}
-      />
+      >
+        {processChildrenForLatex(props.children)}
+      </h3>
     );
   },
   h4(props) {
@@ -211,7 +236,9 @@ const markdownComponents: Components = {
       <h4
         className='mb-2 mt-3 break-words text-sm font-semibold sm:text-base md:text-lg lg:text-xl'
         {...props}
-      />
+      >
+        {processChildrenForLatex(props.children)}
+      </h4>
     );
   },
   ul(props) {
@@ -231,7 +258,11 @@ const markdownComponents: Components = {
     );
   },
   li(props) {
-    return <li className='mb-1 break-words text-sm md:text-base' {...props} />;
+    return (
+      <li className='mb-1 break-words text-sm md:text-base' {...props}>
+        {processChildrenForLatex(props.children)}
+      </li>
+    );
   },
   a(props) {
     return (
@@ -261,7 +292,9 @@ const markdownComponents: Components = {
       <th
         className='border-b border-gray-200 px-2 py-2 text-left text-sm font-medium uppercase tracking-wider dark:border-gray-700 sm:px-3 sm:py-2'
         {...props}
-      />
+      >
+        {processChildrenForLatex(props.children)}
+      </th>
     );
   },
   td(props) {
@@ -269,7 +302,9 @@ const markdownComponents: Components = {
       <td
         className='break-words border-b border-gray-200 px-2 py-2 align-top dark:border-gray-800 sm:px-3 sm:py-2'
         {...props}
-      />
+      >
+        {processChildrenForLatex(props.children)}
+      </td>
     );
   },
   tr(props) {
@@ -282,7 +317,9 @@ const markdownComponents: Components = {
       <blockquote
         className='my-4 border-l-4 border-gray-300 pl-4 text-sm italic text-gray-700 dark:border-gray-700 dark:text-gray-300'
         {...props}
-      />
+      >
+        {processChildrenForLatex(props.children)}
+      </blockquote>
     );
   },
   hr(props) {
