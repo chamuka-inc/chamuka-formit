@@ -204,7 +204,7 @@ const FormNavigation = ({
   };
 
   return (
-    <div className='flex items-center justify-between gap-4 border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50 sm:px-8 sm:py-4'>
+    <div className='flex items-center justify-between gap-4 border-t border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50 sm:px-8 sm:py-4'>
       <button
         onClick={onPrevious}
         disabled={currentPageIndex === 0}
@@ -688,19 +688,6 @@ export default function FormRenderer({
 
           {/* Page Content */}
           <div className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800'>
-            {/* Navigation Header - Moved from footer to top */}
-            <FormNavigation
-              currentPageIndex={currentPageIndex}
-              totalPages={totalPages}
-              isSubmitting={isSubmitting}
-              isPreview={isPreview}
-              onPrevious={goToPrevPage}
-              onNext={goToNextPage}
-              onSubmit={handleSubmit}
-              pages={pages}
-              setPageIndex={setCurrentPageIndex}
-            />
-
             <div className='p-5 sm:p-8'>
               <div className='mb-8 border-b border-gray-100 pb-4 dark:border-gray-700'>
                 <div className='flex items-center gap-2 sm:gap-3'>
@@ -786,6 +773,19 @@ export default function FormRenderer({
                 )}
               </div>
             </div>
+
+            {/* Navigation Footer - at bottom of page */}
+            <FormNavigation
+              currentPageIndex={currentPageIndex}
+              totalPages={totalPages}
+              isSubmitting={isSubmitting}
+              isPreview={isPreview}
+              onPrevious={goToPrevPage}
+              onNext={goToNextPage}
+              onSubmit={handleSubmit}
+              pages={pages}
+              setPageIndex={setCurrentPageIndex}
+            />
           </div>
         </div>
       </div>
