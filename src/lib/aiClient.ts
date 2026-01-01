@@ -80,8 +80,8 @@ export const AI_MODELS = {
   GPT_4O_MINI: "gpt-4o-mini",
   PERPLEXITY_SMALL: "sonar",
   PERPLEXITY_LARGE: "sonar-pro",
-  GEMINI_FLASH_WEB: "gemini-2.0-flash-exp",
-  GEMINI_FLASH_THINKING: "gemini-2.0-flash-thinking-exp-01-21",
+  GEMINI_FLASH_WEB: "gemini-flash-latest",
+  GEMINI_FLASH_THINKING: "gemini-flash-latest",
 } as const;
 
 export type AIModel = keyof typeof AI_MODELS;
