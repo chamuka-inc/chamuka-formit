@@ -20,23 +20,26 @@ export function CreditCounter() {
 
   if (isLoading) {
     return (
-      <div className='flex animate-pulse items-center gap-1 text-sm'>
-        <Sparkles className='h-4 w-4 text-amber-500' />
+      <div className='flex animate-pulse items-center gap-1 text-sm text-muted-foreground'>
+        <Sparkles className='h-4 w-4 text-warning' />
         <span>Loading...</span>
       </div>
     );
   }
 
   return (
-    <div className='flex items-center gap-2 text-sm'>
-      <div className='flex items-center gap-1'>
-        <Sparkles className='h-4 w-4 text-amber-500' />
-        <span className='font-medium'>
-          {credits?.credits ?? 0} Credits Left
+    <div className='flex items-center gap-3 rounded-full border border-border bg-background px-4 py-1.5 shadow-sm'>
+      <div className='flex items-center gap-2'>
+        <Sparkles className='h-4 w-4 text-primary' />
+        <span className='text-xs font-semibold text-foreground'>
+          {credits?.credits ?? 0} Credits
         </span>
       </div>
-      <Link href='/credits' className='text-xs text-blue-500 hover:underline'>
-        Get More
+      <Link 
+        href='/credits' 
+        className='border-l border-border pl-3 text-xs font-bold text-primary hover:text-primary-hover transition-colors'
+      >
+        Add More
       </Link>
     </div>
   );

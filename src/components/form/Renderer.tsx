@@ -40,11 +40,11 @@ const FormHeader = ({
 
   return (
     <div className='mb-6 sm:mb-8'>
-      <h1 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
+      <h1 className='text-xl font-bold text-foreground sm:text-2xl font-display'>
         <LatexText>{title}</LatexText>
       </h1>
       {description && (
-        <p className='mt-2 text-sm text-gray-600 dark:text-gray-300 sm:mt-3'>
+        <p className='mt-2 text-sm text-foreground-secondary sm:mt-3'>
           <LatexText>{description}</LatexText>
         </p>
       )}
@@ -65,16 +65,16 @@ const ProgressIndicator = ({
   return (
     <div className='mb-6'>
       <div className='mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between'>
-        <div className='mb-1 text-sm font-medium text-gray-700 dark:text-gray-300 sm:mb-0'>
+        <div className='mb-1 text-sm font-medium text-foreground-secondary sm:mb-0'>
           Page {current + 1} of {total}
         </div>
-        <div className='text-sm text-gray-500 dark:text-gray-400'>
+        <div className='text-sm text-muted-foreground'>
           {percentage}% Complete
         </div>
       </div>
-      <div className='h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700'>
+      <div className='h-2 w-full overflow-hidden rounded-full bg-muted'>
         <div
-          className='h-full bg-blue-500 transition-all duration-300 dark:bg-blue-400'
+          className='h-full bg-primary transition-all duration-300'
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -85,11 +85,11 @@ const ProgressIndicator = ({
 // Loading state component
 const LoadingState = () => (
   <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
-    <div className='mb-4 flex h-12 w-12 animate-spin items-center justify-center rounded-full border-2 border-gray-200 border-t-blue-500 dark:border-gray-700 dark:border-t-blue-400 sm:h-16 sm:w-16'></div>
-    <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+    <div className='mb-4 flex h-12 w-12 animate-spin items-center justify-center rounded-full border-2 border-border border-t-primary sm:h-16 sm:w-16'></div>
+    <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
       Loading Form
     </h2>
-    <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+    <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
       Please wait while we load the form content...
     </p>
   </div>
@@ -98,9 +98,9 @@ const LoadingState = () => (
 // Error state component
 const ErrorState = ({ message }: { message: string }) => (
   <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
-    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900 sm:h-16 sm:w-16'>
+    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/20 sm:h-16 sm:w-16'>
       <svg
-        className='h-6 w-6 text-red-500 dark:text-red-400 sm:h-8 sm:w-8'
+        className='h-6 w-6 text-destructive sm:h-8 sm:w-8'
         fill='none'
         stroke='currentColor'
         viewBox='0 0 24 24'
@@ -114,10 +114,10 @@ const ErrorState = ({ message }: { message: string }) => (
         />
       </svg>
     </div>
-    <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+    <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
       Error Loading Form
     </h2>
-    <p className='max-w-sm text-sm text-red-500 dark:text-red-400 sm:text-base'>
+    <p className='max-w-sm text-sm text-destructive sm:text-base'>
       {message || "An unexpected error occurred"}
     </p>
   </div>
@@ -126,9 +126,9 @@ const ErrorState = ({ message }: { message: string }) => (
 // Success state component
 const SuccessState = () => (
   <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
-    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 sm:h-16 sm:w-16'>
+    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-success/20 sm:h-16 sm:w-16'>
       <svg
-        className='h-6 w-6 text-green-500 dark:text-green-400 sm:h-8 sm:w-8'
+        className='h-6 w-6 text-success sm:h-8 sm:w-8'
         fill='none'
         stroke='currentColor'
         viewBox='0 0 24 24'
@@ -142,10 +142,10 @@ const SuccessState = () => (
         />
       </svg>
     </div>
-    <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+    <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
       Response Submitted
     </h2>
-    <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+    <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
       Thank you for completing this form. Your response has been recorded.
     </p>
   </div>
@@ -154,13 +154,13 @@ const SuccessState = () => (
 // Empty state component
 const EmptyState = ({ isPreview }: { isPreview: boolean }) => (
   <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
-    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 sm:h-16 sm:w-16'>
-      <FileText className='h-6 w-6 text-gray-400 dark:text-gray-500 sm:h-8 sm:w-8' />
+    <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted sm:h-16 sm:w-16'>
+      <FileText className='h-6 w-6 text-muted-foreground sm:h-8 sm:w-8' />
     </div>
-    <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+    <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
       {isPreview ? "No Pages to Preview" : "No Form Content"}
     </h2>
-    <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+    <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
       {isPreview
         ? "Add some pages to your form using the builder tab to see them in preview mode."
         : "This form has no content yet. Check back later."}
@@ -204,14 +204,14 @@ const FormNavigation = ({
   };
 
   return (
-    <div className='flex items-center justify-between gap-4 border-t border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50 sm:px-8 sm:py-4'>
+    <div className='flex items-center justify-between gap-4 border-t border-border bg-background-secondary px-4 py-3 sm:px-8 sm:py-4'>
       <button
         onClick={onPrevious}
         disabled={currentPageIndex === 0}
         className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:gap-2 sm:px-4 sm:py-2.5 ${
           currentPageIndex === 0
-            ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
-            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            ? "cursor-not-allowed text-muted-foreground opacity-50"
+            : "text-foreground-secondary hover:bg-secondary hover:text-foreground"
         }`}
       >
         <ChevronLeft className='h-4 w-4 sm:h-5 sm:w-5' />
@@ -228,26 +228,26 @@ const FormNavigation = ({
               onClick={() => handlePageDotClick(idx)}
               className={`group relative flex h-6 w-6 items-center justify-center rounded-full transition-all ${
                 isCurrent
-                  ? "bg-blue-100 dark:bg-blue-900/30"
+                  ? "bg-accent"
                   : isCompleted
-                    ? "bg-blue-50 dark:bg-blue-900/20"
-                    : "bg-gray-100 dark:bg-gray-800"
+                    ? "bg-accent/50"
+                    : "bg-muted"
               }`}
               aria-label={`Go to page ${idx + 1}`}
             >
               <span
                 className={`h-2.5 w-2.5 rounded-full transition-all ${
                   isCurrent
-                    ? "bg-blue-500"
+                    ? "bg-primary"
                     : isCompleted
-                      ? "bg-blue-400"
-                      : "bg-gray-300 dark:bg-gray-600"
+                      ? "bg-primary/70"
+                      : "bg-muted-foreground/30"
                 }`}
               />
               {idx < pages.length - 1 && (
                 <span
                   className={`absolute left-[24px] h-0.5 w-3 ${
-                    isCompleted ? "bg-blue-400" : "bg-gray-200 dark:bg-gray-700"
+                    isCompleted ? "bg-primary/50" : "bg-border"
                   }`}
                 />
               )}
@@ -261,8 +261,8 @@ const FormNavigation = ({
         disabled={isSubmitting && !isPreview}
         className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:gap-2 sm:px-6 sm:py-2.5 ${
           isLastPage
-            ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
-            : "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+            ? "bg-primary text-primary-foreground hover:bg-primary-hover"
+            : "bg-primary text-primary-foreground hover:bg-primary-hover"
         } ${isSubmitting && !isPreview ? "cursor-not-allowed opacity-70" : ""}`}
       >
         {isSubmitting && !isPreview ? (
@@ -313,7 +313,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
           type='text'
           value={value}
           onChange={(e) => onChange(questionId, e.target.value)}
-          className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30 sm:text-base'
+          className='w-full rounded-lg border border-input px-3 py-2 text-sm text-foreground shadow-sm focus:border-input-focus focus:outline-none focus:ring-2 focus:ring-ring sm:text-base'
           placeholder='Your answer'
           required={question.required}
         />
@@ -324,7 +324,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
         <textarea
           value={value}
           onChange={(e) => onChange(questionId, e.target.value)}
-          className='h-20 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30 sm:h-24 sm:text-base'
+          className='h-20 w-full rounded-lg border border-input px-3 py-2 text-sm text-foreground shadow-sm focus:border-input-focus focus:outline-none focus:ring-2 focus:ring-ring sm:h-24 sm:text-base'
           placeholder='Your answer'
           required={question.required}
         />
@@ -344,10 +344,10 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
                 value={option}
                 checked={value === option}
                 onChange={() => onChange(questionId, option)}
-                className='h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400 sm:h-4 sm:w-4'
+                className='h-3.5 w-3.5 text-primary focus:ring-ring sm:h-4 sm:w-4'
                 required={question.required}
               />
-              <span className='text-sm text-gray-700 dark:text-gray-300 sm:text-base'>
+              <span className='text-sm text-foreground-secondary sm:text-base'>
                 <LatexText>{option}</LatexText>
               </span>
             </label>
@@ -385,9 +385,9 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
 
                     onChange(questionId, newSelections.join(", "));
                   }}
-                  className='h-3.5 w-3.5 rounded text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400 sm:h-4 sm:w-4'
+                  className='h-3.5 w-3.5 rounded text-primary focus:ring-ring sm:h-4 sm:w-4'
                 />
-                <span className='text-sm text-gray-700 dark:text-gray-300 sm:text-base'>
+                <span className='text-sm text-foreground-secondary sm:text-base'>
                   <LatexText>{option}</LatexText>
                 </span>
               </label>
@@ -401,7 +401,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
         <select
           value={value}
           onChange={(e) => onChange(questionId, e.target.value)}
-          className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400/30 sm:text-base'
+          className='w-full rounded-lg border border-input px-3 py-2 text-sm text-foreground shadow-sm focus:border-input-focus focus:outline-none focus:ring-2 focus:ring-ring sm:text-base'
           required={question.required}
         >
           <option value=''>Select an option</option>
@@ -601,13 +601,13 @@ export default function FormRenderer({
   if (!currentPage) {
     return (
       <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
-        <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 sm:h-16 sm:w-16'>
-          <FileText className='h-6 w-6 text-gray-400 dark:text-gray-500 sm:h-8 sm:w-8' />
+        <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted sm:h-16 sm:w-16'>
+          <FileText className='h-6 w-6 text-muted-foreground sm:h-8 sm:w-8' />
         </div>
-        <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+        <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
           Page Not Found
         </h2>
-        <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+        <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
           The selected page could not be found. Please try selecting a different
           page.
         </p>
@@ -619,7 +619,7 @@ export default function FormRenderer({
     <div className='w-full'>
       {/* Preview Banner - only show in preview mode */}
       {isPreview && (
-        <div className='mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 p-3 text-center text-sm text-gray-600 shadow-sm dark:from-gray-800/50 dark:to-blue-900/20 dark:text-gray-300 sm:text-base'>
+        <div className='mb-6 rounded-lg bg-accent p-3 text-center text-sm text-accent-foreground shadow-sm sm:text-base'>
           <span className='font-medium'>Preview Mode</span> — See how your form
           will appear to respondents
         </div>
@@ -632,7 +632,7 @@ export default function FormRenderer({
       <div className='mb-4 flex lg:hidden'>
         <button
           onClick={() => setSidebarVisible(!sidebarVisible)}
-          className='inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
+          className='inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground-secondary shadow-sm transition-colors hover:bg-secondary'
         >
           {sidebarVisible ? (
             <>
@@ -687,17 +687,17 @@ export default function FormRenderer({
           <ProgressIndicator current={currentPageIndex} total={pages.length} />
 
           {/* Page Content */}
-          <div className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800'>
+          <div className='overflow-hidden rounded-xl border border-border bg-background shadow-md'>
             <div className='p-5 sm:p-8'>
-              <div className='mb-8 border-b border-gray-100 pb-4 dark:border-gray-700'>
+              <div className='mb-8 border-b border-border pb-4'>
                 <div className='flex items-center gap-2 sm:gap-3'>
-                  <FileText className='h-5 w-5 text-gray-400 dark:text-gray-500 sm:h-6 sm:w-6' />
-                  <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
+                  <FileText className='h-5 w-5 text-muted-foreground sm:h-6 sm:w-6' />
+                  <h2 className='text-xl font-bold text-foreground sm:text-2xl font-display'>
                     <LatexText>{currentPage.title}</LatexText>
                   </h2>
                 </div>
                 {currentPage.description && (
-                  <p className='mt-3 pl-8 text-gray-600 dark:text-gray-300'>
+                  <p className='mt-3 pl-8 text-foreground-secondary'>
                     <LatexText>{currentPage.description}</LatexText>
                   </p>
                 )}
@@ -724,13 +724,13 @@ export default function FormRenderer({
                         ) : (
                           <div
                             key={question.id || index}
-                            className='rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50 sm:p-5 md:p-6'
+                            className='rounded-lg border border-border bg-muted p-4 sm:p-5 md:p-6'
                           >
                             <div className='flex items-start'>
-                              <label className='block text-sm font-medium text-gray-700 dark:text-gray-200 sm:text-base'>
+                              <label className='block text-sm font-medium text-foreground sm:text-base'>
                                 <LatexText>{question.text}</LatexText>
                                 {question.required && (
-                                  <span className='ml-1 text-red-500'>*</span>
+                                  <span className='ml-1 text-destructive'>*</span>
                                 )}
                               </label>
                             </div>
@@ -759,11 +759,11 @@ export default function FormRenderer({
                   </div>
                 ) : (
                   !currentPage.contextElements?.length && (
-                    <div className='rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-center dark:border-gray-600 dark:bg-gray-800/30 sm:p-6 md:p-8'>
-                      <p className='text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+                    <div className='rounded-lg border border-dashed border-border bg-muted p-4 text-center sm:p-6 md:p-8'>
+                      <p className='text-sm text-foreground-secondary sm:text-base'>
                         No content added to this page.
                       </p>
-                      <p className='mt-1 text-xs text-gray-400 dark:text-gray-500'>
+                      <p className='mt-1 text-xs text-muted-foreground'>
                         {isPreview
                           ? "Switch to builder mode to add questions or content elements"
                           : "This page has no content yet."}

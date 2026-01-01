@@ -6,9 +6,6 @@ import type { Metadata } from "next";
 import ClientProvider from "@/components/ClientProvider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeAwareToast } from "@/components/theme/ThemeAwareToast";
-import { Inter } from "next/font/google";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://chamuka-formit.vercel.app"),
@@ -84,7 +81,7 @@ export default function RootLayout({
         <meta charSet='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
       </head>
-      <body className={inter.className}>
+      <body className="antialiased selection:bg-primary/10 selection:text-primary">
         <ThemeProvider
           defaultTheme='system'
           enableSystem

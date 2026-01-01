@@ -252,20 +252,20 @@ const FormBuilderContent = ({ hideHeader = false }) => {
 
   return (
     <div
-      className={`${hideHeader ? "h-full" : "min-h-screen"} bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800`}
+      className={`${hideHeader ? "h-full" : "min-h-screen"} bg-background-secondary`}
     >
       {/* Header with Save & Publish buttons - only shown if hideHeader is false */}
       {!hideHeader && (
-        <header className='relative bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500'>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+        <header className='relative border-b border-border bg-primary'>
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-light"></div>
           <div className='relative z-10 px-4 py-4 sm:px-6 lg:px-8'>
             <div className='mx-auto flex flex-col items-center justify-between gap-4 sm:flex-row'>
               <div className='flex items-center gap-3'>
-                <Layout className='h-5 w-5 text-white/90 sm:h-6 sm:w-6' />
-                <h1 className='text-lg font-semibold tracking-tight text-white sm:text-xl'>
+                <Layout className='h-5 w-5 text-primary-foreground/90 sm:h-6 sm:w-6' />
+                <h1 className='text-lg font-semibold tracking-tight text-primary-foreground sm:text-xl'>
                   Chamuka FormIt
                 </h1>
-                <span className='flex items-center rounded-md border border-white/10 bg-white/20 px-3 py-1.5 text-xs font-medium text-white/90'>
+                <span className='flex items-center rounded-md border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1.5 text-xs font-medium text-primary-foreground/90'>
                   <FileText className='mr-1.5 h-3.5 w-3.5 opacity-80' />
                   {pages.length} page{pages.length !== 1 ? "s" : ""}
                 </span>
@@ -273,7 +273,7 @@ const FormBuilderContent = ({ hideHeader = false }) => {
 
               <div className='flex items-center gap-3'>
                 {lastSaved && (
-                  <span className='hidden text-xs text-white/70 md:inline-flex'>
+                  <span className='hidden text-xs text-primary-foreground/70 md:inline-flex'>
                     Last saved: {lastSaved.toLocaleTimeString()}
                   </span>
                 )}
@@ -281,21 +281,21 @@ const FormBuilderContent = ({ hideHeader = false }) => {
                 <button
                   onClick={handleSaveForm}
                   disabled={isSaving}
-                  className='relative flex w-[100px] items-center justify-center rounded-md bg-white/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/30'
+                  className='relative flex w-[100px] items-center justify-center rounded-md bg-primary-foreground/20 px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/30'
                 >
                   <Save className='mr-1.5 h-4 w-4 flex-shrink-0' />
                   <span className='whitespace-nowrap'>
                     {isSaving ? "Saving..." : "Save"}
                   </span>
                   {lastSaved && !isSaving && (
-                    <span className='absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-green-400'></span>
+                    <span className='absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-success'></span>
                   )}
                 </button>
 
                 <button
                   onClick={handlePublishForm}
                   disabled={isPublishing}
-                  className='flex w-[120px] items-center justify-center rounded-md bg-white/90 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-white'
+                  className='flex w-[120px] items-center justify-center rounded-md bg-primary-foreground px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary-foreground/90'
                 >
                   <Share className='mr-1.5 h-4 w-4 flex-shrink-0' />
                   <span className='whitespace-nowrap'>
@@ -305,13 +305,13 @@ const FormBuilderContent = ({ hideHeader = false }) => {
               </div>
             </div>
           </div>
-          <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent'></div>
+          <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-border to-transparent'></div>
         </header>
       )}
 
       {/* Main Content with Enhanced Container */}
       <main className='h-full w-full'>
-        <div className='mx-auto bg-white/80 shadow-sm backdrop-blur-sm dark:bg-gray-800/80'>
+        <div className='mx-auto bg-background/80 shadow-sm backdrop-blur-sm'>
           <div className='p-3 sm:p-6'>
             <div className='mb-4 flex items-center justify-between sm:mb-6 lg:hidden'>
               <TabNavigation
@@ -321,7 +321,7 @@ const FormBuilderContent = ({ hideHeader = false }) => {
               {activeTab === "builder" && (
                 <button
                   onClick={toggleSidebar}
-                  className='rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200 sm:p-2'
+                  className='rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground sm:p-2'
                 >
                   <Menu className='h-5 w-5 sm:h-6 sm:w-6' />
                 </button>
@@ -342,17 +342,17 @@ const FormBuilderContent = ({ hideHeader = false }) => {
                     className={`fixed inset-0 z-50 transform transition-transform duration-300 lg:hidden ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} `}
                   >
                     <div
-                      className='absolute inset-0 bg-black/30 backdrop-blur-[2px]'
+                      className='absolute inset-0 bg-overlay/30 backdrop-blur-[2px]'
                       onClick={toggleSidebar}
                     />
-                    <div className='relative h-full w-[85%] max-w-[320px] overflow-y-auto border-r border-gray-200 bg-white/95 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/95'>
-                      <div className='sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white/95 p-4 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/95'>
-                        <h2 className='text-base font-semibold text-gray-900 dark:text-gray-100'>
+                    <div className='relative h-full w-[85%] max-w-[320px] overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm'>
+                      <div className='sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/95 p-4 backdrop-blur-sm'>
+                        <h2 className='text-base font-semibold text-foreground'>
                           Pages
                         </h2>
                         <button
                           onClick={toggleSidebar}
-                          className='rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100/50 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200'
+                          className='rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
                         >
                           <X className='h-5 w-5' />
                         </button>
@@ -408,29 +408,29 @@ const FormBuilderContent = ({ hideHeader = false }) => {
 
       {/* Publish Success Modal */}
       {publishModalOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <div className='relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-overlay/50 p-4'>
+          <div className='relative w-full max-w-md rounded-lg bg-background p-6 shadow-xl border border-border'>
             <button
               onClick={handleClosePublishModal}
-              className='absolute right-4 top-4 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300'
+              className='absolute right-4 top-4 text-muted-foreground hover:text-foreground'
             >
               <X className='h-5 w-5' />
             </button>
 
             <div className='mb-6 text-center'>
-              <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900'>
-                <CheckCircle className='h-6 w-6 text-green-600 dark:text-green-300' />
+              <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-success/20'>
+                <CheckCircle className='h-6 w-6 text-success' />
               </div>
-              <h3 className='text-lg font-medium text-gray-900 dark:text-white'>
+              <h3 className='text-lg font-medium text-foreground'>
                 Form Published Successfully
               </h3>
-              <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
+              <p className='mt-2 text-sm text-muted-foreground'>
                 Your form is now live and ready to share with respondents.
               </p>
             </div>
 
-            <div className='mb-6 rounded-md bg-gray-50 p-4 dark:bg-gray-700'>
-              <p className='mb-2 text-xs text-gray-500 dark:text-gray-400'>
+            <div className='mb-6 rounded-md bg-muted p-4'>
+              <p className='mb-2 text-xs text-muted-foreground'>
                 Share link:
               </p>
               <div className='flex items-center'>
@@ -438,7 +438,7 @@ const FormBuilderContent = ({ hideHeader = false }) => {
                   type='text'
                   readOnly
                   value={`${window.location.origin}/forms/${formId}`}
-                  className='flex-1 rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300'
+                  className='flex-1 rounded-l-md border border-border bg-background px-3 py-2 text-sm text-foreground'
                 />
                 <button
                   onClick={() => {
@@ -447,7 +447,7 @@ const FormBuilderContent = ({ hideHeader = false }) => {
                     );
                     toast.success("Link copied to clipboard");
                   }}
-                  className='rounded-r-md border border-l-0 border-gray-300 bg-gray-100 px-3 py-2 text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  className='rounded-r-md border border-l-0 border-border bg-secondary px-3 py-2 text-foreground hover:bg-secondary-hover'
                 >
                   Copy
                 </button>
@@ -457,14 +457,14 @@ const FormBuilderContent = ({ hideHeader = false }) => {
             <div className='mt-6 flex flex-col gap-3 sm:flex-row'>
               <button
                 onClick={handleViewPublishedForm}
-                className='flex flex-1 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
+                className='flex flex-1 items-center justify-center rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary-hover'
               >
                 <ExternalLink className='mr-2 h-4 w-4' />
                 View Form
               </button>
               <button
                 onClick={handleBackToDashboard}
-                className='flex-1 rounded-md bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                className='flex-1 rounded-md bg-secondary px-4 py-2 text-secondary-foreground hover:bg-secondary-hover'
               >
                 Back to Dashboard
               </button>

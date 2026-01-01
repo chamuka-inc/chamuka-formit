@@ -184,7 +184,7 @@ const markdownComponents: Components = {
       </div>
     ) : (
       <code
-        className={`${className} break-words rounded bg-gray-100 px-1 py-0.5 text-sm dark:bg-gray-800`}
+        className={`${className} break-words rounded bg-muted px-1 py-0.5 text-sm text-foreground`}
         {...rest}
       >
         {children}
@@ -270,13 +270,13 @@ const markdownComponents: Components = {
         {...props}
         target='_blank'
         rel='noopener noreferrer'
-        className='break-words text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300'
+        className='break-words text-primary underline hover:text-primary-hover transition-colors'
       />
     );
   },
   table(props) {
     return (
-      <div className='my-4 w-full overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800'>
+      <div className='my-4 w-full overflow-x-auto rounded-md border border-border'>
         <table
           className='w-full table-auto border-collapse text-sm md:text-base'
           {...props}
@@ -285,12 +285,12 @@ const markdownComponents: Components = {
     );
   },
   thead(props) {
-    return <thead className='bg-gray-50 dark:bg-gray-800' {...props} />;
+    return <thead className='bg-muted' {...props} />;
   },
   th(props) {
     return (
       <th
-        className='border-b border-gray-200 px-2 py-2 text-left text-sm font-medium uppercase tracking-wider dark:border-gray-700 sm:px-3 sm:py-2'
+        className='border-b border-border px-2 py-2 text-left text-sm font-medium uppercase tracking-wider text-foreground sm:px-3 sm:py-2'
         {...props}
       >
         {processChildrenForLatex(props.children)}
@@ -300,7 +300,7 @@ const markdownComponents: Components = {
   td(props) {
     return (
       <td
-        className='break-words border-b border-gray-200 px-2 py-2 align-top dark:border-gray-800 sm:px-3 sm:py-2'
+        className='break-words border-b border-border px-2 py-2 align-top text-foreground-secondary sm:px-3 sm:py-2'
         {...props}
       >
         {processChildrenForLatex(props.children)}
@@ -309,13 +309,13 @@ const markdownComponents: Components = {
   },
   tr(props) {
     return (
-      <tr className='hover:bg-gray-50 dark:hover:bg-gray-900' {...props} />
+      <tr className='hover:bg-muted transition-colors' {...props} />
     );
   },
   blockquote(props) {
     return (
       <blockquote
-        className='my-4 border-l-4 border-gray-300 pl-4 text-sm italic text-gray-700 dark:border-gray-700 dark:text-gray-300'
+        className='my-4 border-l-4 border-border pl-4 text-sm italic text-foreground-secondary'
         {...props}
       >
         {processChildrenForLatex(props.children)}
@@ -325,7 +325,7 @@ const markdownComponents: Components = {
   hr(props) {
     return (
       <hr
-        className='my-6 border-t border-gray-300 dark:border-gray-700'
+        className='my-6 border-t border-border'
         {...props}
       />
     );

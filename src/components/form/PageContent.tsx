@@ -29,13 +29,13 @@ export const PageContent = ({
   if (!currentPage) {
     return (
       <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
-        <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 sm:h-16 sm:w-16'>
-          <FileText className='h-6 w-6 text-gray-400 dark:text-gray-500 sm:h-8 sm:w-8' />
+        <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted sm:h-16 sm:w-16'>
+          <FileText className='h-6 w-6 text-muted-foreground sm:h-8 sm:w-8' />
         </div>
-        <h2 className='mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl'>
+        <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl'>
           No Page Selected
         </h2>
-        <p className='max-w-sm text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+        <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
           Select a page from the sidebar or create a new one to start building
           your form.
         </p>
@@ -47,12 +47,12 @@ export const PageContent = ({
     <div className='p-4 sm:p-6'>
       <div className='mb-6 flex flex-col items-start justify-between gap-4 sm:mb-8 sm:flex-row sm:items-center'>
         <div className='flex items-center gap-3'>
-          <FileText className='h-5 w-5 text-gray-400 dark:text-gray-500 sm:h-6 sm:w-6' />
+          <FileText className='h-5 w-5 text-muted-foreground sm:h-6 sm:w-6' />
           <div>
-            <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
+            <h2 className='text-xl font-bold text-foreground sm:text-2xl'>
               {currentPage.title}
             </h2>
-            <p className='text-xs text-gray-500 dark:text-gray-400 sm:text-sm'>
+            <p className='text-xs text-muted-foreground sm:text-sm'>
               {currentPage.questions?.length
                 ? `${currentPage.questions.length} question${currentPage.questions.length !== 1 ? "s" : ""}`
                 : "No questions"}
@@ -66,14 +66,14 @@ export const PageContent = ({
         <div className='flex w-full items-center gap-3 sm:w-auto'>
           <button
             onClick={onEditPage}
-            className='inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 sm:flex-none sm:gap-2 sm:px-4 sm:py-2.5'
+            className='inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground transition-colors hover:bg-secondary sm:flex-none sm:gap-2 sm:px-4 sm:py-2.5'
           >
             <Pencil className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
             Edit Page
           </button>
           <button
             onClick={handleDeletePage}
-            className='inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-100 dark:border-red-800/30 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 sm:flex-none sm:gap-2 sm:px-4 sm:py-2.5'
+            className='inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/20 sm:flex-none sm:gap-2 sm:px-4 sm:py-2.5'
           >
             <Trash2 className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
             Delete
@@ -85,7 +85,7 @@ export const PageContent = ({
         {/* Context Elements Section */}
         {currentPage.contextElements &&
           currentPage.contextElements.length > 0 && (
-            <div className='rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:p-6'>
+            <div className='rounded-xl border border-border bg-background p-4 sm:p-6'>
               <ContextElements elements={currentPage.contextElements} />
             </div>
           )}
@@ -104,12 +104,12 @@ export const PageContent = ({
 
         {!currentPage.questions?.length &&
           !currentPage.contextElements?.length && (
-            <div className='rounded-xl border-2 border-dashed border-gray-200 py-8 text-center dark:border-gray-700 sm:py-12'>
-              <FileText className='mx-auto mb-3 h-10 w-10 text-gray-400 dark:text-gray-500 sm:mb-4 sm:h-12 sm:w-12' />
-              <p className='text-sm text-gray-500 dark:text-gray-400 sm:text-base'>
+            <div className='rounded-xl border-2 border-dashed border-border py-8 text-center sm:py-12'>
+              <FileText className='mx-auto mb-3 h-10 w-10 text-muted-foreground sm:mb-4 sm:h-12 sm:w-12' />
+              <p className='text-sm text-foreground-secondary sm:text-base'>
                 No content added to this page yet.
               </p>
-              <p className='mt-1 text-xs text-gray-400 dark:text-gray-500 sm:text-sm'>
+              <p className='mt-1 text-xs text-muted-foreground sm:text-sm'>
                 Click the "Edit Page" button to add content or add a question
                 below.
               </p>
@@ -118,7 +118,7 @@ export const PageContent = ({
 
         <button
           onClick={() => onAddQuestion()}
-          className='mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20 sm:mt-8 sm:gap-2 sm:py-3'
+          className='mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-accent/80 sm:mt-8 sm:gap-2 sm:py-3'
         >
           <Plus className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
           Add Question

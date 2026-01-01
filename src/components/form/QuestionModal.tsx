@@ -45,16 +45,16 @@ const ModalHeader = ({
   icon: React.ElementType;
   onClose: () => void;
 }) => (
-  <div className='relative border-b border-gray-200 px-4 py-4 dark:border-gray-700 sm:px-6 md:px-8 md:py-6'>
+  <div className='relative border-b border-border px-4 py-4 sm:px-6 md:px-8 md:py-6'>
     <div className='flex items-center gap-2 sm:gap-3'>
-      <Icon className='h-5 w-5 text-blue-500 dark:text-blue-400 sm:h-6 sm:w-6' />
-      <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
+      <Icon className='h-5 w-5 text-primary sm:h-6 sm:w-6' />
+      <h2 className='text-xl font-bold text-foreground sm:text-2xl'>
         {title}
       </h2>
     </div>
     <button
       onClick={onClose}
-      className='absolute right-4 top-4 rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-500 dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-gray-400 sm:right-6 sm:top-6 sm:p-2'
+      className='absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:right-6 sm:top-6 sm:p-2'
       aria-label='Close modal'
     >
       <X className='h-4 w-4 sm:h-5 sm:w-5' />
@@ -80,22 +80,22 @@ const OptionTypeButton = ({
     onClick={onClick}
     className={`flex items-center gap-2 rounded-lg border-2 p-2 transition-all sm:flex-col sm:items-center sm:p-4 ${
       selected
-        ? "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10"
-        : "border-gray-200 hover:border-blue-500 dark:border-gray-700 dark:hover:border-blue-400"
+        ? "border-primary bg-accent"
+        : "border-border hover:border-primary"
     } `}
   >
     <Icon
       className={`h-5 w-5 sm:h-6 sm:w-6 ${
         selected
-          ? "text-blue-500 dark:text-blue-400"
-          : "text-gray-400 dark:text-gray-500"
+          ? "text-primary"
+          : "text-muted-foreground"
       }`}
     />
     <span
       className={`text-sm font-medium ${
         selected
-          ? "text-blue-700 dark:text-blue-400"
-          : "text-gray-700 dark:text-gray-300"
+          ? "text-primary"
+          : "text-foreground"
       }`}
     >
       {label}
@@ -112,18 +112,18 @@ const OptionItem = ({
   type: QuestionType;
   onRemove: () => void;
 }) => (
-  <div className='group flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800 sm:gap-3 sm:p-3'>
+  <div className='group flex items-center gap-2 rounded-lg border border-border bg-background p-2 sm:gap-3 sm:p-3'>
     <input
       type={type}
       disabled
-      className={`h-4 w-4 border-2 transition-colors ${type === "radio" ? "rounded-full" : "rounded"} border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700`}
+      className={`h-4 w-4 border-2 transition-colors ${type === "radio" ? "rounded-full" : "rounded"} border-input bg-muted`}
     />
-    <span className='min-w-0 flex-1 break-words text-sm text-gray-700 dark:text-gray-300 sm:text-base'>
+    <span className='min-w-0 flex-1 break-words text-sm text-foreground sm:text-base'>
       {option}
     </span>
     <button
       onClick={onRemove}
-      className='rounded-md p-1 text-gray-400 opacity-70 transition-opacity hover:text-red-500 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-red-400 sm:opacity-0'
+      className='rounded-md p-1 text-muted-foreground opacity-70 transition-opacity hover:text-destructive group-hover:opacity-100 sm:opacity-0'
       aria-label='Remove option'
     >
       <Trash2 className='h-4 w-4' />
@@ -159,7 +159,7 @@ const AddItemInput = <T extends string>({
           onChange={(e) => onChange(e.target.value as T)}
           placeholder={placeholder}
           rows={2}
-          className='min-h-[60px] min-w-0 flex-1 resize-y rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400'
+          className='min-h-[60px] min-w-0 flex-1 resize-y rounded-lg border border-input bg-background px-3 py-1.5 text-sm text-foreground placeholder-muted-foreground transition-shadow focus:border-input-focus focus:outline-none focus:ring-2 focus:ring-ring'
         />
       ) : (
         <input
@@ -168,7 +168,7 @@ const AddItemInput = <T extends string>({
           onChange={(e) => onChange(e.target.value as T)}
           onKeyDown={(e) => e.key === "Enter" && !isDisabled && onAdd()}
           placeholder={placeholder}
-          className='min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400 sm:px-4 sm:py-2.5'
+          className='min-w-0 flex-1 rounded-lg border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground transition-shadow focus:border-input-focus focus:outline-none focus:ring-2 focus:ring-ring sm:px-4 sm:py-2.5'
         />
       )}
       <button
@@ -176,8 +176,8 @@ const AddItemInput = <T extends string>({
         disabled={isDisabled}
         className={`inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 font-medium transition-colors sm:gap-2 sm:px-4 sm:py-2.5 ${
           !isDisabled
-            ? "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20"
-            : "cursor-not-allowed bg-gray-50 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
+            ? "bg-accent text-primary hover:bg-accent/80"
+            : "cursor-not-allowed bg-muted text-muted-foreground"
         } `}
       >
         <Plus className='h-4 w-4' />
@@ -341,12 +341,12 @@ export const QuestionModal = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-opacity ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-overlay/50 p-4 backdrop-blur-sm transition-opacity ${
         isOpen ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
       <div
-        className={`w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-xl transition-transform dark:bg-gray-900 ${
+        className={`w-full max-w-2xl overflow-hidden rounded-xl bg-background shadow-xl border border-border transition-transform ${
           isOpen ? "scale-100" : "scale-95"
         }`}
       >
@@ -361,7 +361,7 @@ export const QuestionModal = ({
           <div className='space-y-2'>
             <label
               htmlFor='questionText'
-              className='text-sm font-medium text-gray-700 dark:text-gray-300'
+              className='text-sm font-medium text-foreground'
             >
               Question Text
             </label>
@@ -374,9 +374,9 @@ export const QuestionModal = ({
                   setFormState((prev) => ({ ...prev, text: e.target.value }))
                 }
                 placeholder='Enter your question here...'
-                className='flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400'
+                className='flex-1 rounded-lg border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground transition-shadow focus:border-input-focus focus:outline-none focus:ring-2 focus:ring-ring'
               />
-              <label className='flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800'>
+              <label className='flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2'>
                 <input
                   type='checkbox'
                   checked={formState.required}
@@ -386,9 +386,9 @@ export const QuestionModal = ({
                       required: e.target.checked,
                     }))
                   }
-                  className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-400'
+                  className='h-4 w-4 rounded border-input text-primary focus:ring-ring'
                 />
-                <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <span className='text-sm font-medium text-foreground'>
                   Required
                 </span>
               </label>
@@ -464,11 +464,11 @@ export const QuestionModal = ({
         </div>
 
         {/* Footer */}
-        <div className='sticky bottom-0 border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-700 dark:bg-gray-800/50 sm:px-6 md:px-8 md:py-6'>
+        <div className='sticky bottom-0 border-t border-border bg-muted px-4 py-4 sm:px-6 md:px-8 md:py-6'>
           <div className='flex justify-end gap-2 sm:gap-4'>
             <button
               onClick={onClose}
-              className='rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 sm:px-6 sm:py-2.5'
+              className='rounded-lg border border-border px-4 py-2 font-medium text-foreground transition-colors hover:bg-secondary sm:px-6 sm:py-2.5'
             >
               Cancel
             </button>
@@ -477,8 +477,8 @@ export const QuestionModal = ({
               disabled={!isFormValid}
               className={`rounded-lg px-4 py-2 font-medium transition-all sm:px-6 sm:py-2.5 ${
                 isFormValid
-                  ? "transform bg-blue-500 text-white hover:scale-[1.02] hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                  : "cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
+                  ? "transform bg-primary text-primary-foreground hover:scale-[1.02] hover:bg-primary-hover"
+                  : "cursor-not-allowed bg-muted text-muted-foreground"
               } `}
             >
               {currentQuestion ? "Save Changes" : "Create Question"}

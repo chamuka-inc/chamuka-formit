@@ -60,7 +60,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   };
 
   return (
-    <div className='flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900'>
+    <div className='flex min-h-screen flex-col bg-background-secondary'>
       {/* Header - full width, fixed at top */}
       <div className='sticky top-0 z-50'>
         <Header toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
@@ -71,7 +71,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Overlay backdrop - visible when sidebar is open on any screen size */}
         {sidebarOpen && (
           <div
-            className={`fixed inset-0 z-30 bg-black ${
+            className={`fixed inset-0 z-30 bg-overlay ${
               sidebarOpen ? "opacity-50" : "pointer-events-none opacity-0"
             }`}
             onClick={toggleSidebar}
@@ -85,7 +85,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             sidebarOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"
           } w-[90%] min-w-[280px] max-w-[320px] sm:w-[65%] md:w-[45%] lg:w-[30%] xl:w-[22%] 2xl:w-[18%]`}
         >
-          <div className='h-full overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'>
+          <div className='h-full overflow-y-auto border-r border-border bg-background'>
             <Sidebar className='h-full' />
           </div>
         </div>
@@ -96,9 +96,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </main>
       </div>
 
-      {/* Footer with improved styling and subtle gradient separator */}
-      <footer className='relative mt-auto border-t border-gray-200 bg-white py-4 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'>
-        <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700'></div>
+      {/* Footer with improved styling and subtle separator */}
+      <footer className='relative mt-auto border-t border-border bg-background py-4 text-center text-sm text-muted-foreground'>
         <div className='container mx-auto'>
           © {new Date().getFullYear()} Chamuka FormIt. All rights reserved.
         </div>

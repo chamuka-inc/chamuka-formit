@@ -6,17 +6,10 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
   ChevronDown,
-  ChevronRight,
-  FileText,
   PlusCircle,
-  BarChart3,
   Settings,
   HelpCircle,
   LayoutGrid,
-  Home,
-  Tag,
-  Star,
-  MessageSquare,
   Sparkles,
   LogOut,
   User,
@@ -45,28 +38,28 @@ const SidebarItem = ({
 }: SidebarItemProps) => (
   <Link
     href={href}
-    className={`group flex items-center justify-between rounded-md px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${
+    className={`group flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
       active
-        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-        : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800/70"
+        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+        : "text-foreground-secondary hover:bg-muted hover:text-foreground"
     }`}
     onClick={onClick}
   >
     <div className='flex items-center gap-3'>
       <div
-        className={`${active ? "text-blue-500 dark:text-blue-400" : "text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300"}`}
+        className={`${active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary transition-colors"}`}
       >
         {icon}
       </div>
-      <span className='font-medium'>{title}</span>
+      <span className='tracking-tight'>{title}</span>
       {isNew && (
-        <span className='rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-green-700 dark:bg-green-900/30 dark:text-green-400'>
+        <span className='rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-success'>
           New
         </span>
       )}
     </div>
     {badge && (
-      <div className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'>
+      <div className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${active ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
         {badge}
       </div>
     )}
@@ -91,23 +84,23 @@ const SidebarSection = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className='mb-3'>
+    <div className='mb-2'>
       <button
-        className='flex w-full items-center justify-between rounded-md px-3.5 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800/70'
+        className='flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground-secondary transition-all hover:bg-muted hover:text-foreground'
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className='flex items-center gap-3'>
-          <div className='text-gray-500 dark:text-gray-400'>{icon}</div>
-          <span className='font-medium'>{title}</span>
+          <div className='text-muted-foreground'>{icon}</div>
+          <span className='tracking-tight'>{title}</span>
         </div>
         <div className='flex items-center gap-2'>
           {badge && (
-            <div className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'>
+            <div className='rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground'>
               {badge}
             </div>
           )}
           <div
-            className='text-gray-400 transition-transform duration-200 dark:text-gray-500'
+            className='text-muted-foreground transition-transform duration-200'
             style={{ transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}
           >
             <ChevronDown className='h-4 w-4' />
@@ -115,9 +108,11 @@ const SidebarSection = ({
         </div>
       </button>
       <div
-        className={`ml-9 mt-1 space-y-1 overflow-hidden transition-all duration-200 ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+        className={`ml-6 mt-1 space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
       >
-        {children}
+        <div className="pl-3 py-1 border-l border-border/50 ml-2">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -141,29 +136,29 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
 
   return (
     <aside
-      className={`h-full border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 ${className}`}
+      className={`h-full border-r border-border bg-background ${className}`}
     >
       <div className='flex h-full flex-col p-4'>
         {/* Account section at the top */}
         {status === "authenticated" && session?.user && (
           <div className='mb-6 px-2'>
-            <div className='flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700/50'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white dark:bg-blue-500'>
+            <div className='flex items-center gap-3 rounded-2xl bg-muted/50 p-4 border border-border/50'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 text-primary-foreground'>
                 {session.user.image ? (
                   <img
                     src={session.user.image}
                     alt={session.user.name || "User"}
-                    className='h-10 w-10 rounded-full'
+                    className='h-full w-full rounded-xl object-cover'
                   />
                 ) : (
                   <User className='h-5 w-5' />
                 )}
               </div>
               <div className='min-w-0 flex-1'>
-                <p className='truncate text-sm font-medium text-gray-900 dark:text-white'>
+                <p className='truncate text-sm font-semibold tracking-tight text-foreground'>
                   {session.user.name || "User"}
                 </p>
-                <p className='truncate text-sm text-gray-500 dark:text-gray-400'>
+                <p className='truncate text-[11px] font-medium text-muted-foreground'>
                   {session.user.email}
                 </p>
               </div>
@@ -172,8 +167,8 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
         )}
 
         <div className='mb-2 px-2'>
-          <div className='mb-2 ml-2 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'>
-            Main
+          <div className='mb-3 ml-2 text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground/60'>
+            Overview
           </div>
           <div className='space-y-1'>
             <SidebarItem
@@ -202,10 +197,10 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
           </div>
         </div>
 
-        <div className='mt-auto border-t border-gray-200 pt-6 dark:border-gray-700'>
+        <div className='mt-auto border-t border-border/50 pt-6'>
           <div className='px-2'>
-            <div className='mb-2 ml-2 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'>
-              Support
+            <div className='mb-3 ml-2 text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground/60'>
+              Account & Support
             </div>
             <div className='space-y-1'>
               {status === "authenticated" && (
@@ -220,7 +215,7 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
               <SidebarItem
                 href='/help'
                 icon={<HelpCircle className='h-5 w-5' />}
-                title='Help & Support'
+                title='Help Center'
                 active={isActive("/help")}
                 onClick={onClose}
               />
@@ -243,18 +238,18 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
           </div>
 
           {status === "authenticated" && (
-            <div className='mx-2 mt-6 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 px-4 py-4 dark:from-blue-900/20 dark:to-indigo-900/20'>
-              <div className='mb-2 flex items-center justify-between'>
-                <span className='text-xs font-medium uppercase tracking-wider text-blue-700 dark:text-blue-400'>
-                  Credits
+            <div className='mx-2 mt-6 rounded-2xl bg-primary/5 p-4 border border-primary/10 shadow-sm'>
+              <div className='mb-3 flex items-center justify-between'>
+                <span className='text-[11px] font-bold uppercase tracking-wider text-primary'>
+                  AI Credits
                 </span>
-                <span className='text-xs font-medium text-blue-600 dark:text-blue-400'>
-                  {credits?.credits || 0} remaining
+                <span className='text-[11px] font-bold text-primary'>
+                  {credits?.credits || 0} left
                 </span>
               </div>
-              <div className='h-1.5 w-full overflow-hidden rounded-full bg-white/50 dark:bg-white/10'>
+              <div className='h-2 w-full overflow-hidden rounded-full bg-primary/10'>
                 <div
-                  className='h-1.5 rounded-full bg-blue-500'
+                  className='h-full rounded-full bg-primary transition-all duration-500 shadow-sm shadow-primary/20'
                   style={{
                     width: `${Math.min(100, (credits?.credits || 0) * 20)}%`,
                   }}
@@ -262,10 +257,10 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
               </div>
               <Link
                 href='/credits'
-                className='mt-3 block text-xs font-medium text-blue-700 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300'
+                className='mt-3 block text-center text-[11px] font-bold uppercase tracking-tight text-primary hover:text-primary-hover transition-colors'
                 onClick={onClose}
               >
-                Get more credits →
+                Get More Credits
               </Link>
             </div>
           )}
