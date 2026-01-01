@@ -8,6 +8,7 @@ import { type FormPage, type Question, type QuestionType } from "@/lib/types";
 import { FormPageNavigation } from "./PageNavigation";
 import { Question as QuestionComponent } from "./Question";
 import { ContextElements } from "./ContextElements";
+import { LatexText } from "@/components/LatexText";
 
 // Extended question type for the renderer
 type ExtendedQuestionType = QuestionType | "textarea" | "select";
@@ -40,11 +41,11 @@ const FormHeader = ({
   return (
     <div className='mb-6 sm:mb-8'>
       <h1 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
-        {title}
+        <LatexText>{title}</LatexText>
       </h1>
       {description && (
         <p className='mt-2 text-sm text-gray-600 dark:text-gray-300 sm:mt-3'>
-          {description}
+          <LatexText>{description}</LatexText>
         </p>
       )}
     </div>
@@ -347,7 +348,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
                 required={question.required}
               />
               <span className='text-sm text-gray-700 dark:text-gray-300 sm:text-base'>
-                {option}
+                <LatexText>{option}</LatexText>
               </span>
             </label>
           ))}
@@ -387,7 +388,7 @@ const QuestionInput = ({ question, value, onChange }: QuestionInputProps) => {
                   className='h-3.5 w-3.5 rounded text-blue-600 focus:ring-blue-500 dark:text-blue-400 dark:focus:ring-blue-400 sm:h-4 sm:w-4'
                 />
                 <span className='text-sm text-gray-700 dark:text-gray-300 sm:text-base'>
-                  {option}
+                  <LatexText>{option}</LatexText>
                 </span>
               </label>
             );
@@ -705,12 +706,12 @@ export default function FormRenderer({
                 <div className='flex items-center gap-2 sm:gap-3'>
                   <FileText className='h-5 w-5 text-gray-400 dark:text-gray-500 sm:h-6 sm:w-6' />
                   <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl'>
-                    {currentPage.title}
+                    <LatexText>{currentPage.title}</LatexText>
                   </h2>
                 </div>
                 {currentPage.description && (
                   <p className='mt-3 pl-8 text-gray-600 dark:text-gray-300'>
-                    {currentPage.description}
+                    <LatexText>{currentPage.description}</LatexText>
                   </p>
                 )}
               </div>
@@ -740,7 +741,7 @@ export default function FormRenderer({
                           >
                             <div className='flex items-start'>
                               <label className='block text-sm font-medium text-gray-700 dark:text-gray-200 sm:text-base'>
-                                {question.text}
+                                <LatexText>{question.text}</LatexText>
                                 {question.required && (
                                   <span className='ml-1 text-red-500'>*</span>
                                 )}

@@ -3,6 +3,7 @@
 import { Question as QuestionType } from "@/lib/types";
 import { ContextElements } from "./ContextElements";
 import { Pencil, Trash2 } from "lucide-react";
+import { LatexText } from "@/components/LatexText";
 
 interface QuestionProps {
   question: QuestionType;
@@ -49,7 +50,7 @@ export const Question = ({
       )}
 
       <h3 className='mb-2 pr-12 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:mb-3 sm:pr-14 md:mb-4 md:pr-0 md:text-lg'>
-        {question.text}
+        <LatexText>{question.text}</LatexText>
         {question.required && (
           <span className='ml-1 text-red-500 dark:text-red-400'>*</span>
         )}
@@ -81,7 +82,7 @@ export const Question = ({
                 } `}
               />
               <span className='text-xs text-gray-700 dark:text-gray-300 sm:text-sm md:text-base'>
-                {option}
+                <LatexText>{option}</LatexText>
               </span>
             </label>
           ))}
