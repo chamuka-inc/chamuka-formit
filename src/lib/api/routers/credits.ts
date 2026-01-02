@@ -156,4 +156,59 @@ export const creditsRouter = createTRPCRouter({
         type: input.type,
       };
     }),
+
+  // Deduct AI credit (for streaming endpoints that handle auth separately)
+  deductAICredit: protectedProcedure
+    .input(
+      z
+        .object({
+          description: z.string().optional(),
+        })
+        .optional(),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Check if user has credits
+      const user = await db.user.findUnique({
+        where: { id: userId },
+        select: { credits: true },
+      });
+
+      if (!user || user.credits < 1) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Insufficient credits",
+        });
+      }
+
+      // Deduct the credit
+      const updatedUser = await db.user.update({
+        where: { id: userId },
+        data: {
+          credits: {
+            decrement: 1,
+          },
+        },
+        select: {
+          credits: true,
+        },
+      });
+
+      // Record the transaction
+      await db.creditTransaction.create({
+        data: {
+          userId: userId,
+          credits: -1,
+          amount: 0,
+          type: CreditTransactionType.AI,
+          description: input?.description || "AI form generation",
+        },
+      });
+
+      return {
+        success: true,
+        remainingCredits: updatedUser.credits,
+      };
+    }),
 });
