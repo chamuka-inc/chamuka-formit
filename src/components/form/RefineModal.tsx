@@ -2,10 +2,13 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "react-toastify";
-import { Loader2, Sparkles, X, Save, Edit } from "lucide-react";
+import { Loader2, Sparkles, X, Save, Edit, Eye, Code } from "lucide-react";
 import { DiffEditor } from "@monaco-editor/react";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { api } from "@/lib/trpc/react";
 import type { JsonValue } from "@prisma/client/runtime/library";
+import { formStructureSchema, type FormStructure } from "@/lib/zod/formSchemas";
+import { StreamingFormPreview } from "./StreamingFormPreview";
 
 interface RefineFormModalProps {
   formId: string;
@@ -36,6 +39,8 @@ function useWindowSize() {
   return isMobile;
 }
 
+type ViewMode = "editor" | "preview";
+
 export function RefineFormModal({
   formId,
   isOpen,
@@ -49,9 +54,57 @@ export function RefineFormModal({
   );
   const [editorValue, setEditorValue] = useState<string>("");
   const [aiPromptOpen, setAiPromptOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("editor");
+  const [isStreamingAI, setIsStreamingAI] = useState(false);
 
   const editorRef = useRef<any>(null);
   const isMobileScreen = useWindowSize();
+
+  // tRPC utils for cache invalidation
+  const utils = api.useUtils();
+
+  // Streaming object hook for AI refinement
+  const {
+    object: streamedFormData,
+    submit: submitStreamRefine,
+    isLoading: isStreaming,
+    error: streamError,
+    stop: stopStreaming,
+    clear: clearStreaming,
+  } = useObject({
+    api: "/api/ai/stream/refine",
+    schema: formStructureSchema,
+    onFinish: ({ object, error }) => {
+      if (error) {
+        toast.error(error.message || "An error occurred during refinement");
+        setIsStreamingAI(false);
+        return;
+      }
+      if (object) {
+        // Update the editor with the completed streamed data
+        setEditorValue(JSON.stringify(object, null, 2));
+        setIsStreamingAI(false);
+        setAiPromptOpen(false);
+        // Deduct credit after successful streaming
+        deductCreditMutation.mutate({ description: "AI form refinement" });
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "An error occurred during refinement");
+      setIsStreamingAI(false);
+    },
+  });
+
+  // Mutation for deducting AI credit
+  const deductCreditMutation = api.credits.deductAICredit.useMutation({
+    onSuccess: () => {
+      utils.credits.getAICredits.invalidate();
+      utils.user.getCredits.invalidate();
+    },
+    onError: (error) => {
+      console.error("Failed to deduct credit:", error);
+    },
+  });
 
   // Helper function to clean up the editor models
   const cleanupEditor = () => {
@@ -157,19 +210,6 @@ export function RefineFormModal({
     [],
   );
 
-  // Mutation for getting form refinement preview
-  const previewRefinementMutation = api.form.previewRefinement.useMutation({
-    onSuccess: (data) => {
-      setIsSubmitting(false);
-      setEditorValue(JSON.stringify(data.structure, null, 2));
-      setAiPromptOpen(false);
-    },
-    onError: (error) => {
-      setIsSubmitting(false);
-      toast.error(`Error generating preview: ${error.message}`);
-    },
-  });
-
   // Mutation for applying form refinement
   const applyRefinementMutation = api.form.applyRefinement.useMutation({
     onSuccess: () => {
@@ -197,6 +237,7 @@ export function RefineFormModal({
     },
   });
 
+  // Handle AI refinement with streaming
   const handleAIRefine = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -210,13 +251,38 @@ export function RefineFormModal({
       return;
     }
 
-    setIsSubmitting(true);
+    // Get the current form data from the editor
+    let existingData: FormStructure;
+    try {
+      existingData = JSON.parse(editorValue);
+    } catch {
+      toast.error("Invalid JSON in editor. Please fix before using AI refinement.");
+      return;
+    }
 
-    previewRefinementMutation.mutate({
-      id: formId,
+    setIsStreamingAI(true);
+    clearStreaming();
+
+    // Switch to preview mode to show streaming
+    setViewMode("preview");
+
+    // Submit to the streaming endpoint
+    submitStreamRefine({
+      existingData,
       prompt: prompt.trim(),
+      formId,
     });
   };
+
+  // Handle stopping the stream
+  const handleStopStream = useCallback(() => {
+    stopStreaming();
+    setIsStreamingAI(false);
+    // If we have partial data, update the editor
+    if (streamedFormData) {
+      setEditorValue(JSON.stringify(streamedFormData, null, 2));
+    }
+  }, [stopStreaming, streamedFormData]);
 
   const handleOpenAIPrompt = () => {
     setAiPromptOpen(true);
@@ -268,6 +334,11 @@ export function RefineFormModal({
 
   // Create a custom close handler that cleans up before closing
   const handleClose = () => {
+    // Stop streaming if active
+    if (isStreaming) {
+      stopStreaming();
+    }
+
     // Prevent multiple calls to close
     if (!editorRef.current) {
       // Editor already cleaned up, just call onClose
@@ -285,6 +356,18 @@ export function RefineFormModal({
     }, 10);
   };
 
+  // Parse editor value for preview
+  const previewFormData = useCallback(() => {
+    if (isStreamingAI && streamedFormData) {
+      return streamedFormData;
+    }
+    try {
+      return JSON.parse(editorValue) as FormStructure;
+    } catch {
+      return undefined;
+    }
+  }, [editorValue, isStreamingAI, streamedFormData]);
+
   // Check for dark mode
   const isDarkMode =
     typeof document !== "undefined" &&
@@ -294,179 +377,239 @@ export function RefineFormModal({
 
   return (
     <div
-      className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-2 sm:p-4 md:p-6 lg:p-8'
+      className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-overlay/50 p-2 sm:p-4 md:p-6 lg:p-8'
       onScroll={handleContentScroll}
       onClick={handleClose}
     >
       <div
-        className='relative max-h-[98vh] w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-800'
+        className='relative max-h-[98vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'
         onClick={handleContentClick}
       >
         {/* Header */}
-        <div className='sticky top-0 z-10 flex items-center justify-between bg-gray-100 px-3 py-2.5 dark:bg-gray-700 sm:px-4 sm:py-3'>
-          <div className='flex items-center'>
-            <Edit className='mr-1.5 h-4 w-4 text-blue-500 sm:mr-2 sm:h-5 sm:w-5' />
-            <h3 className='text-sm font-medium text-gray-900 dark:text-white sm:text-base'>
-              Edit Form JSON
-            </h3>
+        <div className='sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/95 px-4 py-3 backdrop-blur-sm sm:px-6 sm:py-4'>
+          <div className='flex items-center gap-3'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary'>
+              <Edit className='h-5 w-5 text-primary-foreground' />
+            </div>
+            <div>
+              <h3 className='text-base font-bold text-foreground sm:text-lg'>
+                Edit Form Structure
+              </h3>
+              <p className='text-xs text-muted-foreground sm:text-sm'>
+                Modify your form JSON or use AI to refine it
+              </p>
+            </div>
           </div>
-          <button
-            onClick={handleClose}
-            className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-            disabled={isSubmitting}
-          >
-            <X className='h-4 w-4 sm:h-5 sm:w-5' />
-          </button>
+          <div className='flex items-center gap-2'>
+            {/* View Mode Toggle */}
+            <div className='flex rounded-lg border border-border bg-muted/50 p-1'>
+              <button
+                onClick={() => setViewMode("editor")}
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                  viewMode === "editor"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Code className='h-3.5 w-3.5' />
+                Editor
+              </button>
+              <button
+                onClick={() => setViewMode("preview")}
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                  viewMode === "preview"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Eye className='h-3.5 w-3.5' />
+                Preview
+              </button>
+            </div>
+            <button
+              onClick={handleClose}
+              className='rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+              disabled={isSubmitting}
+            >
+              <X className='h-5 w-5' />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
-        <div className='p-2 sm:p-4' onScroll={handleContentScroll}>
-          <div className='space-y-3 sm:space-y-4'>
-            <div
-              className={`h-[60vh] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 ${
-                isMobileScreen ? "sm:h-[65vh]" : "sm:h-[70vh]"
-              } md:h-[500px]`}
-            >
-              {isOpen && (
-                <DiffEditor
-                  key={`diff-editor-${formId}`}
-                  height='100%'
-                  language='json'
-                  original={
-                    originalStructure
-                      ? JSON.stringify(originalStructure, null, 2)
-                      : ""
-                  }
-                  modified={editorValue}
-                  theme={isDarkMode ? "vs-dark" : "light"}
-                  options={{
-                    readOnly: false,
-                    originalEditable: false,
-                    minimap: { enabled: false },
-                    renderSideBySide: !isMobileScreen, // Stack on mobile
-                    renderOverviewRuler: false,
-                    scrollBeyondLastLine: false,
-                    automaticLayout: true,
-                    //wordWrap: "on",
-                    scrollbar: {
-                      verticalScrollbarSize: 10,
-                      horizontalScrollbarSize: 10,
-                      alwaysConsumeMouseWheel: false,
-                    },
-                    lineNumbers: !isMobileScreen ? "on" : "off", // Hide line numbers on mobile
-                    folding: !isMobileScreen, // Disable code folding on mobile
-                    fontSize: isMobileScreen ? 14 : 16, // Smaller font on mobile
-                  }}
-                  onMount={handleEditorDidMount}
-                  loading={
-                    <div className='p-4 text-center'>Loading editor...</div>
-                  }
-                />
-              )}
-            </div>
+        <div className='p-4 sm:p-6' onScroll={handleContentScroll}>
+          <div className='space-y-4'>
+            {/* Editor View */}
+            {viewMode === "editor" && (
+              <>
+                <div
+                  className={`overflow-hidden rounded-xl border border-border ${
+                    isMobileScreen ? "h-[50vh]" : "h-[60vh]"
+                  } md:h-[500px]`}
+                >
+                  {isOpen && (
+                    <DiffEditor
+                      key={`diff-editor-${formId}`}
+                      height='100%'
+                      language='json'
+                      original={
+                        originalStructure
+                          ? JSON.stringify(originalStructure, null, 2)
+                          : ""
+                      }
+                      modified={editorValue}
+                      theme={isDarkMode ? "vs-dark" : "light"}
+                      options={{
+                        readOnly: false,
+                        originalEditable: false,
+                        minimap: { enabled: false },
+                        renderSideBySide: !isMobileScreen,
+                        renderOverviewRuler: false,
+                        scrollBeyondLastLine: false,
+                        automaticLayout: true,
+                        scrollbar: {
+                          verticalScrollbarSize: 10,
+                          horizontalScrollbarSize: 10,
+                          alwaysConsumeMouseWheel: false,
+                        },
+                        lineNumbers: !isMobileScreen ? "on" : "off",
+                        folding: !isMobileScreen,
+                        fontSize: isMobileScreen ? 14 : 16,
+                      }}
+                      onMount={handleEditorDidMount}
+                      loading={
+                        <div className='flex h-full items-center justify-center'>
+                          <Loader2 className='h-8 w-8 animate-spin text-primary' />
+                        </div>
+                      }
+                    />
+                  )}
+                </div>
 
-            <div className='space-y-2 text-xs text-gray-600 dark:text-gray-400 sm:text-sm'>
-              <p>
-                Edit the JSON{" "}
-                {!isMobileScreen
-                  ? "on the right side. The left side shows the original structure for reference."
-                  : "below to modify your form structure."}
-              </p>
-              {isMobileScreen && (
-                <p className='italic'>
-                  Tip: Rotate your device to landscape mode for a better editing
-                  experience.
-                </p>
-              )}
-            </div>
+                <div className='rounded-xl border border-border/50 bg-muted/30 p-3 text-xs text-muted-foreground sm:text-sm'>
+                  <p>
+                    Edit the JSON{" "}
+                    {!isMobileScreen
+                      ? "on the right side. The left side shows the original structure for reference."
+                      : "below to modify your form structure."}
+                  </p>
+                  {isMobileScreen && (
+                    <p className='mt-1 italic'>
+                      Tip: Rotate your device to landscape mode for a better editing
+                      experience.
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Preview View */}
+            {viewMode === "preview" && (
+              <div
+                className={`overflow-y-auto rounded-xl border border-border bg-muted/10 p-4 ${
+                  isMobileScreen ? "h-[50vh]" : "h-[60vh]"
+                } md:h-[500px]`}
+              >
+                <StreamingFormPreview
+                  formData={isStreamingAI ? streamedFormData : previewFormData()}
+                  isLoading={isStreamingAI}
+                  error={streamError}
+                />
+              </div>
+            )}
           </div>
 
+          {/* AI Prompt Modal */}
           {aiPromptOpen && (
             <div
-              className='fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-overlay/50 p-2 sm:p-4 md:p-6'
+              className='fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-overlay/50 p-2 backdrop-blur-sm sm:p-4 md:p-6'
               onScroll={handleContentScroll}
-              onClick={() => setAiPromptOpen(false)}
+              onClick={() => !isStreamingAI && setAiPromptOpen(false)}
             >
               <div
-                className='relative max-h-[95vh] w-full max-w-lg overflow-y-auto rounded-lg bg-background shadow-xl border border-border'
+                className='relative max-h-[95vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-background shadow-2xl'
                 onScroll={handleContentScroll}
                 onClick={handleContentClick}
               >
-                <div className='sticky top-0 z-10 flex items-center justify-between bg-gray-100 px-3 py-2.5 dark:bg-gray-700 sm:px-4 sm:py-3'>
-                  <div className='flex items-center'>
-                    <Sparkles className='mr-1.5 h-4 w-4 text-purple-500 sm:mr-2 sm:h-5 sm:w-5' />
-                    <h3 className='text-sm font-medium text-gray-900 dark:text-white sm:text-base'>
+                <div className='sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/95 px-4 py-3 backdrop-blur-sm sm:px-6 sm:py-4'>
+                  <div className='flex items-center gap-3'>
+                    <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500'>
+                      <Sparkles className='h-4 w-4 text-white' />
+                    </div>
+                    <h3 className='text-sm font-bold text-foreground sm:text-base'>
                       AI Refinement
                     </h3>
                   </div>
                   <button
-                    onClick={() => setAiPromptOpen(false)}
-                    className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                    onClick={() => !isStreamingAI && setAiPromptOpen(false)}
+                    className='rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50'
+                    disabled={isStreamingAI}
                   >
                     <X className='h-4 w-4 sm:h-5 sm:w-5' />
                   </button>
                 </div>
 
-                <div className='p-3 sm:p-4'>
+                <div className='p-4 sm:p-6'>
                   <form onSubmit={handleAIRefine}>
-                    <div className='mb-3 sm:mb-4'>
+                    <div className='mb-4'>
                       <label
                         htmlFor='prompt'
-                        className='mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300 sm:text-sm'
+                        className='mb-2 block text-sm font-semibold text-foreground'
                       >
                         How would you like to improve your form?
                       </label>
                       <textarea
                         id='prompt'
                         rows={isMobileScreen ? 4 : 5}
-                        className='w-full rounded-md border border-gray-300 px-2.5 py-2 text-xs text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500 sm:px-3 sm:text-sm'
+                        className='w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder-muted-foreground transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10'
                         placeholder='Example: Add more questions about demographic information, improve the wording of questions on page 2, add more options to multiple choice questions...'
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        disabled={isSubmitting}
+                        disabled={isStreamingAI}
                       ></textarea>
                     </div>
 
-                    <div className='mb-3 rounded-md bg-blue-50 p-2.5 text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 sm:mb-4 sm:p-3 sm:text-sm'>
-                      <p>
-                        <Sparkles className='mr-1 inline-block h-3.5 w-3.5 sm:h-4 sm:w-4' />{" "}
-                        This will use 1 AI credit and suggest changes based on
-                        your instructions.
+                    <div className='mb-4 rounded-xl border border-purple-200 bg-purple-50 p-4 text-sm text-purple-800 dark:border-purple-900/50 dark:bg-purple-900/20 dark:text-purple-300'>
+                      <p className='flex items-center gap-2'>
+                        <Sparkles className='h-4 w-4' />
+                        This will use 1 AI credit. Watch your form update in real-time!
                       </p>
                     </div>
 
-                    <div className='mb-3 text-xs text-gray-500 dark:text-gray-400 sm:mb-4 sm:text-sm'>
+                    <div className='mb-4 text-sm text-muted-foreground'>
                       {userData?.credits !== undefined
                         ? `Available credits: ${userData.credits}`
                         : "Loading credits..."}
                     </div>
 
-                    <div className='flex flex-col justify-end space-y-2 sm:flex-row sm:space-x-3 sm:space-y-0'>
+                    <div className='flex flex-col justify-end gap-3 sm:flex-row'>
                       <button
                         type='button'
-                        className='w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:w-auto sm:px-4 sm:py-2 sm:text-sm'
-                        onClick={() => setAiPromptOpen(false)}
-                        disabled={isSubmitting}
+                        className='rounded-xl border border-border bg-secondary px-4 py-2.5 text-sm font-semibold text-secondary-foreground transition-all hover:bg-secondary-hover disabled:opacity-50'
+                        onClick={() => !isStreamingAI && setAiPromptOpen(false)}
+                        disabled={isStreamingAI}
                       >
                         Cancel
                       </button>
-                      <button
-                        type='submit'
-                        className='flex w-full items-center justify-center rounded-md bg-purple-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-purple-700 disabled:opacity-50 dark:bg-purple-500 dark:hover:bg-purple-600 sm:w-auto sm:px-4 sm:py-2 sm:text-sm'
-                        disabled={isSubmitting || !hasCredits || !prompt.trim()}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin sm:mr-1.5 sm:h-4 sm:w-4' />{" "}
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className='mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4' />{" "}
-                            Generate Changes
-                          </>
-                        )}
-                      </button>
+                      {isStreamingAI ? (
+                        <button
+                          type='button'
+                          onClick={handleStopStream}
+                          className='flex items-center justify-center rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-all hover:bg-destructive/90'
+                        >
+                          <X className='mr-2 h-4 w-4' />
+                          Stop Generation
+                        </button>
+                      ) : (
+                        <button
+                          type='submit'
+                          className='flex items-center justify-center rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-purple-700 disabled:opacity-50'
+                          disabled={!hasCredits || !prompt.trim()}
+                        >
+                          <Sparkles className='mr-2 h-4 w-4' />
+                          Generate Changes
+                        </button>
+                      )}
                     </div>
                   </form>
                 </div>
@@ -476,22 +619,31 @@ export function RefineFormModal({
         </div>
 
         {/* Footer */}
-        <div className='sticky bottom-0 flex flex-col items-center justify-between bg-gray-50 px-3 py-2.5 dark:bg-gray-700 sm:flex-row sm:px-4 sm:py-3'>
-          <div className='mb-2 w-full sm:mb-0 sm:w-auto'>
+        <div className='sticky bottom-0 flex flex-col items-center justify-between gap-3 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm sm:flex-row sm:px-6 sm:py-4'>
+          <div className='flex w-full items-center gap-2 sm:w-auto'>
             {hasCredits && (
               <button
                 onClick={handleOpenAIPrompt}
-                className='inline-flex w-full items-center justify-center rounded bg-purple-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 sm:w-auto sm:px-3 sm:text-sm'
+                disabled={isStreamingAI}
+                className='inline-flex w-full items-center justify-center rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-purple-700 disabled:opacity-50 sm:w-auto'
               >
-                <Sparkles className='mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4' />
+                <Sparkles className='mr-2 h-4 w-4' />
                 AI Assist
               </button>
             )}
+            {isStreamingAI && (
+              <div className='flex items-center gap-2'>
+                <div className='h-2 w-2 animate-pulse rounded-full bg-purple-500' />
+                <span className='text-xs font-medium text-muted-foreground'>
+                  Streaming...
+                </span>
+              </div>
+            )}
           </div>
-          <div className='flex w-full flex-col justify-end space-y-2 sm:w-auto sm:flex-row sm:space-x-3 sm:space-y-0'>
+          <div className='flex w-full flex-col justify-end gap-3 sm:w-auto sm:flex-row'>
             <button
               type='button'
-              className='w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:w-auto sm:px-4 sm:py-2 sm:text-sm'
+              className='rounded-xl border border-border bg-secondary px-4 py-2.5 text-sm font-semibold text-secondary-foreground transition-all hover:bg-secondary-hover'
               onClick={handleClose}
               disabled={isSubmitting}
             >
@@ -499,18 +651,18 @@ export function RefineFormModal({
             </button>
             <button
               type='button'
-              className='flex w-full items-center justify-center rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50 dark:bg-green-500 dark:hover:bg-green-600 sm:w-auto sm:px-4 sm:py-2 sm:text-sm'
+              className='flex items-center justify-center rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-green-700 disabled:opacity-50'
               onClick={handleSaveChanges}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isStreamingAI}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin sm:mr-1.5 sm:h-4 sm:w-4' />{" "}
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                   Saving...
                 </>
               ) : (
                 <>
-                  <Save className='mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4' />{" "}
+                  <Save className='mr-2 h-4 w-4' />
                   Save Changes
                 </>
               )}

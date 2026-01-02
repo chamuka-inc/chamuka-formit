@@ -193,3 +193,13 @@ Redesigned the entire frontend to remove 'ai slop' and implement a consistent In
 Transitioned the entire design to a Modern Corporate aesthetic, replacing brutalist elements with a refined Slate/Blue palette, soft rounding, and clean 'Geist' typography.
 Updated CreditCounter and UserMenu components to match the Modern Corporate aesthetic, removing remaining brutalist styling.
 Fixed UserMenu transparency and overlap issues by adding missing popover CSS variables and increasing z-index.
+
+# 2026-01-01
+- Implemented AI streaming for form generation and refinement using Vercel AI SDK v6:
+  - Added streaming API endpoints (/api/ai/stream/generate, /api/ai/stream/refine) with Google Gemini model
+  - Created StreamingFormPreview component for progressive rendering of form blocks as they stream
+  - Updated Create Form page to use streaming with real-time preview modal showing form generation progress
+  - Enhanced RefineModal with streaming support, editor/preview toggle, and AI-assisted refinement
+  - Added form structure Zod schemas for type-safe streaming with AI SDK's Output.object()
+  - Added deductAICredit tRPC mutation for credit deduction after successful streaming operations
+  - Fixed markdown rendering in StreamingFormPreview by using ContextElements component for proper markdown parsing and display
