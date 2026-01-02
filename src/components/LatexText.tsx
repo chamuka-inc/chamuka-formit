@@ -89,7 +89,7 @@ export const LatexText = ({ children, className = "" }: LatexTextProps) => {
           return <span key={index}>{part.content}</span>;
         } else if (part.type === "block") {
           return (
-            <div key={index} className="my-2">
+            <div key={index} className='my-2'>
               <BlockMath math={part.content} />
             </div>
           );

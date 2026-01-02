@@ -38,12 +38,12 @@ export default function Header({ toggleSidebar, sidebarOpen }: HeaderProps) {
               <Menu className='h-6 w-6' aria-hidden='true' />
             </button>
 
-            <Link href='/' className='flex items-center gap-2 group'>
+            <Link href='/' className='group flex items-center gap-2'>
               <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 transition-transform group-hover:scale-105'>
                 <FileText className='h-5 w-5 text-primary-foreground' />
               </div>
               <span className='text-xl font-bold tracking-tight text-foreground'>
-                Chamuka <span className="text-primary">FormIt</span>
+                Chamuka <span className='text-primary'>FormIt</span>
               </span>
             </Link>
           </div>

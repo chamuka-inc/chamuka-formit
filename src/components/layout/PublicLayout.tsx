@@ -28,14 +28,14 @@ export default function PublicLayout({
     <div className='flex min-h-screen flex-col bg-background'>
       {/* Header */}
       <div className='relative bg-primary'>
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-light"></div>
+        <div className="opacity-light absolute inset-0 bg-[url('/grid.svg')]"></div>
         <div className='relative z-10 w-full px-4 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-4'>
           <div className='flex w-full items-center justify-between'>
             {/* Logo - Visible on all screens */}
             <div className='flex items-center gap-1.5 sm:gap-2'>
               <Link
                 href='/'
-                className='flex items-center gap-1.5 text-base font-semibold text-primary-foreground sm:gap-2 sm:text-lg md:text-xl font-display'
+                className='font-display flex items-center gap-1.5 text-base font-semibold text-primary-foreground sm:gap-2 sm:text-lg md:text-xl'
               >
                 <FileText className='h-5 w-5 text-primary-foreground sm:h-6 sm:w-6 md:h-7 md:w-7' />
                 <span className='whitespace-nowrap'>Chamuka FormIt</span>

@@ -10,7 +10,11 @@ import { z } from "zod";
 // Context elements that provide additional content around questions
 export const contextElementSchema = z.object({
   type: z.enum(["paragraph", "image", "video"]),
-  content: z.string().describe("Detailed markdown text content for paragraph, or valid URL for image/video"),
+  content: z
+    .string()
+    .describe(
+      "Detailed markdown text content for paragraph, or valid URL for image/video",
+    ),
 });
 
 export type ContextElement = z.infer<typeof contextElementSchema>;
@@ -20,8 +24,14 @@ export const questionSchema = z.object({
   type: z.enum(["text", "radio", "checkbox"]),
   text: z.string().describe("The question text"),
   required: z.boolean().describe("Whether the question is required"),
-  options: z.array(z.string()).optional().describe("Options for radio/checkbox questions"),
-  contextElements: z.array(contextElementSchema).optional().describe("Context elements for this question"),
+  options: z
+    .array(z.string())
+    .optional()
+    .describe("Options for radio/checkbox questions"),
+  contextElements: z
+    .array(contextElementSchema)
+    .optional()
+    .describe("Context elements for this question"),
 });
 
 export type Question = z.infer<typeof questionSchema>;
@@ -31,7 +41,10 @@ export const pageSchema = z.object({
   title: z.string().describe("Page title"),
   description: z.string().optional().describe("Optional page description"),
   questions: z.array(questionSchema).describe("Questions on this page"),
-  contextElements: z.array(contextElementSchema).optional().describe("Page-level context elements"),
+  contextElements: z
+    .array(contextElementSchema)
+    .optional()
+    .describe("Page-level context elements"),
 });
 
 export type Page = z.infer<typeof pageSchema>;

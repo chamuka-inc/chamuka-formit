@@ -67,9 +67,10 @@ export function CreditPurchaseForm() {
   return (
     <div className='rounded-3xl border border-border bg-background p-8 shadow-sm'>
       <div className='mb-8'>
-        <h3 className='text-xl font-bold tracking-tight mb-1'>Buy Credits</h3>
-        <p className='text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
-          Balance: <span className='text-primary'>{credits?.credits || 0} Units</span>
+        <h3 className='mb-1 text-xl font-bold tracking-tight'>Buy Credits</h3>
+        <p className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+          Balance:{" "}
+          <span className='text-primary'>{credits?.credits || 0} Units</span>
         </p>
       </div>
 
@@ -77,7 +78,7 @@ export function CreditPurchaseForm() {
         {creditPackages.map((pkg) => (
           <button
             key={pkg.id}
-            className={`w-full flex flex-col items-start p-4 transition-all rounded-2xl border-2 text-left ${
+            className={`flex w-full flex-col items-start rounded-2xl border-2 p-4 text-left transition-all ${
               selectedPackage === pkg.id
                 ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
                 : "border-border bg-background text-foreground hover:bg-muted"
@@ -89,16 +90,24 @@ export function CreditPurchaseForm() {
                 Popular
               </div>
             )}
-            <div className='flex justify-between items-center w-full'>
+            <div className='flex w-full items-center justify-between'>
               <div className='min-w-0'>
-                <div className='text-sm font-bold tracking-tight'>{pkg.name}</div>
-                <div className={`text-[11px] font-medium truncate ${selectedPackage === pkg.id ? 'text-primary/70' : 'text-muted-foreground'}`}>
+                <div className='text-sm font-bold tracking-tight'>
+                  {pkg.name}
+                </div>
+                <div
+                  className={`truncate text-[11px] font-medium ${selectedPackage === pkg.id ? "text-primary/70" : "text-muted-foreground"}`}
+                >
                   {pkg.description}
                 </div>
               </div>
-              <div className='text-right shrink-0 ml-4'>
-                <div className='text-sm font-bold tracking-tight text-primary'>{pkg.credits} Units</div>
-                <div className='text-xs font-semibold text-muted-foreground'>${(pkg.amount / 100).toFixed(2)}</div>
+              <div className='ml-4 shrink-0 text-right'>
+                <div className='text-sm font-bold tracking-tight text-primary'>
+                  {pkg.credits} Units
+                </div>
+                <div className='text-xs font-semibold text-muted-foreground'>
+                  ${(pkg.amount / 100).toFixed(2)}
+                </div>
               </div>
             </div>
           </button>
@@ -106,7 +115,7 @@ export function CreditPurchaseForm() {
       </div>
 
       <button
-        className='w-full rounded-xl bg-primary px-6 py-4 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50'
+        className='w-full rounded-xl bg-primary px-6 py-4 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50'
         onClick={handlePurchase}
         disabled={isLoading}
       >
@@ -114,7 +123,8 @@ export function CreditPurchaseForm() {
       </button>
 
       <div className='mt-6 text-center text-[10px] font-medium text-muted-foreground'>
-        Payments are processed securely. No credit card data is stored on our servers.
+        Payments are processed securely. No credit card data is stored on our
+        servers.
       </div>
     </div>
   );

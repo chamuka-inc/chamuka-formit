@@ -257,7 +257,7 @@ const FormBuilderContent = ({ hideHeader = false }) => {
       {/* Header with Save & Publish buttons - only shown if hideHeader is false */}
       {!hideHeader && (
         <header className='relative border-b border-border bg-primary'>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-light"></div>
+          <div className="opacity-light absolute inset-0 bg-[url('/grid.svg')]"></div>
           <div className='relative z-10 px-4 py-4 sm:px-6 lg:px-8'>
             <div className='mx-auto flex flex-col items-center justify-between gap-4 sm:flex-row'>
               <div className='flex items-center gap-3'>
@@ -409,7 +409,7 @@ const FormBuilderContent = ({ hideHeader = false }) => {
       {/* Publish Success Modal */}
       {publishModalOpen && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-overlay/50 p-4'>
-          <div className='relative w-full max-w-md rounded-lg bg-background p-6 shadow-xl border border-border'>
+          <div className='relative w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-xl'>
             <button
               onClick={handleClosePublishModal}
               className='absolute right-4 top-4 text-muted-foreground hover:text-foreground'
@@ -430,9 +430,7 @@ const FormBuilderContent = ({ hideHeader = false }) => {
             </div>
 
             <div className='mb-6 rounded-md bg-muted p-4'>
-              <p className='mb-2 text-xs text-muted-foreground'>
-                Share link:
-              </p>
+              <p className='mb-2 text-xs text-muted-foreground'>Share link:</p>
               <div className='flex items-center'>
                 <input
                   type='text'

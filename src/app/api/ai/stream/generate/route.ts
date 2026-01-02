@@ -10,7 +10,9 @@ import { db } from "@/lib/db";
 export const maxDuration = 60;
 
 // System prompt for form generation
-const getSystemPrompt = (prompt: string) => `You are an expert content creator. Create a comprehensive content based on the user's needs.
+const getSystemPrompt = (
+  prompt: string,
+) => `You are an expert content creator. Create a comprehensive content based on the user's needs.
         
 Your task is to generate a well-structured JSON content format following these specifications:
 
@@ -62,7 +64,7 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -77,7 +79,7 @@ export async function POST(req: NextRequest) {
     if (!user || user.credits < 1) {
       return NextResponse.json(
         { success: false, error: "Insufficient credits" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -86,7 +88,7 @@ export async function POST(req: NextRequest) {
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
         { success: false, error: "Prompt is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -105,7 +107,7 @@ export async function POST(req: NextRequest) {
     console.error("AI streaming generation error:", error);
     return NextResponse.json(
       { success: false, error: "Failed to generate form with AI" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

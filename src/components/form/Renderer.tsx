@@ -40,7 +40,7 @@ const FormHeader = ({
 
   return (
     <div className='mb-6 sm:mb-8'>
-      <h1 className='text-xl font-bold text-foreground sm:text-2xl font-display'>
+      <h1 className='font-display text-xl font-bold text-foreground sm:text-2xl'>
         <LatexText>{title}</LatexText>
       </h1>
       {description && (
@@ -86,7 +86,7 @@ const ProgressIndicator = ({
 const LoadingState = () => (
   <div className='flex h-[60vh] flex-col items-center justify-center p-4 text-center sm:p-8'>
     <div className='mb-4 flex h-12 w-12 animate-spin items-center justify-center rounded-full border-2 border-border border-t-primary sm:h-16 sm:w-16'></div>
-    <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
+    <h2 className='font-display mb-2 text-lg font-semibold text-foreground sm:text-xl'>
       Loading Form
     </h2>
     <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
@@ -114,7 +114,7 @@ const ErrorState = ({ message }: { message: string }) => (
         />
       </svg>
     </div>
-    <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
+    <h2 className='font-display mb-2 text-lg font-semibold text-foreground sm:text-xl'>
       Error Loading Form
     </h2>
     <p className='max-w-sm text-sm text-destructive sm:text-base'>
@@ -142,7 +142,7 @@ const SuccessState = () => (
         />
       </svg>
     </div>
-    <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
+    <h2 className='font-display mb-2 text-lg font-semibold text-foreground sm:text-xl'>
       Response Submitted
     </h2>
     <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
@@ -157,7 +157,7 @@ const EmptyState = ({ isPreview }: { isPreview: boolean }) => (
     <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted sm:h-16 sm:w-16'>
       <FileText className='h-6 w-6 text-muted-foreground sm:h-8 sm:w-8' />
     </div>
-    <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
+    <h2 className='font-display mb-2 text-lg font-semibold text-foreground sm:text-xl'>
       {isPreview ? "No Pages to Preview" : "No Form Content"}
     </h2>
     <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
@@ -604,7 +604,7 @@ export default function FormRenderer({
         <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted sm:h-16 sm:w-16'>
           <FileText className='h-6 w-6 text-muted-foreground sm:h-8 sm:w-8' />
         </div>
-        <h2 className='mb-2 text-lg font-semibold text-foreground sm:text-xl font-display'>
+        <h2 className='font-display mb-2 text-lg font-semibold text-foreground sm:text-xl'>
           Page Not Found
         </h2>
         <p className='max-w-sm text-sm text-muted-foreground sm:text-base'>
@@ -692,7 +692,7 @@ export default function FormRenderer({
               <div className='mb-8 border-b border-border pb-4'>
                 <div className='flex items-center gap-2 sm:gap-3'>
                   <FileText className='h-5 w-5 text-muted-foreground sm:h-6 sm:w-6' />
-                  <h2 className='text-xl font-bold text-foreground sm:text-2xl font-display'>
+                  <h2 className='font-display text-xl font-bold text-foreground sm:text-2xl'>
                     <LatexText>{currentPage.title}</LatexText>
                   </h2>
                 </div>
@@ -730,7 +730,9 @@ export default function FormRenderer({
                               <label className='block text-sm font-medium text-foreground sm:text-base'>
                                 <LatexText>{question.text}</LatexText>
                                 {question.required && (
-                                  <span className='ml-1 text-destructive'>*</span>
+                                  <span className='ml-1 text-destructive'>
+                                    *
+                                  </span>
                                 )}
                               </label>
                             </div>

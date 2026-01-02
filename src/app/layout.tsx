@@ -81,7 +81,7 @@ export default function RootLayout({
         <meta charSet='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
       </head>
-      <body className="antialiased selection:bg-primary/10 selection:text-primary">
+      <body className='antialiased selection:bg-primary/10 selection:text-primary'>
         <ThemeProvider
           defaultTheme='system'
           enableSystem

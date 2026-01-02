@@ -35,8 +35,8 @@ export default async function Home() {
       <main className='flex-1'>
         <div className='relative overflow-hidden'>
           {/* Background pattern with subtle texture */}
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-subtle"></div>
-          <div className="absolute inset-0 grain"></div>
+          <div className="opacity-subtle absolute inset-0 bg-[url('/grid.svg')]"></div>
+          <div className='grain absolute inset-0'></div>
 
           <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
             <div className='relative pb-20 pt-32 sm:pb-24 sm:pt-40'>
@@ -76,7 +76,7 @@ export default async function Home() {
             </div>
 
             {/* Stats Section */}
-            <div className='mx-auto mb-10 mt-6 max-w-4xl rounded-2xl bg-background-secondary border border-border p-5 shadow-md sm:mb-12 sm:mt-8 sm:p-6'>
+            <div className='mx-auto mb-10 mt-6 max-w-4xl rounded-2xl border border-border bg-background-secondary p-5 shadow-md sm:mb-12 sm:mt-8 sm:p-6'>
               <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6'>
                 <div className='py-2 text-center'>
                   <p className='text-3xl font-bold text-primary sm:text-4xl'>
@@ -358,7 +358,7 @@ export default async function Home() {
                   <div className='mt-5 sm:mt-6'>
                     <Link
                       href='/auth/signin'
-                      className='inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover transition-colors'
+                      className='inline-flex items-center text-sm font-medium text-primary transition-colors hover:text-primary-hover'
                     >
                       Learn more
                       <ChevronRight className='ml-1 h-4 w-4' />
@@ -378,7 +378,7 @@ export default async function Home() {
                   <div className='mt-5 sm:mt-6'>
                     <Link
                       href='/auth/signin'
-                      className='inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover transition-colors'
+                      className='inline-flex items-center text-sm font-medium text-primary transition-colors hover:text-primary-hover'
                     >
                       Learn more
                       <ChevronRight className='ml-1 h-4 w-4' />
@@ -398,7 +398,7 @@ export default async function Home() {
                   <div className='mt-5 sm:mt-6'>
                     <Link
                       href='/auth/signin'
-                      className='inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover transition-colors'
+                      className='inline-flex items-center text-sm font-medium text-primary transition-colors hover:text-primary-hover'
                     >
                       Learn more
                       <ChevronRight className='ml-1 h-4 w-4' />
@@ -418,7 +418,7 @@ export default async function Home() {
                   <div className='mt-5 sm:mt-6'>
                     <Link
                       href='/auth/signin'
-                      className='inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover transition-colors'
+                      className='inline-flex items-center text-sm font-medium text-primary transition-colors hover:text-primary-hover'
                     >
                       Learn more
                       <ChevronRight className='ml-1 h-4 w-4' />
@@ -432,7 +432,7 @@ export default async function Home() {
 
         {/* CTA Section */}
         <div className='relative overflow-hidden bg-primary py-16 sm:py-20 md:py-24'>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-light"></div>
+          <div className="opacity-light absolute inset-0 bg-[url('/grid.svg')]"></div>
           <div className='relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
             <div className='mx-auto max-w-2xl text-center'>
               <h2 className='text-2xl font-bold tracking-tight text-primary-foreground sm:text-3xl'>

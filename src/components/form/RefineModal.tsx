@@ -256,7 +256,9 @@ export function RefineFormModal({
     try {
       existingData = JSON.parse(editorValue);
     } catch {
-      toast.error("Invalid JSON in editor. Please fix before using AI refinement.");
+      toast.error(
+        "Invalid JSON in editor. Please fix before using AI refinement.",
+      );
       return;
     }
 
@@ -495,8 +497,8 @@ export function RefineFormModal({
                   </p>
                   {isMobileScreen && (
                     <p className='mt-1 italic'>
-                      Tip: Rotate your device to landscape mode for a better editing
-                      experience.
+                      Tip: Rotate your device to landscape mode for a better
+                      editing experience.
                     </p>
                   )}
                 </div>
@@ -511,7 +513,9 @@ export function RefineFormModal({
                 } md:h-[500px]`}
               >
                 <StreamingFormPreview
-                  formData={isStreamingAI ? streamedFormData : previewFormData()}
+                  formData={
+                    isStreamingAI ? streamedFormData : previewFormData()
+                  }
                   isLoading={isStreamingAI}
                   error={streamError}
                 />
@@ -572,7 +576,8 @@ export function RefineFormModal({
                     <div className='mb-4 rounded-xl border border-purple-200 bg-purple-50 p-4 text-sm text-purple-800 dark:border-purple-900/50 dark:bg-purple-900/20 dark:text-purple-300'>
                       <p className='flex items-center gap-2'>
                         <Sparkles className='h-4 w-4' />
-                        This will use 1 AI credit. Watch your form update in real-time!
+                        This will use 1 AI credit. Watch your form update in
+                        real-time!
                       </p>
                     </div>
 

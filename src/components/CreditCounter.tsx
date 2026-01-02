@@ -35,9 +35,9 @@ export function CreditCounter() {
           {credits?.credits ?? 0} Credits
         </span>
       </div>
-      <Link 
-        href='/credits' 
-        className='border-l border-border pl-3 text-xs font-bold text-primary hover:text-primary-hover transition-colors'
+      <Link
+        href='/credits'
+        className='border-l border-border pl-3 text-xs font-bold text-primary transition-colors hover:text-primary-hover'
       >
         Add More
       </Link>

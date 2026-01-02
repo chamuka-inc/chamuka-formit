@@ -266,9 +266,9 @@ export const SpeechToTextArea = forwardRef<
         <motion.div
           className={`${
             waveformActive
-              ? "border-primary/50 from-primary/30 via-accent/30 to-primary/30 bg-gradient-to-r text-transparent"
+              ? "border-primary/50 bg-gradient-to-r from-primary/30 via-accent/30 to-primary/30 text-transparent"
               : ""
-          } hide-scrollbar border-accent bg-accent/30 flex h-full w-full items-center overflow-hidden overflow-y-scroll rounded-2xl dark:border-primary/30 dark:bg-background-secondary`}
+          } hide-scrollbar flex h-full w-full items-center overflow-hidden overflow-y-scroll rounded-2xl border-accent bg-accent/30 dark:border-primary/30 dark:bg-background-secondary`}
           animate={{
             padding: waveformActive ? "1.5rem" : "0.375rem",
           }}
@@ -306,7 +306,7 @@ export const SpeechToTextArea = forwardRef<
               type='button'
               className={`${
                 waveformActive
-                  ? "text-primary hover:text-primary-hover z-20 mr-5"
+                  ? "z-20 mr-5 text-primary hover:text-primary-hover"
                   : "text-primary hover:text-primary-hover"
               } transform text-xl dark:text-foreground-secondary dark:hover:text-foreground`}
               onClick={isRecording ? stopRecording : startRecording}
@@ -327,7 +327,7 @@ export const SpeechToTextArea = forwardRef<
                 type='button'
                 className={`${
                   waveformActive ? "hidden" : ""
-                } bg-primary hover:bg-primary-hover flex h-8 w-8 items-center justify-center rounded-full text-primary-foreground transition-colors focus-visible:outline-none disabled:bg-muted dark:bg-primary dark:hover:bg-primary-hover dark:disabled:bg-muted`}
+                } flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none disabled:bg-muted dark:bg-primary dark:hover:bg-primary-hover dark:disabled:bg-muted`}
                 disabled={
                   !value.trim() || isLoading || waveformActive || isUploading
                 }

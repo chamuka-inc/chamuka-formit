@@ -10,7 +10,10 @@ import { db } from "@/lib/db";
 export const maxDuration = 60;
 
 // System prompt for form refinement
-const getSystemPrompt = (existingData: FormStructure, prompt: string) => `You are an expert content designer. Refine an existing content based on the user's instructions.
+const getSystemPrompt = (
+  existingData: FormStructure,
+  prompt: string,
+) => `You are an expert content designer. Refine an existing content based on the user's instructions.
         
 Your task is to analyze the existing content structure and refine it according to the provided instructions.
 
@@ -63,7 +66,7 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -78,7 +81,7 @@ export async function POST(req: NextRequest) {
     if (!user || user.credits < 1) {
       return NextResponse.json(
         { success: false, error: "Insufficient credits" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -87,14 +90,14 @@ export async function POST(req: NextRequest) {
     if (!existingData || typeof existingData !== "object") {
       return NextResponse.json(
         { success: false, error: "Existing form data is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
         { success: false, error: "Refinement instructions are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -113,7 +116,7 @@ export async function POST(req: NextRequest) {
     console.error("AI streaming refinement error:", error);
     return NextResponse.json(
       { success: false, error: "Failed to refine form with AI" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
