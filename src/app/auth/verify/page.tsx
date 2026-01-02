@@ -35,7 +35,7 @@ export default function VerifyRequest() {
                   If you still haven't received it after a few minutes,{" "}
                   <Link
                     href='/auth/signin'
-                    className='text-primary hover:text-primary-hover transition-colors'
+                    className='text-primary transition-colors hover:text-primary-hover'
                   >
                     try signing in again
                   </Link>

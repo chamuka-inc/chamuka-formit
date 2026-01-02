@@ -48,9 +48,7 @@ const ModalHeader = ({
   <div className='relative border-b border-border px-4 py-4 sm:px-6 md:px-8 md:py-6'>
     <div className='flex items-center gap-2 sm:gap-3'>
       <Icon className='h-5 w-5 text-primary sm:h-6 sm:w-6' />
-      <h2 className='text-xl font-bold text-foreground sm:text-2xl'>
-        {title}
-      </h2>
+      <h2 className='text-xl font-bold text-foreground sm:text-2xl'>{title}</h2>
     </div>
     <button
       onClick={onClose}
@@ -86,16 +84,12 @@ const OptionTypeButton = ({
   >
     <Icon
       className={`h-5 w-5 sm:h-6 sm:w-6 ${
-        selected
-          ? "text-primary"
-          : "text-muted-foreground"
+        selected ? "text-primary" : "text-muted-foreground"
       }`}
     />
     <span
       className={`text-sm font-medium ${
-        selected
-          ? "text-primary"
-          : "text-foreground"
+        selected ? "text-primary" : "text-foreground"
       }`}
     >
       {label}
@@ -346,7 +340,7 @@ export const QuestionModal = ({
       }`}
     >
       <div
-        className={`w-full max-w-2xl overflow-hidden rounded-xl bg-background shadow-xl border border-border transition-transform ${
+        className={`w-full max-w-2xl overflow-hidden rounded-xl border border-border bg-background shadow-xl transition-transform ${
           isOpen ? "scale-100" : "scale-95"
         }`}
       >

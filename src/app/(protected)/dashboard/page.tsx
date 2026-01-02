@@ -161,10 +161,7 @@ const FormCard = ({
           </span>
         </div>
 
-        <Link
-          href={`/forms/${form.id}/edit`}
-          className='block'
-        >
+        <Link href={`/forms/${form.id}/edit`} className='block'>
           <h2 className='mb-2 line-clamp-1 text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary'>
             {form.title}
           </h2>
@@ -188,19 +185,19 @@ const FormCard = ({
         </div>
       </div>
 
-      <div className='border-t border-border bg-muted/30 p-4 rounded-b-2xl'>
+      <div className='rounded-b-2xl border-t border-border bg-muted/30 p-4'>
         <div className='flex items-center justify-between'>
           <div className='flex gap-1'>
             <Link
               href={`/forms/${form.id}/edit`}
-              className='rounded-lg p-2 text-muted-foreground hover:bg-background hover:text-primary transition-all'
+              className='rounded-lg p-2 text-muted-foreground transition-all hover:bg-background hover:text-primary'
               title='Edit Form'
             >
               <Edit className='h-4 w-4' />
             </Link>
             <button
               onClick={() => onDelete(form.id)}
-              className='rounded-lg p-2 text-muted-foreground hover:bg-background hover:text-destructive transition-all'
+              className='rounded-lg p-2 text-muted-foreground transition-all hover:bg-background hover:text-destructive'
               title='Delete Form'
             >
               <Trash2 className='h-4 w-4' />
@@ -212,14 +209,14 @@ const FormCard = ({
                 <Link
                   href={`/s/${form.publicShareToken}`}
                   target='_blank'
-                  className='rounded-lg p-2 text-muted-foreground hover:bg-background hover:text-success transition-all'
+                  className='rounded-lg p-2 text-muted-foreground transition-all hover:bg-background hover:text-success'
                   title='Open Form'
                 >
                   <ExternalLink className='h-4 w-4' />
                 </Link>
                 <Link
                   href={`/forms/${form.id}/analytics`}
-                  className='rounded-lg p-2 text-muted-foreground hover:bg-background hover:text-primary transition-all'
+                  className='rounded-lg p-2 text-muted-foreground transition-all hover:bg-background hover:text-primary'
                   title='View Analytics'
                 >
                   <LineChart className='h-4 w-4' />
@@ -250,14 +247,14 @@ const Pagination = ({
       <button
         onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
         disabled={currentPage === 1}
-        className='rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted disabled:opacity-50 transition-all'
+        className='rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold transition-all hover:bg-muted disabled:opacity-50'
       >
         Previous
       </button>
       <button
         onClick={() => onPageChange(Math.min(currentPage + 1, pageCount))}
         disabled={currentPage === pageCount}
-        className='rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted disabled:opacity-50 transition-all'
+        className='rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold transition-all hover:bg-muted disabled:opacity-50'
       >
         Next
       </button>
@@ -267,18 +264,23 @@ const Pagination = ({
     <div className='hidden sm:flex sm:flex-1 sm:items-center sm:justify-between'>
       <div>
         <p className='text-xs font-medium text-muted-foreground'>
-          Showing <span className='font-bold text-foreground'>{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className='font-bold text-foreground'>{Math.min(currentPage * ITEMS_PER_PAGE, total)}</span> of <span className='font-bold text-foreground'>{total}</span> forms
+          Showing{" "}
+          <span className='font-bold text-foreground'>
+            {(currentPage - 1) * ITEMS_PER_PAGE + 1}
+          </span>{" "}
+          to{" "}
+          <span className='font-bold text-foreground'>
+            {Math.min(currentPage * ITEMS_PER_PAGE, total)}
+          </span>{" "}
+          of <span className='font-bold text-foreground'>{total}</span> forms
         </p>
       </div>
       <div>
-        <nav
-          className='flex gap-1.5'
-          aria-label='Pagination'
-        >
+        <nav className='flex gap-1.5' aria-label='Pagination'>
           <button
             onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
-            className='rounded-lg border border-border bg-background p-2 hover:bg-muted disabled:opacity-50 transition-all'
+            className='rounded-lg border border-border bg-background p-2 transition-all hover:bg-muted disabled:opacity-50'
           >
             <ChevronLeft className='h-4 w-4' />
           </button>
@@ -303,7 +305,7 @@ const Pagination = ({
           <button
             onClick={() => onPageChange(Math.min(currentPage + 1, pageCount))}
             disabled={currentPage === pageCount}
-            className='rounded-lg border border-border bg-background p-2 hover:bg-muted disabled:opacity-50 transition-all'
+            className='rounded-lg border border-border bg-background p-2 transition-all hover:bg-muted disabled:opacity-50'
           >
             <ChevronRight className='h-4 w-4' />
           </button>
@@ -441,7 +443,7 @@ export default function DashboardPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className='p-8 max-w-7xl mx-auto'>
+      <div className='mx-auto max-w-7xl p-8'>
         <div className='mb-10 flex items-end justify-between'>
           <div className='space-y-3'>
             <div className='h-9 w-48 animate-pulse rounded-lg bg-muted'></div>
@@ -472,7 +474,7 @@ export default function DashboardPage() {
                   <div className='h-3 w-32 rounded bg-muted'></div>
                 </div>
               </div>
-              <div className='h-20 border-t border-border bg-muted/30 rounded-b-2xl'></div>
+              <div className='h-20 rounded-b-2xl border-t border-border bg-muted/30'></div>
             </div>
           ))}
         </div>
@@ -497,13 +499,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className='p-8 max-w-7xl mx-auto'>
+    <div className='mx-auto max-w-7xl p-8'>
       {/* Header */}
       <div className='mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
         <div className='min-w-0 flex-1'>
-          <h1 className='text-3xl font-bold tracking-tight mb-2'>
-            My Forms
-          </h1>
+          <h1 className='mb-2 text-3xl font-bold tracking-tight'>My Forms</h1>
           <p className='text-sm font-medium text-muted-foreground'>
             Manage your content and view performance analytics.
           </p>
@@ -511,7 +511,7 @@ export default function DashboardPage() {
         <div className='flex shrink-0'>
           <Link
             href='/forms/create'
-            className='inline-flex items-center rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:scale-[1.02] active:scale-100'
+            className='inline-flex items-center rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] hover:bg-primary-hover active:scale-100'
           >
             <Plus className='mr-2 h-5 w-5' />
             Create New Form
@@ -574,7 +574,7 @@ export default function DashboardPage() {
           {!search && (
             <Link
               href='/forms/create'
-              className='inline-flex items-center rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:scale-[1.02]'
+              className='inline-flex items-center rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] hover:bg-primary-hover'
             >
               <Plus className='mr-2 h-5 w-5' />
               Create Form

@@ -47,7 +47,7 @@ const SidebarItem = ({
   >
     <div className='flex items-center gap-3'>
       <div
-        className={`${active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary transition-colors"}`}
+        className={`${active ? "text-primary-foreground" : "text-muted-foreground transition-colors group-hover:text-primary"}`}
       >
         {icon}
       </div>
@@ -59,7 +59,9 @@ const SidebarItem = ({
       )}
     </div>
     {badge && (
-      <div className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${active ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+      <div
+        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${active ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+      >
         {badge}
       </div>
     )}
@@ -110,7 +112,7 @@ const SidebarSection = ({
       <div
         className={`ml-6 mt-1 space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
       >
-        <div className="pl-3 py-1 border-l border-border/50 ml-2">
+        <div className='ml-2 border-l border-border/50 py-1 pl-3'>
           {children}
         </div>
       </div>
@@ -142,8 +144,8 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
         {/* Account section at the top */}
         {status === "authenticated" && session?.user && (
           <div className='mb-6 px-2'>
-            <div className='flex items-center gap-3 rounded-2xl bg-muted/50 p-4 border border-border/50'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 text-primary-foreground'>
+            <div className='flex items-center gap-3 rounded-2xl border border-border/50 bg-muted/50 p-4'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20'>
                 {session.user.image ? (
                   <img
                     src={session.user.image}
@@ -238,7 +240,7 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
           </div>
 
           {status === "authenticated" && (
-            <div className='mx-2 mt-6 rounded-2xl bg-primary/5 p-4 border border-primary/10 shadow-sm'>
+            <div className='mx-2 mt-6 rounded-2xl border border-primary/10 bg-primary/5 p-4 shadow-sm'>
               <div className='mb-3 flex items-center justify-between'>
                 <span className='text-[11px] font-bold uppercase tracking-wider text-primary'>
                   AI Credits
@@ -249,7 +251,7 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
               </div>
               <div className='h-2 w-full overflow-hidden rounded-full bg-primary/10'>
                 <div
-                  className='h-full rounded-full bg-primary transition-all duration-500 shadow-sm shadow-primary/20'
+                  className='h-full rounded-full bg-primary shadow-sm shadow-primary/20 transition-all duration-500'
                   style={{
                     width: `${Math.min(100, (credits?.credits || 0) * 20)}%`,
                   }}
@@ -257,7 +259,7 @@ export default function Sidebar({ className = "", onClose }: SidebarProps) {
               </div>
               <Link
                 href='/credits'
-                className='mt-3 block text-center text-[11px] font-bold uppercase tracking-tight text-primary hover:text-primary-hover transition-colors'
+                className='mt-3 block text-center text-[11px] font-bold uppercase tracking-tight text-primary transition-colors hover:text-primary-hover'
                 onClick={onClose}
               >
                 Get More Credits

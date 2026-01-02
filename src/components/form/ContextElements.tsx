@@ -270,7 +270,7 @@ const markdownComponents: Components = {
         {...props}
         target='_blank'
         rel='noopener noreferrer'
-        className='break-words text-primary underline hover:text-primary-hover transition-colors'
+        className='break-words text-primary underline transition-colors hover:text-primary-hover'
       />
     );
   },
@@ -308,9 +308,7 @@ const markdownComponents: Components = {
     );
   },
   tr(props) {
-    return (
-      <tr className='hover:bg-muted transition-colors' {...props} />
-    );
+    return <tr className='transition-colors hover:bg-muted' {...props} />;
   },
   blockquote(props) {
     return (
@@ -323,12 +321,7 @@ const markdownComponents: Components = {
     );
   },
   hr(props) {
-    return (
-      <hr
-        className='my-6 border-t border-border'
-        {...props}
-      />
-    );
+    return <hr className='my-6 border-t border-border' {...props} />;
   },
   img(props) {
     return (

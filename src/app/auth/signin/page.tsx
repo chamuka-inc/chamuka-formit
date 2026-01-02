@@ -50,7 +50,7 @@ function SignInContent() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className='block w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground shadow-sm placeholder-muted-foreground focus:border-input-focus focus:ring-2 focus:ring-ring sm:px-4 sm:py-3'
+                    className='block w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground shadow-sm focus:border-input-focus focus:ring-2 focus:ring-ring sm:px-4 sm:py-3'
                     placeholder='you@example.com'
                   />
                 </div>
@@ -71,7 +71,7 @@ function SignInContent() {
                 By signing in, you agree to our{" "}
                 <Link
                   href='#'
-                  className='font-medium text-primary hover:text-primary-hover transition-colors'
+                  className='font-medium text-primary transition-colors hover:text-primary-hover'
                 >
                   Privacy Policy
                 </Link>

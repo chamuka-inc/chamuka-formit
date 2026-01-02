@@ -58,12 +58,14 @@ export function TransactionHistory() {
 
   return (
     <div className='w-full'>
-      <h3 className='mb-6 text-xl font-bold tracking-tight'>Transaction History</h3>
-      <div className='w-full border border-border rounded-2xl bg-background overflow-hidden shadow-sm'>
+      <h3 className='mb-6 text-xl font-bold tracking-tight'>
+        Transaction History
+      </h3>
+      <div className='w-full overflow-hidden rounded-2xl border border-border bg-background shadow-sm'>
         <div className='max-h-[400px] w-full overflow-y-auto'>
           <table className='w-full table-fixed border-collapse'>
-            <thead className='sticky top-0 bg-muted/50 backdrop-blur-md z-10'>
-              <tr className="border-b border-border">
+            <thead className='sticky top-0 z-10 bg-muted/50 backdrop-blur-md'>
+              <tr className='border-b border-border'>
                 <th
                   scope='col'
                   className='w-1/4 px-6 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-muted-foreground'
@@ -92,7 +94,10 @@ export function TransactionHistory() {
             </thead>
             <tbody className='divide-y divide-border/50'>
               {transactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-muted/30 transition-colors">
+                <tr
+                  key={transaction.id}
+                  className='transition-colors hover:bg-muted/30'
+                >
                   <td className='truncate px-6 py-4 text-xs font-medium text-muted-foreground'>
                     {formatDistanceToNow(new Date(transaction.createdAt), {
                       addSuffix: true,
@@ -111,7 +116,11 @@ export function TransactionHistory() {
                   </td>
                   <td className='truncate px-6 py-4 text-xs font-bold'>
                     <span
-                      className={transaction.credits > 0 ? "text-success" : "text-primary"}
+                      className={
+                        transaction.credits > 0
+                          ? "text-success"
+                          : "text-primary"
+                      }
                     >
                       {transaction.credits > 0 ? "+" : ""}
                       {transaction.credits}

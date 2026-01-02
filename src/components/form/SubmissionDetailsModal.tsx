@@ -95,7 +95,7 @@ const SubmissionDetailsModal: React.FC<SubmissionDetailsModalProps> = ({
     <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-overlay/50 p-4'>
       <div
         ref={modalRef}
-        className='relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-background p-4 shadow-xl border border-border sm:p-6'
+        className='relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg border border-border bg-background p-4 shadow-xl sm:p-6'
         aria-modal='true'
         role='dialog'
         aria-labelledby='modal-title'

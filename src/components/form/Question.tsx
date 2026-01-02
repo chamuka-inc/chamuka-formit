@@ -37,9 +37,7 @@ export const Question = ({
   return (
     <div
       className={`group relative rounded-lg border p-3 transition-all duration-200 sm:rounded-xl sm:p-4 md:p-6 ${
-        isBuilder
-          ? "border-border hover:border-primary"
-          : "border-transparent"
+        isBuilder ? "border-border hover:border-primary" : "border-transparent"
       } bg-background shadow-sm hover:shadow-md`}
       data-question-id={question.id}
     >
@@ -51,9 +49,7 @@ export const Question = ({
 
       <h3 className='mb-2 pr-12 text-sm font-semibold text-foreground sm:mb-3 sm:pr-14 md:mb-4 md:pr-0 md:text-lg'>
         <LatexText>{question.text}</LatexText>
-        {question.required && (
-          <span className='ml-1 text-destructive'>*</span>
-        )}
+        {question.required && <span className='ml-1 text-destructive'>*</span>}
       </h3>
 
       {question.type === "text" && !isBuilder && (
@@ -69,7 +65,7 @@ export const Question = ({
           {question.options?.map((option, optionIndex) => (
             <label
               key={optionIndex}
-              className={`flex items-center gap-1.5 rounded-lg border border-border p-1.5 sm:gap-2 sm:p-2 md:gap-3 md:p-3 ${!isBuilder && "cursor-pointer hover:border-primary transition-colors"} `}
+              className={`flex items-center gap-1.5 rounded-lg border border-border p-1.5 sm:gap-2 sm:p-2 md:gap-3 md:p-3 ${!isBuilder && "cursor-pointer transition-colors hover:border-primary"} `}
             >
               <input
                 type={question.type}

@@ -260,7 +260,7 @@ export default function EditFormPage() {
     <div className='flex min-h-screen flex-col bg-background-secondary'>
       {/* Unified Header */}
       <div className='sticky top-0 z-20 border-b border-border bg-primary shadow-md'>
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-light"></div>
+        <div className="opacity-light absolute inset-0 bg-[url('/grid.svg')]"></div>
         <div className='relative z-10 w-full px-2 py-2'>
           <div className='flex items-center justify-between'>
             {/* Left section: Back and title */}
@@ -406,7 +406,7 @@ export default function EditFormPage() {
       {/* Publish Success Modal */}
       {publishModalOpen && (
         <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-overlay/50 p-4 sm:p-6 md:p-8'>
-          <div className='relative w-full max-w-md rounded-lg bg-background p-4 shadow-xl border border-border sm:p-6'>
+          <div className='relative w-full max-w-md rounded-lg border border-border bg-background p-4 shadow-xl sm:p-6'>
             <button
               onClick={handleClosePublishModal}
               className='absolute right-3 top-3 text-muted-foreground hover:text-foreground sm:right-4 sm:top-4'
@@ -470,7 +470,7 @@ export default function EditFormPage() {
       {/* Add Modal for Title and Description Editing */}
       {titleEditModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-overlay/50 p-4 sm:p-6 md:p-8'>
-          <div className='relative w-full max-w-md rounded-lg bg-background p-4 shadow-xl border border-border sm:p-6'>
+          <div className='relative w-full max-w-md rounded-lg border border-border bg-background p-4 shadow-xl sm:p-6'>
             <button
               onClick={() => setTitleEditModal(false)}
               className='absolute right-3 top-3 text-muted-foreground hover:text-foreground sm:right-4 sm:top-4'

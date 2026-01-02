@@ -116,7 +116,7 @@ export const ContextElementEditor = ({
                 <div className='flex items-center gap-2'>
                   <button
                     onClick={() => toggleCollapse(index)}
-                    className='text-muted-foreground hover:text-foreground transition-colors'
+                    className='text-muted-foreground transition-colors hover:text-foreground'
                     aria-label={isCollapsed ? "Expand" : "Collapse"}
                     title={isCollapsed ? "Expand" : "Collapse"}
                   >
@@ -135,7 +135,7 @@ export const ContextElementEditor = ({
                 </div>
                 <button
                   onClick={() => handleRemoveElement(index)}
-                  className='ml-2 rounded-full p-1 text-destructive hover:bg-muted hover:text-destructive transition-colors'
+                  className='ml-2 rounded-full p-1 text-destructive transition-colors hover:bg-muted hover:text-destructive'
                   aria-label={`Remove ${element.type}`}
                   title={`Remove ${element.type}`}
                 >
@@ -152,7 +152,7 @@ export const ContextElementEditor = ({
                       onChange={(e) =>
                         handleUpdateElement(index, e.target.value)
                       }
-                      className='min-h-[100px] w-full resize-y rounded border border-input bg-background p-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-input-focus focus:ring-2 focus:ring-ring sm:text-base'
+                      className='min-h-[100px] w-full resize-y rounded border border-input bg-background p-2 text-sm text-foreground placeholder-muted-foreground focus:border-input-focus focus:outline-none focus:ring-2 focus:ring-ring sm:text-base'
                       placeholder={getPlaceholder(element.type)}
                       aria-label={`${element.type} content`}
                     />
@@ -164,7 +164,7 @@ export const ContextElementEditor = ({
                       onChange={(e) =>
                         handleUpdateElement(index, e.target.value)
                       }
-                      className='w-full rounded border border-input bg-background p-1.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-input-focus focus:ring-2 focus:ring-ring sm:p-2 sm:text-base'
+                      className='w-full rounded border border-input bg-background p-1.5 text-sm text-foreground placeholder-muted-foreground focus:border-input-focus focus:outline-none focus:ring-2 focus:ring-ring sm:p-2 sm:text-base'
                       placeholder={getPlaceholder(element.type)}
                       aria-label={`${element.type} content`}
                     />
