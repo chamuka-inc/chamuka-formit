@@ -1,5 +1,7 @@
 # 🎯 Chamuka FormIt - Modern Form Builder
 
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 A modern form builder application built with Next.js 14, designed to create, manage, and collect responses for surveys and forms.
 
 ## ✨ Product Features
@@ -135,3 +137,9 @@ npx prisma migrate deploy
 ---
 
 Built with ❤️ using Next.js and modern web technologies. For support, please [open an issue](https://github.com/swiftugandan/chamuka-formit/issues).
+
+## License
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+The original MIT notice from the template this project was derived from (Copyright (c) 2025 Kevin Leneway) is preserved in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
