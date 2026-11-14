@@ -58,7 +58,7 @@ A modern form builder application built with Next.js 14, designed to create, man
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/swiftugandan/chamuka-formit.git
+git clone https://github.com/chamuka-inc/chamuka-formit.git
 cd chamuka-formit
 ```
 
@@ -134,4 +134,4 @@ npx prisma migrate deploy
 
 ---
 
-Built with ❤️ using Next.js and modern web technologies. For support, please [open an issue](https://github.com/swiftugandan/chamuka-formit/issues).
+Built with ❤️ using Next.js and modern web technologies. For support, please [open an issue](https://github.com/chamuka-inc/chamuka-formit/issues).
