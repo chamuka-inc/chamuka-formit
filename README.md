@@ -60,7 +60,7 @@ Form builder for creating, managing, and collecting responses to surveys and for
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/chamuka-inc/chamuka-formit.git
+git clone https://github.com/chamuka-labs/chamuka-formit.git
 cd chamuka-formit
 ```
 
